@@ -14,7 +14,7 @@ public enum TokenType {
 
     // Keywords
     PACKAGE, USE, MOD, CLASS,
-    VAR, VAL,
+    VAR, CONST,
     FUN, RETURN,
     IF, ELSE, WHILE,
 

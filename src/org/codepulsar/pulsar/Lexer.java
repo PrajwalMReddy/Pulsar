@@ -67,6 +67,47 @@ public class Lexer {
     }
 
     private TokenType identifyIdentifier() {
+        switch (this.sourceCode.charAt(this.start)) {
+            case 'c':
+                switch (this.sourceCode.charAt(this.start + 1)) {
+                    case 'l':
+                        return checkKeyword("ass", CLASS, 2);
+                    case 'o':
+                        return checkKeyword("nst", CONST, 2);
+                    default:
+                        return IDENTIFIER;
+                }
+            case 'e':
+                return checkKeyword("lse", ELSE, 1);
+            case 'f':
+                return checkKeyword("un", FUN, 1);
+            case 'i':
+                return checkKeyword("f", IF, 1);
+            case 'm':
+                return checkKeyword("od", MOD, 1);
+            case 'p':
+                return checkKeyword("ackage", PACKAGE, 1);
+            case 'r':
+                return checkKeyword("eturn", RETURN, 1);
+            case 'u':
+                return checkKeyword("se", USE, 1);
+            case 'v':
+                return checkKeyword("ar", VAR, 1);
+            case 'w':
+                return checkKeyword("hile", WHILE, 1);
+            default:
+                return IDENTIFIER;
+        }
+    }
+
+    private TokenType checkKeyword(String remaining, TokenType ttype, int starter) {
+        int length = remaining.length() + starter;
+        String word = this.sourceCode.substring(start + starter, start + length);
+
+        if (((this.current - this.start) == length) && (word.equals(remaining))) {
+            return ttype;
+        }
+
         return IDENTIFIER;
     }
 
