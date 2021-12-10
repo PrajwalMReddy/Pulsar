@@ -1,7 +1,12 @@
 package org.codepulsar.pulsar;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class Pulsar {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (args.length < 1) {
             // TODO Implement REPL
             repl();
@@ -30,6 +35,11 @@ public class Pulsar {
     private static void interpretFile(String file) {
     }
 
-    private static void compileFile(String file) {
+    private static void compileFile(String file) throws IOException {
+        byte[] fileBytes = Files.readAllBytes(Paths.get(file));
+        String stringFile = new String(fileBytes, Charset.defaultCharset());
+
+        Compiler compiler = new Compiler(stringFile);
+        compiler.compile();
     }
 }
