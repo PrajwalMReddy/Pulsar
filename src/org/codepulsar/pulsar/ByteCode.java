@@ -7,5 +7,5 @@ public enum ByteCode {
     OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE,
 
     // Unary
-    OP_NEGATE,
+    OP_NEGATE, OP_NOT,
 }

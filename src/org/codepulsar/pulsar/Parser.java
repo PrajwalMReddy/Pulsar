@@ -10,6 +10,8 @@ public class Parser {
     private ArrayList<Instruction> instructions;
     private ArrayList<Object> values;
     private int current;
+    ArrayList<Error> errors;
+    boolean hasError;
 
     public Parser(String sourceCode) {
         this.sourceCode = sourceCode;
@@ -17,6 +19,8 @@ public class Parser {
         this.instructions = new ArrayList<>();
         this.values = new ArrayList<>();
         this.current = 0;
+        this.errors = new ArrayList<>();
+        this.hasError = false;
     }
 
     public ArrayList<Instruction> parse() {
@@ -30,22 +34,92 @@ public class Parser {
     }
 
     private void expression() {
-        primary();
+        term();
+    }
+
+    private void term() {
+        factor();
+
+        while (match(TK_PLUS) || match(TK_MINUS)) {
+            if (peek().getTtype() == TK_PLUS) {
+                advance();
+                factor();
+                this.instructions.add(makeOpCode(OP_ADD));
+            } else if (peek().getTtype() == TK_MINUS) {
+                advance();
+                factor();
+                this.instructions.add(makeOpCode(OP_SUBTRACT));
+            }
+        }
+    }
+
+    private void factor() {
+        unary();
+
+        while (match(TK_MULTIPLICATION) || match(TK_DIVISION)) {
+            if (peek().getTtype() == TK_MULTIPLICATION) {
+                advance();
+                unary();
+                this.instructions.add(makeOpCode(OP_MULTIPLY));
+            } else if (peek().getTtype() == TK_DIVISION) {
+                advance();
+                unary();
+                this.instructions.add(makeOpCode(OP_DIVIDE));
+            }
+        }
+    }
+
+    private void unary() {
+        if (match(TK_MINUS)) {
+            advance();
+            unary();
+            this.instructions.add(makeOpCode(OP_NEGATE));
+        } else if (match(TK_NOT)) {
+            advance();
+            unary();
+            this.instructions.add(makeOpCode(OP_NOT));
+        } else {
+            primary();
+        }
     }
 
     private void primary() {
-        while (match(INTEGER)) {
+        if (match(TK_INTEGER) || match(TK_DOUBLE)) {
             this.instructions.add(makeOpCode(OP_CONSTANT));
             advance();
+        } else if (match(TK_LPAR)) {
+            advance();
+            expression();
+            look(TK_RPAR, "Expected Character: ')'", "Missing Character");
+        } else {
+            setErrors("Missing Expression", "Expression Expected", peek());
         }
     }
 
     private Instruction makeOpCode(ByteCode opcode) {
         if (opcode == OP_CONSTANT) {
-            this.values.add(peek().getLiteral());
+            if (peek().getTtype() == TK_INTEGER) {
+                this.values.add(Integer.parseInt(peek().getLiteral()));
+            } else if (peek().getTtype() == TK_DOUBLE) {
+                this.values.add(Double.parseDouble(peek().getLiteral()));
+            }
             return new Instruction(OP_CONSTANT, this.values.size() - 1);
         } else {
             return new Instruction(opcode, null);
+        }
+    }
+
+    private void setErrors(String etype, String message, Token token) {
+        this.hasError = true;
+        Error error = new Error(etype, message, token);
+        this.errors.add(error);
+    }
+
+    private void look(TokenType token, String message, String errorType) {
+        if (peek().getTtype() != token) {
+            setErrors(errorType, message, peek());
+        } else {
+            advance();
         }
     }
 

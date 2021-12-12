@@ -23,7 +23,7 @@ public class Lexer {
             Token toAdd = scanToken();
             tokens.add(toAdd);
 
-            if (toAdd.getTtype() == EOF) {
+            if (toAdd.getTtype() == TK_EOF) {
                 break;
             }
         }
@@ -44,7 +44,7 @@ public class Lexer {
         this.start = this.current;
 
         if (isAtEnd()) {
-            return makeToken(EOF);
+            return makeToken(TK_EOF);
         }
 
         char now = advance();
@@ -57,105 +57,105 @@ public class Lexer {
 
         switch (now) {
             case '.':
-                return makeToken(DOT);
+                return makeToken(TK_DOT);
             case ',':
-                return makeToken(COMMA);
+                return makeToken(TK_COMMA);
             case ':':
                 if (peek() == ':') {
                     advance();
-                    return makeToken(DOUBLECOLON);
+                    return makeToken(TK_DOUBLECOLON);
                 } else {
-                    return makeToken(COLON);
+                    return makeToken(TK_COLON);
                 }
             case ';':
-                return makeToken(SEMICOLON);
+                return makeToken(TK_SEMICOLON);
             case '?':
-                return makeToken(QMARK);
+                return makeToken(TK_QMARK);
             case '(':
-                return makeToken(LPAR);
+                return makeToken(TK_LPAR);
             case ')':
-                return makeToken(RPAR);
+                return makeToken(TK_RPAR);
             case '{':
-                return makeToken(LBRACE);
+                return makeToken(TK_LBRACE);
             case '}':
-                return makeToken(RBRACE);
+                return makeToken(TK_RBRACE);
             case '"':
                 return string();
 
             case '!':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(NOTEQUAL);
+                    return makeToken(TK_NOTEQUAL);
                 } else {
-                    return makeToken(NOT);
+                    return makeToken(TK_NOT);
                 }
             case '+':
                 if (peek() == '+') {
                     advance();
-                    return makeToken(PLUSPLUS);
+                    return makeToken(TK_PLUSPLUS);
                 } else if (peek() == '='){
                     advance();
-                    return makeToken(PLUSEQUAL);
+                    return makeToken(TK_PLUSEQUAL);
                 } else {
-                    return makeToken(PLUS);
+                    return makeToken(TK_PLUS);
                 }
             case '-':
                 if (peek() == '-') {
                     advance();
-                    return makeToken(MINUSMINUS);
+                    return makeToken(TK_MINUSMINUS);
                 } else if (peek() == '='){
                     advance();
-                    return makeToken(MINUSEQUAL);
+                    return makeToken(TK_MINUSEQUAL);
                 } else {
-                    return makeToken(MINUS);
+                    return makeToken(TK_MINUS);
                 }
             case '*':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(MULEQUAL);
+                    return makeToken(TK_MULEQUAL);
                 } else {
-                    return makeToken(MULTIPLICATION);
+                    return makeToken(TK_MULTIPLICATION);
                 }
             case '/':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(DIVEQUAL);
+                    return makeToken(TK_DIVEQUAL);
                 } else {
-                    return makeToken(DIVISION);
+                    return makeToken(TK_DIVISION);
                 }
 
             case '=':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(EQUALEQUAL);
+                    return makeToken(TK_EQUALEQUAL);
                 } else {
-                    return makeToken(EQUAL);
+                    return makeToken(TK_EQUAL);
                 }
             case '>':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(GTEQUAL);
+                    return makeToken(TK_GTEQUAL);
                 } else {
-                    return makeToken(GT);
+                    return makeToken(TK_GT);
                 }
             case '<':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(LTEQUAL);
+                    return makeToken(TK_LTEQUAL);
                 } else {
-                    return makeToken(LT);
+                    return makeToken(TK_LT);
                 }
             case '|':
                 if (peek() == '|') {
                     advance();
-                    return makeToken(LOGICALOR);
+                    return makeToken(TK_LOGICALOR);
                 } else {
                     return errorToken("Invalid Character: " + now + ". Perhaps You Meant Logical Or: ||");
                 }
             case '&':
                 if (peek() == '&') {
                     advance();
-                    return makeToken(LOGICALAND);
+                    return makeToken(TK_LOGICALAND);
                 } else {
                     return errorToken("Invalid Character: " + now + ". Perhaps You Meant Logical AND: &&");
                 }
@@ -178,7 +178,7 @@ public class Lexer {
         }
 
         advance();
-        return makeToken(STRING);
+        return makeToken(TK_STRING);
     }
 
     private Token identifier() {
@@ -194,32 +194,32 @@ public class Lexer {
             case 'c':
                 switch (this.sourceCode.charAt(this.start + 1)) {
                     case 'l':
-                        return checkKeyword("ass", CLASS, 2);
+                        return checkKeyword("ass", TK_CLASS, 2);
                     case 'o':
-                        return checkKeyword("nst", CONST, 2);
+                        return checkKeyword("nst", TK_CONST, 2);
                     default:
-                        return IDENTIFIER;
+                        return TK_IDENTIFIER;
                 }
             case 'e':
-                return checkKeyword("lse", ELSE, 1);
+                return checkKeyword("lse", TK_ELSE, 1);
             case 'f':
-                return checkKeyword("un", FUN, 1);
+                return checkKeyword("un", TK_FUN, 1);
             case 'i':
-                return checkKeyword("f", IF, 1);
+                return checkKeyword("f", TK_IF, 1);
             case 'm':
-                return checkKeyword("od", MOD, 1);
+                return checkKeyword("od", TK_MOD, 1);
             case 'p':
-                return checkKeyword("ackage", PACKAGE, 1);
+                return checkKeyword("ackage", TK_PACKAGE, 1);
             case 'r':
-                return checkKeyword("eturn", RETURN, 1);
+                return checkKeyword("eturn", TK_RETURN, 1);
             case 'u':
-                return checkKeyword("se", USE, 1);
+                return checkKeyword("se", TK_USE, 1);
             case 'v':
-                return checkKeyword("ar", VAR, 1);
+                return checkKeyword("ar", TK_VAR, 1);
             case 'w':
-                return checkKeyword("hile", WHILE, 1);
+                return checkKeyword("hile", TK_WHILE, 1);
             default:
-                return IDENTIFIER;
+                return TK_IDENTIFIER;
         }
     }
 
@@ -231,7 +231,7 @@ public class Lexer {
             return ttype;
         }
 
-        return IDENTIFIER;
+        return TK_IDENTIFIER;
     }
 
     private Token number() {
@@ -244,14 +244,14 @@ public class Lexer {
         }
 
         if (dotCount == 1 && !currentLiteral().endsWith(".")) {
-            return makeToken(DOUBLE);
+            return makeToken(TK_DOUBLE);
         } else if (dotCount > 1) {
             return errorToken("Invalid Literal: " + currentLiteral());
         } else if (currentLiteral().endsWith(".")) {
             return errorToken("Invalid Literal: " + currentLiteral());
         }
 
-        return makeToken(INTEGER);
+        return makeToken(TK_INTEGER);
     }
 
     private Token makeToken(TokenType ttype) {
@@ -259,7 +259,7 @@ public class Lexer {
     }
 
     private Token errorToken(String message) {
-        return new Token(ERROR, message, this.line);
+        return new Token(TK_ERROR, message, this.line);
     }
 
     private void skipWhitespace() {
@@ -276,7 +276,7 @@ public class Lexer {
                     break;
 
                 case '/':
-                    if (peek() == '/') {
+                    if (peek(1) == '/') {
                         while (peek() != '\n' && !isAtEnd()) {
                             advance();
                         }
@@ -304,6 +304,13 @@ public class Lexer {
             return '\0';
         }
         return this.sourceCode.charAt(this.current);
+    }
+
+    private char peek(int skip) {
+        if (isAtEnd()) {
+            return '\0';
+        }
+        return this.sourceCode.charAt(this.current + skip);
     }
 
     private char advance() {
