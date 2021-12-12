@@ -2,7 +2,7 @@ package org.codepulsar.pulsar;
 
 public enum TokenType {
     // Operators
-    NOT, PLUSPLUS, MINUSMINUS, POSTPLUSPLUS, POSTMINUSMINUS, // Unary
+    NOT, PLUSPLUS, MINUSMINUS, // Unary
     MINUS, PLUS, MULTIPLICATION, DIVISION, // Binary
     NOTEQUAL, EQUALEQUAL, GT, GTEQUAL, LT, LTEQUAL, // Comparison
     EQUAL, PLUSEQUAL, MINUSEQUAL, MULEQUAL, DIVEQUAL, // Assignment

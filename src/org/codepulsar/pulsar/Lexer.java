@@ -55,7 +55,130 @@ public class Lexer {
             return number();
         }
 
-        return errorToken("Unknown Character: " + now);
+        switch (now) {
+            case '.':
+                return makeToken(DOT);
+            case ',':
+                return makeToken(COMMA);
+            case ':':
+                if (peek() == ':') {
+                    advance();
+                    return makeToken(DOUBLECOLON);
+                } else {
+                    return makeToken(COLON);
+                }
+            case ';':
+                return makeToken(SEMICOLON);
+            case '?':
+                return makeToken(QMARK);
+            case '(':
+                return makeToken(LPAR);
+            case ')':
+                return makeToken(RPAR);
+            case '{':
+                return makeToken(LBRACE);
+            case '}':
+                return makeToken(RBRACE);
+            case '"':
+                return string();
+
+            case '!':
+                if (peek() == '=') {
+                    advance();
+                    return makeToken(NOTEQUAL);
+                } else {
+                    return makeToken(NOT);
+                }
+            case '+':
+                if (peek() == '+') {
+                    advance();
+                    return makeToken(PLUSPLUS);
+                } else if (peek() == '='){
+                    advance();
+                    return makeToken(PLUSEQUAL);
+                } else {
+                    return makeToken(PLUS);
+                }
+            case '-':
+                if (peek() == '-') {
+                    advance();
+                    return makeToken(MINUSMINUS);
+                } else if (peek() == '='){
+                    advance();
+                    return makeToken(MINUSEQUAL);
+                } else {
+                    return makeToken(MINUS);
+                }
+            case '*':
+                if (peek() == '=') {
+                    advance();
+                    return makeToken(MULEQUAL);
+                } else {
+                    return makeToken(MULTIPLICATION);
+                }
+            case '/':
+                if (peek() == '=') {
+                    advance();
+                    return makeToken(DIVEQUAL);
+                } else {
+                    return makeToken(DIVISION);
+                }
+
+            case '=':
+                if (peek() == '=') {
+                    advance();
+                    return makeToken(EQUALEQUAL);
+                } else {
+                    return makeToken(EQUAL);
+                }
+            case '>':
+                if (peek() == '=') {
+                    advance();
+                    return makeToken(GTEQUAL);
+                } else {
+                    return makeToken(GT);
+                }
+            case '<':
+                if (peek() == '=') {
+                    advance();
+                    return makeToken(LTEQUAL);
+                } else {
+                    return makeToken(LT);
+                }
+            case '|':
+                if (peek() == '|') {
+                    advance();
+                    return makeToken(LOGICALOR);
+                } else {
+                    return errorToken("Invalid Character: " + now + ". Perhaps You Meant Logical Or: ||");
+                }
+            case '&':
+                if (peek() == '&') {
+                    advance();
+                    return makeToken(LOGICALAND);
+                } else {
+                    return errorToken("Invalid Character: " + now + ". Perhaps You Meant Logical AND: &&");
+                }
+        }
+
+        return errorToken("Invalid Character: " + now);
+    }
+
+    private Token string() {
+        while (peek() != '"' && !isAtEnd()) {
+            if (peek() == '\n') {
+                this.line++;
+            }
+
+            advance();
+        }
+
+        if (isAtEnd()) {
+            return errorToken("String Literal Not Closed");
+        }
+
+        advance();
+        return makeToken(STRING);
     }
 
     private Token identifier() {
