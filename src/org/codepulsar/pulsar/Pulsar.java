@@ -32,7 +32,12 @@ public class Pulsar {
     private static void repl() {
     }
 
-    private static void interpretFile(String file) {
+    private static void interpretFile(String file) throws IOException {
+        byte[] fileBytes = Files.readAllBytes(Paths.get(file));
+        String stringFile = new String(fileBytes, Charset.defaultCharset());
+
+        Interpreter interpreter = new Interpreter(stringFile);
+        interpreter.interpret();
     }
 
     private static void compileFile(String file) throws IOException {
@@ -40,6 +45,6 @@ public class Pulsar {
         String stringFile = new String(fileBytes, Charset.defaultCharset());
 
         Compiler compiler = new Compiler(stringFile);
-        compiler.compile();
+        compiler.start();
     }
 }

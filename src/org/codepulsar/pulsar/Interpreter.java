@@ -2,14 +2,16 @@ package org.codepulsar.pulsar;
 
 import java.util.ArrayList;
 
-public class Compiler {
+public class Interpreter {
     private final String sourceCode;
+    private ArrayList<Instruction> instructions;
 
-    public Compiler(String sourceCode) {
+    public Interpreter(String sourceCode) {
         this.sourceCode = sourceCode;
+        this.instructions = new ArrayList<>();
     }
 
-    public void start() {
+    public void interpret() {
         Parser parser = new Parser(this.sourceCode);
         ArrayList<Instruction> instructions = parser.parse();
 
@@ -20,7 +22,7 @@ public class Compiler {
                 System.out.println(reportError(error));
             }
         } else {
-            compile();
+            execute();
         }
     }
 
@@ -31,6 +33,6 @@ public class Compiler {
         return errorMessage;
     }
 
-    private void compile() {
+    private void execute() {
     }
 }
