@@ -10,9 +10,7 @@ public class Compiler {
     }
 
     public void compile() {
-        Lexer lexer = new Lexer(this.sourceCode + "\n");
-        ArrayList<Token> tokens = lexer.tokenize();
-
-        System.out.println(tokens);
+        Parser parser = new Parser(this.sourceCode);
+        parser.parse();
     }
 }
