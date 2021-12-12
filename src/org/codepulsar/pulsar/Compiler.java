@@ -11,6 +11,8 @@ public class Compiler {
 
     public void compile() {
         Parser parser = new Parser(this.sourceCode);
-        parser.parse();
+        ArrayList<Instruction> instructions = parser.parse();
+
+        System.out.println(instructions);
     }
 }
