@@ -4,20 +4,26 @@ import java.util.ArrayList;
 
 public class Compiler {
     private final String sourceCode;
+    private ArrayList<Instruction> instructions;
 
     public Compiler(String sourceCode) {
         this.sourceCode = sourceCode;
+        this.instructions = new ArrayList<>();
     }
 
     public void start() {
         Parser parser = new Parser(this.sourceCode);
-        ArrayList<Instruction> instructions = parser.parse();
+        this.instructions = parser.parse();
 
-        System.out.println(instructions);
+        if (SetUpKt.getDebug()) {
+            Disassembler.disassemble(this.instructions);
+            System.out.println();
+        }
 
         if (parser.hasError) {
+            System.out.println("-- Errors --");
             for (Error error: parser.errors) {
-                System.out.println(reportError(error));
+                System.out.println(reportError(error) + "\n");
             }
         } else {
             compile();

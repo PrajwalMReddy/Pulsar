@@ -16,7 +16,7 @@ public class Pulsar {
             } else {
                 SetUpKt.setUp(1, "Invalid Command For One Argument: " + args[0] + "\nTry pulsar -h For More");
             }
-        } else {
+        } else if (args.length == 2) {
             switch (args[0].trim()) {
                 case "-i" ->
                         // TODO Implement Interpreter
@@ -24,6 +24,17 @@ public class Pulsar {
                 case "-c" ->
                         // TODO Implement Compiler
                         compileFile(args[1]);
+                default -> SetUpKt.setUp(1, ("Invalid Command: " + args[0]));
+            }
+        } else if (args.length == 3) {
+            switch (args[2].trim()) {
+                case "-d" -> SetUpKt.debug();
+                default -> SetUpKt.setUp(1, "Invalid Command: " + args[2]);
+            }
+
+            switch (args[0].trim()) {
+                case "-i" -> interpretFile(args[1]);
+                case "-c" -> compileFile(args[1]);
                 default -> SetUpKt.setUp(1, ("Invalid Command: " + args[0]));
             }
         }

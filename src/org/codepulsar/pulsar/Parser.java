@@ -8,7 +8,7 @@ public class Parser {
     private final String sourceCode;
     private ArrayList<Token> tokens;
     private ArrayList<Instruction> instructions;
-    private ArrayList<Object> values;
+    public static ArrayList<Object> values;
     private int current;
     ArrayList<Error> errors;
     boolean hasError;
@@ -27,7 +27,9 @@ public class Parser {
         Lexer lexer = new Lexer(this.sourceCode + "\n");
         this.tokens = lexer.tokenize();
 
-        System.out.println(this.tokens);
+        if (SetUpKt.getDebug()) {
+            Disassembler.tokens(this.tokens);
+        }
 
         expression();
         return this.instructions;
@@ -42,13 +44,15 @@ public class Parser {
 
         while (match(TK_PLUS) || match(TK_MINUS)) {
             if (peek().getTtype() == TK_PLUS) {
+                int line = peek().getLine();
                 advance();
                 factor();
-                this.instructions.add(makeOpCode(OP_ADD));
+                this.instructions.add(makeOpCode(OP_ADD, line));
             } else if (peek().getTtype() == TK_MINUS) {
+                int line = peek().getLine();
                 advance();
                 factor();
-                this.instructions.add(makeOpCode(OP_SUBTRACT));
+                this.instructions.add(makeOpCode(OP_SUBTRACT, line));
             }
         }
     }
@@ -58,26 +62,30 @@ public class Parser {
 
         while (match(TK_MULTIPLICATION) || match(TK_DIVISION)) {
             if (peek().getTtype() == TK_MULTIPLICATION) {
+                int line = peek().getLine();
                 advance();
                 unary();
-                this.instructions.add(makeOpCode(OP_MULTIPLY));
+                this.instructions.add(makeOpCode(OP_MULTIPLY, line));
             } else if (peek().getTtype() == TK_DIVISION) {
+                int line = peek().getLine();
                 advance();
                 unary();
-                this.instructions.add(makeOpCode(OP_DIVIDE));
+                this.instructions.add(makeOpCode(OP_DIVIDE, line));
             }
         }
     }
 
     private void unary() {
         if (match(TK_MINUS)) {
+            int line = peek().getLine();
             advance();
             unary();
-            this.instructions.add(makeOpCode(OP_NEGATE));
+            this.instructions.add(makeOpCode(OP_NEGATE, line));
         } else if (match(TK_NOT)) {
+            int line = peek().getLine();
             advance();
             unary();
-            this.instructions.add(makeOpCode(OP_NOT));
+            this.instructions.add(makeOpCode(OP_NOT, line));
         } else {
             primary();
         }
@@ -85,7 +93,8 @@ public class Parser {
 
     private void primary() {
         if (match(TK_INTEGER) || match(TK_DOUBLE)) {
-            this.instructions.add(makeOpCode(OP_CONSTANT));
+            int line = peek().getLine();
+            this.instructions.add(makeOpCode(OP_CONSTANT, line));
             advance();
         } else if (match(TK_LPAR)) {
             advance();
@@ -96,16 +105,16 @@ public class Parser {
         }
     }
 
-    private Instruction makeOpCode(ByteCode opcode) {
+    private Instruction makeOpCode(ByteCode opcode, int line) {
         if (opcode == OP_CONSTANT) {
             if (peek().getTtype() == TK_INTEGER) {
                 this.values.add(Integer.parseInt(peek().getLiteral()));
             } else if (peek().getTtype() == TK_DOUBLE) {
                 this.values.add(Double.parseDouble(peek().getLiteral()));
             }
-            return new Instruction(OP_CONSTANT, this.values.size() - 1);
+            return new Instruction(OP_CONSTANT, this.values.size() - 1, line);
         } else {
-            return new Instruction(opcode, null);
+            return new Instruction(opcode, null, line);
         }
     }
 
