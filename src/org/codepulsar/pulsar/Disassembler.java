@@ -29,31 +29,40 @@ public class Disassembler {
     public static void disassemble(ArrayList<Instruction> instructions) {
         int line = 0;
         System.out.println("\n-- Disassembled Bytecode --");
+        int count = 0;
 
         for (Instruction instruction : instructions) {
             if (instruction.getLine() == line) {
-                System.out.print("            ");
+                System.out.print("          " + count + "  | ");
             } else {
                 line = instruction.getLine();
-                System.out.print("\n" + line + "           ");
+                System.out.print("\n" + line + "         " + count + "  | ");
             }
             decide(instruction);
+
+            count++;
         }
     }
 
     private static void decide(Instruction instruction) {
         switch (instruction.getOpcode()) {
-            case OP_CONSTANT -> constant(instruction);
-            case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_NEGATE, OP_NOT -> opcode(instruction);
+            case OP_CONSTANT, OP_JUMP_IF_FALSE -> operand(instruction);
+            case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_NEGATE,
+                    OP_NOT, OP_LOGICAL_OR, OP_LOGICAL_AND, OP_COMPARE_EQUAL, OP_GREATER, OP_LESSER,
+                    OP_POP -> opcode(instruction);
         }
     }
 
     private static void opcode(Instruction instruction) {
-        System.out.println(instruction.getOpcode() + spaces(instruction) + instruction.getLine());
+        System.out.println(instruction.getOpcode());
     }
 
-    private static void constant(Instruction instruction) {
-        System.out.println("OP_CONSTANT" + spaces(instruction) + instruction.getOperand() + "  (" + Parser.values.get(instruction.getOperand()) + ")");
+    private static void operand(Instruction instruction) {
+        if (instruction.getOpcode() == ByteCode.OP_CONSTANT) {
+            System.out.println("OP_CONSTANT" + spaces(instruction) + instruction.getOperand() + "  (" + Parser.values.get(instruction.getOperand()) + ")");
+        } else if (instruction.getOpcode() == ByteCode.OP_JUMP_IF_FALSE) {
+            System.out.println("OP_JUMP_IF_FALSE" + spaces(instruction) + instruction.getOperand());
+        }
     }
 
     private static String spaces(Instruction instruction) {
