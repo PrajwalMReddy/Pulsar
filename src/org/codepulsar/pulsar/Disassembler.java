@@ -47,7 +47,7 @@ public class Disassembler {
     private static void decide(Instruction instruction) {
         switch (instruction.getOpcode()) {
             case OP_CONSTANT, OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE -> operand(instruction);
-            case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_NEGATE,
+            case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_MODULO, OP_NEGATE,
                     OP_NOT, OP_LOGICAL_OR, OP_LOGICAL_AND, OP_COMPARE_EQUAL, OP_GREATER, OP_LESSER,
                     OP_POP -> opcode(instruction);
         }

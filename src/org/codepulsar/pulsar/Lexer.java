@@ -123,6 +123,13 @@ public class Lexer {
                 } else {
                     return makeToken(TK_DIVISION);
                 }
+            case '%':
+                if (peek() == '=') {
+                    advance();
+                    return makeToken(TK_MODEQUAL);
+                } else {
+                    return makeToken(TK_MODULUS);
+                }
 
             case '=':
                 if (peek() == '=') {

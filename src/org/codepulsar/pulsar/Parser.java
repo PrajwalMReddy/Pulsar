@@ -215,7 +215,7 @@ public class Parser {
     private void factor() {
         unary();
 
-        while (match(TK_MULTIPLICATION) || match(TK_DIVISION)) {
+        while (match(TK_MULTIPLICATION) || match(TK_DIVISION) || match(TK_MODULUS)) {
             if (peek().getTtype() == TK_MULTIPLICATION) {
                 int line = peek().getLine();
                 advance();
@@ -226,6 +226,11 @@ public class Parser {
                 advance();
                 unary();
                 this.instructions.add(makeOpCode(OP_DIVIDE, line));
+            } else if (peek().getTtype() == TK_MODULUS) {
+                int line = peek().getLine();
+                advance();
+                unary();
+                this.instructions.add(makeOpCode(OP_MODULO, line));
             }
         }
     }

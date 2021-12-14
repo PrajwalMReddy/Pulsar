@@ -3,9 +3,9 @@ package org.codepulsar.pulsar;
 public enum TokenType {
     // Operators
     TK_NOT, TK_PLUSPLUS, TK_MINUSMINUS, // Unary
-    TK_MINUS, TK_PLUS, TK_MULTIPLICATION, TK_DIVISION, // Binary
+    TK_MINUS, TK_PLUS, TK_MULTIPLICATION, TK_DIVISION, TK_MODULUS, // Binary
     TK_NOTEQUAL, TK_EQUALEQUAL, TK_GT, TK_GTEQUAL, TK_LT, TK_LTEQUAL, // Comparison
-    TK_EQUAL, TK_PLUSEQUAL, TK_MINUSEQUAL, TK_MULEQUAL, TK_DIVEQUAL, // Assignment
+    TK_EQUAL, TK_PLUSEQUAL, TK_MINUSEQUAL, TK_MULEQUAL, TK_DIVEQUAL, TK_MODEQUAL, // Assignment
     TK_LOGICALOR, TK_LOGICALAND, // Logical
 
     // Other Character Tokens
