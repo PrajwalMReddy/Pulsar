@@ -11,7 +11,7 @@ public enum ByteCode {
     OP_CONSTANT,
 
     // Control Flow OpCodes
-    OP_JUMP_IF_FALSE,
+    OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,
 
     // Special OpCodes
     OP_POP

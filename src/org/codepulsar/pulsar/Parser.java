@@ -52,27 +52,47 @@ public class Parser {
 
     private void ifStatement() {
         expression();
-        int offset = makeThenJump();
+        int offset = makeJump(OP_JUMP_IF_FALSE);
+        this.instructions.add(makeOpCode(OP_POP, peek().getLine()));
         block();
-        fixThenJump(offset);
+
+        int elseOffset = makeJump(OP_JUMP);
+        fixJump(offset, OP_JUMP_IF_FALSE);
+
+        this.instructions.add(makeOpCode(OP_POP, peek().getLine()));
+        if (match(TK_ELSE)) {
+            advance();
+            if (match(TK_IF)) {
+                advance();
+                ifStatement();
+            } else {
+                block();
+            }
+        }
+        fixJump(elseOffset, OP_JUMP);
     }
 
-    private int makeThenJump() {
+    private int makeJump(ByteCode opcode) {
         int size = this.instructions.size();
 
-        this.instructions.add(makeOpCode(OP_JUMP_IF_FALSE, peek().getLine()));
+        this.instructions.add(makeOpCode(opcode, peek().getLine()));
 
         return size;
     }
 
-    private void fixThenJump(int offset) {
+    private void fixJump(int offset, ByteCode opcode) {
         Instruction oldJump = this.instructions.get(offset);
         int line = oldJump.getLine();
-        Instruction jumpOpCode = new Instruction(OP_JUMP_IF_FALSE, this.instructions.size(), line);
+        Instruction jumpOpCode = new Instruction(opcode, this.instructions.size(), line);
         this.instructions.set(offset, jumpOpCode);
     }
 
     private void block() {
+        if (!match(TK_LBRACE)) {
+            setErrors("Missing Character", "Left Curly Brace Expected", peek());
+            synchronize();
+            return;
+        }
         look(TK_LBRACE, "Left Curly Brace Expected", "Missing Character");
         statement(TK_RBRACE);
         look(TK_RBRACE, "Right Curly Brace Expected", "Missing Character");
@@ -90,28 +110,35 @@ public class Parser {
 
     private void logicalOr() {
         logicalAnd();
+        int endOffset = -1;
 
         while (match(TK_LOGICALOR)) {
             if (peek().getTtype() == TK_LOGICALOR) {
                 int line = peek().getLine();
                 advance();
+                endOffset = makeJump(OP_JUMP_IF_TRUE);
+                this.instructions.add(makeOpCode(OP_POP, line));
                 logicalAnd();
-                this.instructions.add(makeOpCode(OP_LOGICAL_OR, line));
+                fixJump(endOffset, OP_JUMP_IF_TRUE);
             }
         }
     }
 
     private void logicalAnd() {
         equality();
+        int endOffset = -1;
 
         while (match(TK_LOGICALAND)) {
             if (peek().getTtype() == TK_LOGICALAND) {
                 int line = peek().getLine();
                 advance();
+                endOffset = makeJump(OP_JUMP_IF_FALSE);
+                this.instructions.add(makeOpCode(OP_POP, line));
                 equality();
-                this.instructions.add(makeOpCode(OP_LOGICAL_AND, line));
+                fixJump(endOffset, OP_JUMP_IF_FALSE);
             }
         }
+
     }
 
     private void equality() {
@@ -257,17 +284,28 @@ public class Parser {
     private void look(TokenType token, String message, String errorType) {
         if (peek().getTtype() != token) {
             setErrors(errorType, message, peek());
+            synchronize();
         } else {
+            advance();
+        }
+    }
+
+    private void synchronize() {
+        while (peek().getTtype() != TK_EOF) {
+            if (peek().getTtype() == TK_SEMICOLON) {
+                advance();
+                return;
+            }
+            switch (peek().getTtype()) {
+                case TK_IF -> { return; }
+            }
+
             advance();
         }
     }
 
     private boolean match(TokenType type) {
         return peek().getTtype() == type;
-    }
-
-    private boolean isAtEnd() {
-        return this.current >= this.tokens.size();
     }
 
     private Token peek() {
