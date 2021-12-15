@@ -45,9 +45,26 @@ public class Parser {
         if (match(TK_IF)) {
             advance();
             ifStatement();
+        } else if (match(TK_WHILE)) {
+            advance();
+            whileStatement();
         } else {
             expressionStatement();
         }
+    }
+
+    private void whileStatement() {
+        int starting = this.instructions.size();
+        expression();
+
+        int offset = makeJump(OP_JUMP_IF_FALSE);
+        this.instructions.add(makeOpCode(OP_POP, peek().getLine()));
+
+        block();
+        this.instructions.add(new Instruction(OP_JUMP, starting, peek().getLine()));
+
+        fixJump(offset, OP_JUMP_IF_FALSE);
+        this.instructions.add(makeOpCode(OP_POP, peek().getLine()));
     }
 
     private void ifStatement() {
