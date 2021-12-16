@@ -15,12 +15,12 @@ public class Interpreter {
         Parser parser = new Parser(this.sourceCode);
         this.instructions = parser.parse();
 
-        if (SetUpKt.getDebug()) {
+        if (CommandsKt.getDebug()) {
             Disassembler.disassemble(this.instructions);
             System.out.println();
         }
 
-        if (parser.hasError) {
+        if (parser.hasErrors) {
             System.out.println("-- Errors --");
             for (Error error: parser.errors) {
                 System.out.println(reportError(error) + "\n");

@@ -6,44 +6,20 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Pulsar {
-    public static void main(String[] args) throws IOException {
-        if (args.length < 1) {
-            // TODO Implement REPL
-            repl();
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            repl(); // TODO Implement REPL
         } else if (args.length == 1) {
-            if (args[0].trim().equals("-h")) {
-                SetUpKt.setUp(0, "");
-            } else {
-                SetUpKt.setUp(1, "Invalid Command For One Argument: " + args[0] + "\nTry pulsar -h For More");
-            }
+            CommandsKt.parseCommands(args[0].trim());
         } else if (args.length == 2) {
-            switch (args[0].trim()) {
-                case "-i" ->
-                        // TODO Implement Interpreter
-                        interpretFile(args[1]);
-                case "-c" ->
-                        // TODO Implement Compiler
-                        compileFile(args[1]);
-                default -> SetUpKt.setUp(1, ("Invalid Command: " + args[0]));
-            }
-        } else if (args.length == 3) {
-            switch (args[2].trim()) {
-                case "-d" -> SetUpKt.debug();
-                default -> SetUpKt.setUp(1, "Invalid Command: " + args[2]);
-            }
-
-            switch (args[0].trim()) {
-                case "-i" -> interpretFile(args[1]);
-                case "-c" -> compileFile(args[1]);
-                default -> SetUpKt.setUp(1, ("Invalid Command: " + args[0]));
-            }
+            CommandsKt.parseCommands(args[0].trim(), args[1].trim());
         }
     }
 
     private static void repl() {
     }
 
-    private static void interpretFile(String file) throws IOException {
+    public static void interpretFile(String file) throws IOException {
         byte[] fileBytes = Files.readAllBytes(Paths.get(file));
         String stringFile = new String(fileBytes, Charset.defaultCharset());
 
@@ -51,11 +27,11 @@ public class Pulsar {
         interpreter.interpret();
     }
 
-    private static void compileFile(String file) throws IOException {
+    public static void compileFile(String file) throws IOException {
         byte[] fileBytes = Files.readAllBytes(Paths.get(file));
         String stringFile = new String(fileBytes, Charset.defaultCharset());
 
         Compiler compiler = new Compiler(stringFile);
-        compiler.start();
+        compiler.init();
     }
 }

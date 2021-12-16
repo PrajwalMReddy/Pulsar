@@ -1,5 +1,10 @@
 package org.codepulsar.pulsar;
 
+import org.codepulsar.primitives.PBoolean;
+import org.codepulsar.primitives.PDouble;
+import org.codepulsar.primitives.PInteger;
+import org.codepulsar.primitives.Primitive;
+
 import java.util.ArrayList;
 import static org.codepulsar.pulsar.TokenType.*;
 import static org.codepulsar.pulsar.ByteCode.*;
@@ -8,10 +13,10 @@ public class Parser {
     private final String sourceCode;
     private ArrayList<Token> tokens;
     private ArrayList<Instruction> instructions;
-    public static ArrayList<LiteralRepresentation> values;
+    public static ArrayList<Primitive> values;
     private int current;
     ArrayList<Error> errors;
-    boolean hasError;
+    boolean hasErrors;
 
     public Parser(String sourceCode) {
         this.sourceCode = sourceCode;
@@ -20,19 +25,40 @@ public class Parser {
         this.values = new ArrayList<>();
         this.current = 0;
         this.errors = new ArrayList<>();
-        this.hasError = false;
+        this.hasErrors = false;
     }
 
     public ArrayList<Instruction> parse() {
         Lexer lexer = new Lexer(this.sourceCode + "\n");
         this.tokens = lexer.tokenize();
 
-        if (SetUpKt.getDebug()) {
+        if (CommandsKt.getDebug()) {
             Disassembler.tokens(this.tokens);
         }
 
-        statement(TK_EOF);
+        while (!match(TK_EOF)) {
+            declaration();
+        }
         return this.instructions;
+    }
+
+    private void declaration() {
+        while (!match(TK_EOF)) {
+            if (match(TK_VAR) || match(TK_CONST) || match(TK_FUN)) {
+                topLevelDeclaration();
+            } else {
+                statement(TK_EOF);
+            }
+        }
+    }
+
+    private void topLevelDeclaration() {
+        if (match(TK_VAR) || match(TK_CONST)) {
+            variableDeclaration();
+        }
+    }
+
+    private void variableDeclaration() {
     }
 
     private void statement(TokenType notMatch) {
@@ -269,7 +295,7 @@ public class Parser {
     }
 
     private void primary() {
-        if (match(TK_INTEGER) || match(TK_DOUBLE)) {
+        if (match(TK_INTEGER) || match(TK_DOUBLE) || match(TK_TRUE) || match(TK_FALSE)) {
             int line = peek().getLine();
             this.instructions.add(makeOpCode(OP_CONSTANT, line));
             advance();
@@ -285,10 +311,16 @@ public class Parser {
     private Instruction makeOpCode(ByteCode opcode, int line) {
         if (opcode == OP_CONSTANT) {
             if (peek().getTtype() == TK_INTEGER) {
-                LiteralRepresentation lr = new LiteralRepresentation(Integer.parseInt(peek().getLiteral()));
+                Primitive lr = new PInteger(Integer.parseInt(peek().getLiteral()));
                 this.values.add(lr);
             } else if (peek().getTtype() == TK_DOUBLE) {
-                LiteralRepresentation lr = new LiteralRepresentation(Double.parseDouble(peek().getLiteral()));
+                Primitive lr = new PDouble(Double.parseDouble(peek().getLiteral()));
+                this.values.add(lr);
+            } else if (peek().getTtype() == TK_TRUE) {
+                Primitive lr = new PBoolean(true);
+                this.values.add(lr);
+            } else if (peek().getTtype() == TK_FALSE) {
+                Primitive lr = new PBoolean(false);
                 this.values.add(lr);
             }
             return new Instruction(OP_CONSTANT, this.values.size() - 1, line);
@@ -298,7 +330,7 @@ public class Parser {
     }
 
     private void setErrors(String etype, String message, Token token) {
-        this.hasError = true;
+        this.hasErrors = true;
         Error error = new Error(etype, message, token);
         this.errors.add(error);
     }

@@ -1,5 +1,6 @@
 package org.codepulsar.pulsar;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import static org.codepulsar.pulsar.TokenType.*;
 
@@ -210,7 +211,14 @@ public class Lexer {
             case 'e':
                 return checkKeyword("lse", TK_ELSE, 1);
             case 'f':
-                return checkKeyword("un", TK_FUN, 1);
+                switch (this.sourceCode.charAt(this.start + 1)) {
+                    case 'u':
+                        return checkKeyword("n", TK_FUN, 2);
+                    case 'a':
+                        return checkKeyword("lse", TK_FALSE, 2);
+                    default:
+                        return TK_IDENTIFIER;
+                }
             case 'i':
                 return checkKeyword("f", TK_IF, 1);
             case 'm':
@@ -219,6 +227,8 @@ public class Lexer {
                 return checkKeyword("ackage", TK_PACKAGE, 1);
             case 'r':
                 return checkKeyword("eturn", TK_RETURN, 1);
+            case 't':
+                return checkKeyword("rue", TK_TRUE, 1);
             case 'u':
                 return checkKeyword("se", TK_USE, 1);
             case 'v':
