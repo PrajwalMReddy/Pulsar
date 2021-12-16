@@ -1,6 +1,5 @@
 package org.codepulsar.pulsar;
 
-import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import static org.codepulsar.pulsar.TokenType.*;
 
@@ -198,46 +197,28 @@ public class Lexer {
     }
 
     private TokenType identifyIdentifier() {
-        switch (this.sourceCode.charAt(this.start)) {
-            case 'c':
-                switch (this.sourceCode.charAt(this.start + 1)) {
-                    case 'l':
-                        return checkKeyword("ass", TK_CLASS, 2);
-                    case 'o':
-                        return checkKeyword("nst", TK_CONST, 2);
-                    default:
-                        return TK_IDENTIFIER;
-                }
-            case 'e':
-                return checkKeyword("lse", TK_ELSE, 1);
-            case 'f':
-                switch (this.sourceCode.charAt(this.start + 1)) {
-                    case 'u':
-                        return checkKeyword("n", TK_FUN, 2);
-                    case 'a':
-                        return checkKeyword("lse", TK_FALSE, 2);
-                    default:
-                        return TK_IDENTIFIER;
-                }
-            case 'i':
-                return checkKeyword("f", TK_IF, 1);
-            case 'm':
-                return checkKeyword("od", TK_MOD, 1);
-            case 'p':
-                return checkKeyword("ackage", TK_PACKAGE, 1);
-            case 'r':
-                return checkKeyword("eturn", TK_RETURN, 1);
-            case 't':
-                return checkKeyword("rue", TK_TRUE, 1);
-            case 'u':
-                return checkKeyword("se", TK_USE, 1);
-            case 'v':
-                return checkKeyword("ar", TK_VAR, 1);
-            case 'w':
-                return checkKeyword("hile", TK_WHILE, 1);
-            default:
-                return TK_IDENTIFIER;
-        }
+        return switch (this.sourceCode.charAt(this.start)) {
+            case 'c' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'l' -> checkKeyword("ass", TK_CLASS, 2);
+                case 'o' -> checkKeyword("nst", TK_CONST, 2);
+                default -> TK_IDENTIFIER;
+            };
+            case 'e' -> checkKeyword("lse", TK_ELSE, 1);
+            case 'f' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'u' -> checkKeyword("n", TK_FUN, 2);
+                case 'a' -> checkKeyword("lse", TK_FALSE, 2);
+                default -> TK_IDENTIFIER;
+            };
+            case 'i' -> checkKeyword("f", TK_IF, 1);
+            case 'm' -> checkKeyword("od", TK_MOD, 1);
+            case 'p' -> checkKeyword("ackage", TK_PACKAGE, 1);
+            case 'r' -> checkKeyword("eturn", TK_RETURN, 1);
+            case 't' -> checkKeyword("rue", TK_TRUE, 1);
+            case 'u' -> checkKeyword("se", TK_USE, 1);
+            case 'v' -> checkKeyword("ar", TK_VAR, 1);
+            case 'w' -> checkKeyword("hile", TK_WHILE, 1);
+            default -> TK_IDENTIFIER;
+        };
     }
 
     private TokenType checkKeyword(String remaining, TokenType ttype, int starter) {

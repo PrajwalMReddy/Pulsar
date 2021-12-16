@@ -80,11 +80,6 @@ public class Disassembler {
     }
 
     private static String giveSpaces(int length) {
-        StringBuilder spaces = new StringBuilder();
-        for (int i = 20; i >= length; i--) {
-            spaces.append(" ");
-        }
-
-        return spaces.toString();
+        return " ".repeat(Math.max(0, 20 - length + 1));
     }
 }

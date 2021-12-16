@@ -12,17 +12,17 @@ import static org.codepulsar.pulsar.ByteCode.*;
 public class Parser {
     private final String sourceCode;
     private ArrayList<Token> tokens;
-    private ArrayList<Instruction> instructions;
+    private final ArrayList<Instruction> instructions;
     public static ArrayList<Primitive> values;
     private int current;
-    ArrayList<Error> errors;
+    public final ArrayList<Error> errors;
     boolean hasErrors;
 
     public Parser(String sourceCode) {
         this.sourceCode = sourceCode;
         this.tokens = new ArrayList<>();
         this.instructions = new ArrayList<>();
-        this.values = new ArrayList<>();
+        values = new ArrayList<>();
         this.current = 0;
         this.errors = new ArrayList<>();
         this.hasErrors = false;
@@ -153,7 +153,7 @@ public class Parser {
 
     private void logicalOr() {
         logicalAnd();
-        int endOffset = -1;
+        int endOffset;
 
         while (match(TK_LOGICALOR)) {
             if (peek().getTtype() == TK_LOGICALOR) {
@@ -169,7 +169,7 @@ public class Parser {
 
     private void logicalAnd() {
         equality();
-        int endOffset = -1;
+        int endOffset;
 
         while (match(TK_LOGICALAND)) {
             if (peek().getTtype() == TK_LOGICALAND) {
@@ -312,18 +312,18 @@ public class Parser {
         if (opcode == OP_CONSTANT) {
             if (peek().getTtype() == TK_INTEGER) {
                 Primitive lr = new PInteger(Integer.parseInt(peek().getLiteral()));
-                this.values.add(lr);
+                values.add(lr);
             } else if (peek().getTtype() == TK_DOUBLE) {
                 Primitive lr = new PDouble(Double.parseDouble(peek().getLiteral()));
-                this.values.add(lr);
+                values.add(lr);
             } else if (peek().getTtype() == TK_TRUE) {
                 Primitive lr = new PBoolean(true);
-                this.values.add(lr);
+                values.add(lr);
             } else if (peek().getTtype() == TK_FALSE) {
                 Primitive lr = new PBoolean(false);
-                this.values.add(lr);
+                values.add(lr);
             }
-            return new Instruction(OP_CONSTANT, this.values.size() - 1, line);
+            return new Instruction(OP_CONSTANT, values.size() - 1, line);
         } else {
             return new Instruction(opcode, null, line);
         }
@@ -350,8 +350,8 @@ public class Parser {
                 advance();
                 return;
             }
-            switch (peek().getTtype()) {
-                case TK_IF -> { return; }
+            if (peek().getTtype() == TK_IF) {
+                return;
             }
 
             advance();
