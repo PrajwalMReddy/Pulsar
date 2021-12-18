@@ -1,5 +1,4 @@
 # Pulsar
-___
 Pulsar is a new programming language that aims to be as
 * powerful as Java,
 * simple as Python,

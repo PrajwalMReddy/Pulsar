@@ -46,10 +46,11 @@ public class Disassembler {
 
     private static void decide(Instruction instruction) {
         switch (instruction.getOpcode()) {
-            case OP_CONSTANT, OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE -> operand(instruction);
+            case OP_CONSTANT, OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,
+                    OP_STORE_GLOBAL, OP_LOAD_GLOBAL -> operand(instruction);
             case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_MODULO, OP_NEGATE,
                     OP_NOT, OP_LOGICAL_OR, OP_LOGICAL_AND, OP_COMPARE_EQUAL, OP_GREATER, OP_LESSER,
-                    OP_POP -> opcode(instruction);
+                    OP_POP, OP_NULL -> opcode(instruction);
         }
     }
 
@@ -59,13 +60,18 @@ public class Disassembler {
 
     private static void operand(Instruction instruction) {
         if (instruction.getOpcode() == ByteCode.OP_CONSTANT) {
-            System.out.println("OP_CONSTANT" + spaces(instruction) + instruction.getOperand() + "  (" + Parser.values.get(instruction.getOperand()) + ")");
+            System.out.println("OP_CONSTANT" + spaces(instruction) + instruction.getOperand()
+                    + "  (" + Parser.values.get((int) instruction.getOperand()) + ")");
         } else if (instruction.getOpcode() == ByteCode.OP_JUMP) {
             System.out.println("OP_JUMP" + spaces(instruction) + instruction.getOperand());
         } else if (instruction.getOpcode() == ByteCode.OP_JUMP_IF_TRUE) {
             System.out.println("OP_JUMP_IF_TRUE" + spaces(instruction) + instruction.getOperand());
         } else if (instruction.getOpcode() == ByteCode.OP_JUMP_IF_FALSE) {
             System.out.println("OP_JUMP_IF_FALSE" + spaces(instruction) + instruction.getOperand());
+        } else if (instruction.getOpcode() == ByteCode.OP_STORE_GLOBAL) {
+            System.out.println("OP_STORE_GLOBAL" + spaces(instruction) + instruction.getOperand());
+        } else if (instruction.getOpcode() == ByteCode.OP_LOAD_GLOBAL) {
+            System.out.println("OP_LOAD_GLOBAL" + spaces(instruction) + instruction.getOperand());
         }
     }
 

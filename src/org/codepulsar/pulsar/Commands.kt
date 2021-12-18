@@ -6,7 +6,6 @@ fun help() {
     println("Usage: pulsar [command] [file]")
     println("Commands:")
     println("    -h     : Shows This Help Menu")
-    println()
     println("    -i     : Interprets The Given File")
     println("    -c     : Compiles The Given File")
     println("    -d     : Displays Debug Information Including Generated Tokens and Bytecode Disassembly\n" +
@@ -27,6 +26,7 @@ fun parseCommands(command: String) {
 
 fun parseCommands(command: String, file: String) {
     when (command) {
+        "-h" -> help()
         "-i" -> Pulsar.interpretFile(file)
         "-c" -> Pulsar.compileFile(file)
 

@@ -13,6 +13,8 @@ public class Pulsar {
             CommandsKt.parseCommands(args[0].trim());
         } else if (args.length == 2) {
             CommandsKt.parseCommands(args[0].trim(), args[1].trim());
+        } else {
+            CommandsKt.error("Invalid Parameters Given; Only 1 or 2 Parameters Allowed");
         }
     }
 

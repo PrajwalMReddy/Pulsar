@@ -8,7 +8,7 @@ public enum ByteCode {
     OP_LOGICAL_OR, OP_LOGICAL_AND, // Logical
 
     // Data Types and Variables
-    OP_CONSTANT,
+    OP_CONSTANT, OP_NULL, OP_STORE_GLOBAL, OP_LOAD_GLOBAL,
 
     // Control Flow OpCodes
     OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,

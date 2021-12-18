@@ -211,6 +211,7 @@ public class Lexer {
             };
             case 'i' -> checkKeyword("f", TK_IF, 1);
             case 'm' -> checkKeyword("od", TK_MOD, 1);
+            case 'n' -> checkKeyword("ull", TK_NULL, 1);
             case 'p' -> checkKeyword("ackage", TK_PACKAGE, 1);
             case 'r' -> checkKeyword("eturn", TK_RETURN, 1);
             case 't' -> checkKeyword("rue", TK_TRUE, 1);

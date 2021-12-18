@@ -1,11 +1,9 @@
 package org.codepulsar.pulsar;
 
-import org.codepulsar.primitives.PBoolean;
-import org.codepulsar.primitives.PDouble;
-import org.codepulsar.primitives.PInteger;
-import org.codepulsar.primitives.Primitive;
+import org.codepulsar.primitives.*;
 
 import java.util.ArrayList;
+
 import static org.codepulsar.pulsar.TokenType.*;
 import static org.codepulsar.pulsar.ByteCode.*;
 
@@ -39,6 +37,7 @@ public class Parser {
         while (!match(TK_EOF)) {
             declaration();
         }
+
         return this.instructions;
     }
 
@@ -55,10 +54,28 @@ public class Parser {
     private void topLevelDeclaration() {
         if (match(TK_VAR) || match(TK_CONST)) {
             variableDeclaration();
+        } else if (match(TK_FUN)) {
+            functionDeclaration();
         }
     }
 
+    private void functionDeclaration() {
+    }
+
     private void variableDeclaration() {
+        advance();
+        String name = peek().getLiteral();
+        advance();
+
+        if (match(TK_EQUAL)) {
+            advance();
+            expression();
+        } else {
+            this.instructions.add(makeOpCode(OP_NULL, peek().getLine()));
+        }
+
+        this.instructions.add(new Instruction(OP_STORE_GLOBAL, name, peek().getLine()));
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
     }
 
     private void statement(TokenType notMatch) {
@@ -74,9 +91,16 @@ public class Parser {
         } else if (match(TK_WHILE)) {
             advance();
             whileStatement();
+        } else if (match(TK_VAR) || match(TK_CONST)) {
+            variableDeclaration();
+        } else if (match(TK_RETURN)) {
+            returnStatement();
         } else {
             expressionStatement();
         }
+    }
+
+    private void returnStatement() {
     }
 
     private void whileStatement() {
@@ -295,9 +319,13 @@ public class Parser {
     }
 
     private void primary() {
-        if (match(TK_INTEGER) || match(TK_DOUBLE) || match(TK_TRUE) || match(TK_FALSE)) {
+        if (match(TK_INTEGER) || match(TK_DOUBLE) || match(TK_TRUE) || match(TK_FALSE) || match(TK_NULL)) {
             int line = peek().getLine();
             this.instructions.add(makeOpCode(OP_CONSTANT, line));
+            advance();
+        } else if (match(TK_IDENTIFIER)) {
+            int line = peek().getLine();
+            this.instructions.add(new Instruction(OP_LOAD_GLOBAL, peek().getLiteral(), line));
             advance();
         } else if (match(TK_LPAR)) {
             advance();
@@ -321,6 +349,9 @@ public class Parser {
                 values.add(lr);
             } else if (peek().getTtype() == TK_FALSE) {
                 Primitive lr = new PBoolean(false);
+                values.add(lr);
+            } else if (peek().getTtype() == TK_NULL) {
+                Primitive lr = new PNull();
                 values.add(lr);
             }
             return new Instruction(OP_CONSTANT, values.size() - 1, line);
@@ -351,6 +382,8 @@ public class Parser {
                 return;
             }
             if (peek().getTtype() == TK_IF) {
+                return;
+            } else if (peek().getTtype() == TK_WHILE) {
                 return;
             }
 
