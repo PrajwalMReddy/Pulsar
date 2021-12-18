@@ -35,372 +35,95 @@ public class Parser {
         }
 
         while (!match(TK_EOF)) {
-            declaration();
+            unary();
         }
 
         return this.instructions;
     }
 
-    private void declaration() {
-        while (!match(TK_EOF)) {
-            if (match(TK_VAR) || match(TK_CONST) || match(TK_FUN)) {
-                topLevelDeclaration();
-            } else {
-                statement(TK_EOF);
-            }
-        }
-    }
-
-    private void topLevelDeclaration() {
-        if (match(TK_VAR) || match(TK_CONST)) {
-            variableDeclaration();
-        } else if (match(TK_FUN)) {
-            functionDeclaration();
-        }
-    }
-
-    private void functionDeclaration() {
-    }
-
-    private void variableDeclaration() {
-        advance();
-        String name = peek().getLiteral();
-        advance();
-
-        if (match(TK_EQUAL)) {
-            advance();
-            expression();
-        } else {
-            this.instructions.add(makeOpCode(OP_NULL, peek().getLine()));
-        }
-
-        this.instructions.add(new Instruction(OP_STORE_GLOBAL, name, peek().getLine()));
-        look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
-    }
-
-    private void statement(TokenType notMatch) {
-        while (!match(notMatch)) {
-            baseStatement();
-        }
-    }
-
-    private void baseStatement() {
-        if (match(TK_IF)) {
-            advance();
-            ifStatement();
-        } else if (match(TK_WHILE)) {
-            advance();
-            whileStatement();
-        } else if (match(TK_VAR) || match(TK_CONST)) {
-            variableDeclaration();
-        } else if (match(TK_RETURN)) {
-            returnStatement();
-        } else {
-            expressionStatement();
-        }
-    }
-
-    private void returnStatement() {
-    }
-
-    private void whileStatement() {
-        int starting = this.instructions.size();
-        expression();
-
-        int offset = makeJump(OP_JUMP_IF_FALSE);
-        this.instructions.add(makeOpCode(OP_POP, peek().getLine()));
-
-        block();
-        this.instructions.add(new Instruction(OP_JUMP, starting, peek().getLine()));
-
-        fixJump(offset, OP_JUMP_IF_FALSE);
-        this.instructions.add(makeOpCode(OP_POP, peek().getLine()));
-    }
-
-    private void ifStatement() {
-        expression();
-        int offset = makeJump(OP_JUMP_IF_FALSE);
-        this.instructions.add(makeOpCode(OP_POP, peek().getLine()));
-        block();
-
-        int elseOffset = makeJump(OP_JUMP);
-        fixJump(offset, OP_JUMP_IF_FALSE);
-
-        this.instructions.add(makeOpCode(OP_POP, peek().getLine()));
-        if (match(TK_ELSE)) {
-            advance();
-            if (match(TK_IF)) {
-                advance();
-                ifStatement();
-            } else {
-                block();
-            }
-        }
-        fixJump(elseOffset, OP_JUMP);
-    }
-
-    private int makeJump(ByteCode opcode) {
-        int size = this.instructions.size();
-
-        this.instructions.add(makeOpCode(opcode, peek().getLine()));
-
-        return size;
-    }
-
-    private void fixJump(int offset, ByteCode opcode) {
-        Instruction oldJump = this.instructions.get(offset);
-        int line = oldJump.getLine();
-        Instruction jumpOpCode = new Instruction(opcode, this.instructions.size(), line);
-        this.instructions.set(offset, jumpOpCode);
-    }
-
-    private void block() {
-        if (!match(TK_LBRACE)) {
-            setErrors("Missing Character", "Left Curly Brace Expected", peek());
-            synchronize();
-            return;
-        }
-        look(TK_LBRACE, "Left Curly Brace Expected", "Missing Character");
-        statement(TK_RBRACE);
-        look(TK_RBRACE, "Right Curly Brace Expected", "Missing Character");
-    }
-
-    private void expressionStatement() {
-        expression();
-        this.instructions.add(makeOpCode(OP_POP, peek().getLine()));
-        look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
-    }
-
-    private void expression() {
-        logicalOr();
-    }
-
-    private void logicalOr() {
-        logicalAnd();
-        int endOffset;
-
-        while (match(TK_LOGICALOR)) {
-            if (peek().getTtype() == TK_LOGICALOR) {
-                int line = peek().getLine();
-                advance();
-                endOffset = makeJump(OP_JUMP_IF_TRUE);
-                this.instructions.add(makeOpCode(OP_POP, line));
-                logicalAnd();
-                fixJump(endOffset, OP_JUMP_IF_TRUE);
-            }
-        }
-    }
-
-    private void logicalAnd() {
-        equality();
-        int endOffset;
-
-        while (match(TK_LOGICALAND)) {
-            if (peek().getTtype() == TK_LOGICALAND) {
-                int line = peek().getLine();
-                advance();
-                endOffset = makeJump(OP_JUMP_IF_FALSE);
-                this.instructions.add(makeOpCode(OP_POP, line));
-                equality();
-                fixJump(endOffset, OP_JUMP_IF_FALSE);
-            }
-        }
-
-    }
-
-    private void equality() {
-        comparison();
-
-        while (match(TK_EQUALEQUAL) || match(TK_NOTEQUAL)) {
-            if (peek().getTtype() == TK_EQUALEQUAL) {
-                int line = peek().getLine();
-                advance();
-                comparison();
-                this.instructions.add(makeOpCode(OP_COMPARE_EQUAL, line));
-            }
-            if (peek().getTtype() == TK_NOTEQUAL) {
-                int line = peek().getLine();
-                advance();
-                comparison();
-                this.instructions.add(makeOpCode(OP_COMPARE_EQUAL, line));
-                this.instructions.add(makeOpCode(OP_NOT, line));
-            }
-        }
-    }
-
-    private void comparison() {
-        term();
-
-        while (match(TK_GT) || match(TK_GTEQUAL) || match(TK_LT) || match(TK_LTEQUAL)) {
-            if (peek().getTtype() == TK_GT) {
-                int line = peek().getLine();
-                advance();
-                term();
-                this.instructions.add(makeOpCode(OP_GREATER, line));
-            }
-            if (peek().getTtype() == TK_LT) {
-                int line = peek().getLine();
-                advance();
-                term();
-                this.instructions.add(makeOpCode(OP_LESSER, line));
-            }
-            if (peek().getTtype() == TK_LTEQUAL) {
-                int line = peek().getLine();
-                advance();
-                term();
-                this.instructions.add(makeOpCode(OP_GREATER, line));
-                this.instructions.add(makeOpCode(OP_NOT, line));
-            }
-            if (peek().getTtype() == TK_GTEQUAL) {
-                int line = peek().getLine();
-                advance();
-                term();
-                this.instructions.add(makeOpCode(OP_LESSER, line));
-                this.instructions.add(makeOpCode(OP_NOT, line));
-            }
-        }
-    }
-
-    private void term() {
-        factor();
-
-        while (match(TK_PLUS) || match(TK_MINUS)) {
-            if (peek().getTtype() == TK_PLUS) {
-                int line = peek().getLine();
-                advance();
-                factor();
-                this.instructions.add(makeOpCode(OP_ADD, line));
-            } else if (peek().getTtype() == TK_MINUS) {
-                int line = peek().getLine();
-                advance();
-                factor();
-                this.instructions.add(makeOpCode(OP_SUBTRACT, line));
-            }
-        }
-    }
-
-    private void factor() {
-        unary();
-
-        while (match(TK_MULTIPLICATION) || match(TK_DIVISION) || match(TK_MODULUS)) {
-            if (peek().getTtype() == TK_MULTIPLICATION) {
-                int line = peek().getLine();
-                advance();
-                unary();
-                this.instructions.add(makeOpCode(OP_MULTIPLY, line));
-            } else if (peek().getTtype() == TK_DIVISION) {
-                int line = peek().getLine();
-                advance();
-                unary();
-                this.instructions.add(makeOpCode(OP_DIVIDE, line));
-            } else if (peek().getTtype() == TK_MODULUS) {
-                int line = peek().getLine();
-                advance();
-                unary();
-                this.instructions.add(makeOpCode(OP_MODULO, line));
-            }
-        }
-    }
-
     private void unary() {
-        if (match(TK_MINUS)) {
-            int line = peek().getLine();
-            advance();
+        if (matchAdvance(TK_NOT)) {
             unary();
-            this.instructions.add(makeOpCode(OP_NEGATE, line));
-        } else if (match(TK_NOT)) {
-            int line = peek().getLine();
-            advance();
+            makeOpCode(OP_NOT, peekLine());
+        } else if (matchAdvance(TK_MINUS)) {
             unary();
-            this.instructions.add(makeOpCode(OP_NOT, line));
+            makeOpCode(OP_NEGATE, peekLine());
         } else {
             primary();
         }
     }
 
     private void primary() {
-        if (match(TK_INTEGER) || match(TK_DOUBLE) || match(TK_TRUE) || match(TK_FALSE) || match(TK_NULL)) {
-            int line = peek().getLine();
-            this.instructions.add(makeOpCode(OP_CONSTANT, line));
+        if (match(TK_INTEGER, TK_DOUBLE, TK_TRUE, TK_FALSE, TK_NULL)) {
+            makeOpCode(OP_CONSTANT, peekLine());
             advance();
-        } else if (match(TK_IDENTIFIER)) {
-            int line = peek().getLine();
-            this.instructions.add(new Instruction(OP_LOAD_GLOBAL, peek().getLiteral(), line));
-            advance();
-        } else if (match(TK_LPAR)) {
-            advance();
-            expression();
-            look(TK_RPAR, "Expected Character: ')'", "Missing Character");
-        } else {
-            setErrors("Missing Expression", "Expression Expected", peek());
         }
     }
 
     private Instruction makeOpCode(ByteCode opcode, int line) {
         if (opcode == OP_CONSTANT) {
-            if (peek().getTtype() == TK_INTEGER) {
-                Primitive lr = new PInteger(Integer.parseInt(peek().getLiteral()));
-                values.add(lr);
-            } else if (peek().getTtype() == TK_DOUBLE) {
-                Primitive lr = new PDouble(Double.parseDouble(peek().getLiteral()));
-                values.add(lr);
-            } else if (peek().getTtype() == TK_TRUE) {
-                Primitive lr = new PBoolean(true);
-                values.add(lr);
-            } else if (peek().getTtype() == TK_FALSE) {
-                Primitive lr = new PBoolean(false);
-                values.add(lr);
-            } else if (peek().getTtype() == TK_NULL) {
-                Primitive lr = new PNull();
-                values.add(lr);
+            Primitive lr = new Primitive();
+            switch (peekType()) {
+                case TK_INTEGER -> lr = new PInteger(Integer.parseInt(peekLiteral()));
+                case TK_DOUBLE -> lr = new PDouble(Double.parseDouble(peekLiteral()));
+                case TK_TRUE -> lr = new PBoolean(true);
+                case TK_FALSE -> lr = new PBoolean(false);
+                case TK_NULL -> lr = new PNull();
             }
-            return new Instruction(OP_CONSTANT, values.size() - 1, line);
+            values.add(lr);
+            Instruction instruction = new Instruction(OP_CONSTANT, values.size() - 1, line);
+            this.instructions.add(instruction);
+            return instruction;
         } else {
-            return new Instruction(opcode, null, line);
+            Instruction instruction = new Instruction(opcode, null, line);
+            this.instructions.add(instruction);
+            return instruction;
         }
     }
 
-    private void setErrors(String etype, String message, Token token) {
-        this.hasErrors = true;
-        Error error = new Error(etype, message, token);
-        this.errors.add(error);
+    private Instruction makeOpCode(ByteCode opcode, Object operand, int line) {
+        Instruction instruction = new Instruction(opcode, operand, line);
+        this.instructions.add(instruction);
+        return instruction;
     }
 
-    private void look(TokenType token, String message, String errorType) {
-        if (peek().getTtype() != token) {
-            setErrors(errorType, message, peek());
-            synchronize();
-        } else {
-            advance();
+    private boolean match(TokenType... types) {
+        for (TokenType type: types) {
+            if (peekType() == type) {
+                return true;
+            }
         }
+        return false;
     }
 
-    private void synchronize() {
-        while (peek().getTtype() != TK_EOF) {
-            if (peek().getTtype() == TK_SEMICOLON) {
+    private boolean matchAdvance(TokenType... types) {
+        for (TokenType type: types) {
+            if (peekType() == type) {
                 advance();
-                return;
+                return true;
             }
-            if (peek().getTtype() == TK_IF) {
-                return;
-            } else if (peek().getTtype() == TK_WHILE) {
-                return;
-            }
-
-            advance();
         }
+        return false;
     }
 
-    private boolean match(TokenType type) {
-        return peek().getTtype() == type;
+    private Token advance() {
+        this.current++;
+        return this.tokens.get(this.current - 1);
     }
 
     private Token peek() {
         return this.tokens.get(this.current);
     }
 
-    private Token advance() {
-        this.current++;
-        return this.tokens.get(this.current - 1);
+    private TokenType peekType() {
+        return this.tokens.get(this.current).getTtype();
+    }
+
+    private int peekLine() {
+        return this.tokens.get(this.current).getLine();
+    }
+
+    private String peekLiteral() {
+        return this.tokens.get(this.current).getLiteral();
     }
 }

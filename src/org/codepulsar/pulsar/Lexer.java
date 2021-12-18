@@ -90,20 +90,13 @@ public class Lexer {
                     return makeToken(TK_NOT);
                 }
             case '+':
-                if (peek() == '+') {
-                    advance();
-                    return makeToken(TK_PLUSPLUS);
-                } else if (peek() == '='){
+                if (peek() == '='){
                     advance();
                     return makeToken(TK_PLUSEQUAL);
                 } else {
                     return makeToken(TK_PLUS);
                 }
-            case '-':
-                if (peek() == '-') {
-                    advance();
-                    return makeToken(TK_MINUSMINUS);
-                } else if (peek() == '='){
+            case '-':if (peek() == '='){
                     advance();
                     return makeToken(TK_MINUSEQUAL);
                 } else {

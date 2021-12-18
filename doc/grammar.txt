@@ -1,0 +1,17 @@
+---------------------------------KEY---------------------------------
+
+Key:
+	| "?" : Zero Or One Times
+	| "*" : Zero Or More Times
+	| "+" : One Or More Times
+
+-------------------------------GRAMMAR-------------------------------
+
+unary:
+	| ("!" | "-") unary
+	| primary
+
+primary:
+    | IDENTIFIER
+    | DATA
+    | "(" expression ")"
