@@ -35,10 +35,138 @@ public class Parser {
         }
 
         while (!match(TK_EOF)) {
-            unary();
+            expressionStatement();
         }
 
         return this.instructions;
+    }
+
+    private void expressionStatement() {
+        expression();
+        makeOpCode(OP_POP, peekLine());
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
+    }
+
+    private void expression() {
+        assignment();
+    }
+
+    private void assignment() {
+        if (match(TK_IDENTIFIER)) {
+        } else {
+            logicalOr();
+        }
+    }
+
+    private void logicalOr() {
+        logicalAnd();
+        int offset;
+
+        while (match(TK_LOGICALOR)) {
+            if (peekType() == TK_LOGICALOR) {
+                int line = peekLine();
+                advance();
+                offset = makeJump(OP_JUMP_IF_TRUE);
+                makeOpCode(OP_POP, line);
+                logicalAnd();
+                fixJump(offset, OP_JUMP_IF_TRUE);
+            }
+        }
+    }
+
+    private void logicalAnd() {
+        equality();
+        int offset;
+
+        while (match(TK_LOGICALAND)) {
+            if (peekType() == TK_LOGICALAND) {
+                int line = peekLine();
+                advance();
+                offset = makeJump(OP_JUMP_IF_FALSE);
+                makeOpCode(OP_POP, line);
+                equality();
+                fixJump(offset, OP_JUMP_IF_FALSE);
+            }
+        }
+    }
+
+    private void equality() {
+        comparison();
+
+        while (match(TK_EQUALEQUAL, TK_NOTEQUAL)) {
+            if (peekType() == TK_EQUALEQUAL) {
+                advance();
+                comparison();
+                makeOpCode(OP_COMPARE_EQUAL, peekLine());
+            } else if (peekType() == TK_NOTEQUAL) {
+                advance();
+                comparison();
+                makeOpCode(OP_COMPARE_EQUAL, peekLine());
+                makeOpCode(OP_NOT, peekLine());
+            }
+        }
+    }
+
+    private void comparison() {
+        term();
+
+        while (match(TK_GT, TK_GTEQUAL, TK_LT, TK_LTEQUAL)) {
+            if (peekType() == TK_GT) {
+                advance();
+                term();
+                makeOpCode(OP_GREATER, peekLine());
+            } else if (peekType() == TK_LT) {
+                advance();
+                term();
+                makeOpCode(OP_LESSER, peekLine());
+            } else if (peekType() == TK_GTEQUAL) {
+                advance();
+                term();
+                makeOpCode(OP_LESSER, peekLine());
+                makeOpCode(OP_NOT, peekLine());
+            } else if (peekType() == TK_LTEQUAL) {
+                advance();
+                term();
+                makeOpCode(OP_GREATER, peekLine());
+                makeOpCode(OP_NOT, peekLine());
+            }
+        }
+    }
+
+    private void term() {
+        factor();
+
+        while (match(TK_PLUS, TK_MINUS)) {
+            if (peekType() == TK_PLUS) {
+                advance();
+                factor();
+                makeOpCode(OP_ADD, peekLine());
+            } else if (peekType() == TK_MINUS) {
+                advance();
+                factor();
+                makeOpCode(OP_SUBTRACT, peekLine());
+            }
+        }
+    }
+
+    private void factor() {
+        unary();
+
+        while (match(TK_MULTIPLICATION, TK_DIVISION, TK_MODULUS)) {
+            if (peekType() == TK_MULTIPLICATION) {
+                advance();
+                unary();
+                makeOpCode(OP_MULTIPLY, peekLine());
+            } else if (peekType() == TK_DIVISION) {
+                advance();
+                unary();
+                makeOpCode(OP_DIVIDE, peekLine());
+            } else if (peekType() == TK_MODULUS) {
+                advance();
+                unary();
+                makeOpCode(OP_MODULO, peekLine());
+            }
+        }
     }
 
     private void unary() {
@@ -87,6 +215,21 @@ public class Parser {
         return instruction;
     }
 
+    private int makeJump(ByteCode opcode) {
+        int size = this.instructions.size();
+
+        makeOpCode(opcode, peekLine());
+
+        return size;
+    }
+
+    private void fixJump(int offset, ByteCode opcode) {
+        Instruction oldJump = this.instructions.get(offset);
+        int line = oldJump.getLine();
+        Instruction jumpOpCode = new Instruction(opcode, this.instructions.size(), line);
+        this.instructions.set(offset, jumpOpCode);
+    }
+
     private boolean match(TokenType... types) {
         for (TokenType type: types) {
             if (peekType() == type) {
@@ -109,6 +252,32 @@ public class Parser {
     private Token advance() {
         this.current++;
         return this.tokens.get(this.current - 1);
+    }
+
+    private void look(TokenType token, String message, String errorType) {
+        if (peek().getTtype() != token) {
+            setErrors(errorType, message, peek());
+            synchronize();
+        } else {
+            advance();
+        }
+    }
+
+    private void synchronize() {
+        while (peek().getTtype() != TK_EOF) {
+            if (peek().getTtype() == TK_SEMICOLON) {
+                advance();
+                return;
+            }
+
+            advance();
+        }
+    }
+
+    private void setErrors(String etype, String message, Token token) {
+        this.hasErrors = true;
+        Error error = new Error(etype, message, token);
+        this.errors.add(error);
     }
 
     private Token peek() {
