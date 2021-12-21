@@ -7,6 +7,20 @@ Key:
 
 -------------------------------GRAMMAR-------------------------------
 
+statement:
+	| if_statement
+	| while_statement
+	| expression_statement
+
+if_statement:
+	| "if" expression block ("else" (if_statement | block))?
+
+while_statement:
+	| "while" expression block
+
+block:
+	| "{" statement* "}"
+
 expression_statement:
 	| expression ";"
 

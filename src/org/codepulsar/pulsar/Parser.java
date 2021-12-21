@@ -35,10 +35,63 @@ public class Parser {
         }
 
         while (!match(TK_EOF)) {
-            expressionStatement();
+            statement();
         }
 
         return this.instructions;
+    }
+
+    private void statement() {
+        if (matchAdvance(TK_IF)) {
+            ifStatement();
+        } else if (matchAdvance(TK_WHILE)) {
+            whileStatement();
+        } else {
+            expressionStatement();
+        }
+    }
+
+    private void ifStatement() {
+        expression();
+        int ifOffset = makeJump(OP_JUMP_IF_FALSE);
+        makeOpCode(OP_POP, peekLine());
+        block();
+
+        int elseOffset = makeJump(OP_JUMP);
+        fixJump(ifOffset, OP_JUMP_IF_FALSE);
+        makeOpCode(OP_POP, peekLine());
+
+        if (matchAdvance(TK_ELSE)) {
+            if (matchAdvance(TK_IF)) {
+                ifStatement();
+            } else {
+                block();
+            }
+        }
+
+        fixJump(elseOffset, OP_JUMP);
+    }
+
+    private void whileStatement() {
+        int start = this.instructions.size();
+        expression();
+
+        int offset = makeJump(OP_JUMP_IF_FALSE);
+        makeOpCode(OP_POP, peekLine());
+
+        block();
+        makeOpCode(OP_JUMP, start, peekLine());
+
+        fixJump(offset, OP_JUMP_IF_FALSE);
+        makeOpCode(OP_POP, peekLine());
+    }
+
+    private void block() {
+        look(TK_LBRACE, "An Opening Brace Was Expected Before The Block", "Missing Character");
+        while (!match(TK_RBRACE)) {
+            statement();
+        }
+        look(TK_RBRACE, "A Closing  Brace Was Expected Before The Block", "Missing Character");
     }
 
     private void expressionStatement() {
