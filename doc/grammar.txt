@@ -33,6 +33,7 @@ statement:
 	| while_statement
 	| return_statement
 	| variable_declaration
+	| print_statement
 	| expression_statement
 
 if_statement:
@@ -43,6 +44,9 @@ while_statement:
 
 block:
 	| "{" statement* "}"
+
+print_statement:
+    | "print" expression_statement
 
 expression_statement:
 	| expression ";"

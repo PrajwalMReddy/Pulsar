@@ -22,5 +22,5 @@ public enum TokenType {
     TK_STRING, TK_INTEGER, TK_DOUBLE, TK_IDENTIFIER, TK_TRUE, TK_FALSE, TK_NULL,
 
     // Special Tokens
-    TK_ERROR, TK_EOF
+    TK_PRINT, TK_ERROR, TK_EOF
 }

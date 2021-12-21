@@ -81,6 +81,8 @@ public class Parser {
             ifStatement();
         } else if (matchAdvance(TK_WHILE)) {
             whileStatement();
+        } else if (matchAdvance(TK_PRINT)) {
+            printStatement();
         } else {
             expressionStatement();
         }
@@ -129,6 +131,12 @@ public class Parser {
         look(TK_RBRACE, "A Closing Brace Was Expected Before The Block", "Missing Character");
     }
 
+    private void printStatement() {
+        expression();
+        makeOpCode(OP_PRINT, peekLine());
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
+    }
+
     private void expressionStatement() {
         expression();
         makeOpCode(OP_POP, peekLine());
@@ -140,7 +148,7 @@ public class Parser {
     }
 
     private void assignment() {
-        if (peekNext().getLiteral().contains("=")) {
+        if (peekType() == TK_IDENTIFIER && peekNext().getLiteral().contains("=")) {
             Token next = peekNext();
 
             String name = peekLiteral();

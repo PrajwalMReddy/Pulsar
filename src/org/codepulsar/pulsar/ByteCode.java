@@ -13,5 +13,5 @@ public enum ByteCode {
     OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,
 
     // Special OpCodes
-    OP_POP
+    OP_PRINT, OP_POP
 }

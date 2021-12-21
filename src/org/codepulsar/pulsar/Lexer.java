@@ -205,7 +205,11 @@ public class Lexer {
             case 'i' -> checkKeyword("f", TK_IF, 1);
             case 'm' -> checkKeyword("od", TK_MOD, 1);
             case 'n' -> checkKeyword("ull", TK_NULL, 1);
-            case 'p' -> checkKeyword("ackage", TK_PACKAGE, 1);
+            case 'p' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'a' -> checkKeyword("ckage", TK_PACKAGE, 2);
+                case 'r' -> checkKeyword("int", TK_PRINT, 2);
+                default -> TK_IDENTIFIER;
+            };
             case 'r' -> checkKeyword("eturn", TK_RETURN, 1);
             case 't' -> checkKeyword("rue", TK_TRUE, 1);
             case 'u' -> checkKeyword("se", TK_USE, 1);
