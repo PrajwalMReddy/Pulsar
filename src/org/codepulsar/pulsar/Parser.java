@@ -125,7 +125,7 @@ public class Parser {
         while (!match(TK_RBRACE)) {
             statement();
         }
-        look(TK_RBRACE, "A Closing  Brace Was Expected Before The Block", "Missing Character");
+        look(TK_RBRACE, "A Closing Brace Was Expected Before The Block", "Missing Character");
     }
 
     private void expressionStatement() {
@@ -139,10 +139,7 @@ public class Parser {
     }
 
     private void assignment() {
-        if (match(TK_IDENTIFIER)) {
-        } else {
-            logicalOr();
-        }
+        logicalOr();
     }
 
     private void logicalOr() {
@@ -274,6 +271,14 @@ public class Parser {
         if (match(TK_INTEGER, TK_DOUBLE, TK_TRUE, TK_FALSE, TK_NULL)) {
             makeOpCode(OP_CONSTANT, peekLine());
             advance();
+        } else if (match(TK_IDENTIFIER)) {
+            makeOpCode(OP_LOAD_GLOBAL, peekLiteral(), peekLine());
+            advance();
+        } else if (matchAdvance(TK_LPAR)) {
+            expression();
+            look(TK_RPAR, "A Closing Parenthesis Was Expected Before The Block", "Missing Character");
+        } else {
+            setErrors("Missing Expression", "An Expression Was Expected But Nothing Was Given", peek());
         }
     }
 
