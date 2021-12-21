@@ -10,4 +10,12 @@ public class Variable {
     public Variable() {
         this.values = new HashMap<>();
     }
+
+    public void newVariable(String name, Primitive value) {
+        this.values.put(name, value);
+    }
+
+    public Primitive getValue(String name) {
+        return this.values.get(name);
+    }
 }

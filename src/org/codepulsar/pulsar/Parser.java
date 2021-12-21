@@ -51,16 +51,28 @@ public class Parser {
 
     private void topLevelDeclaration() {
         if (matchAdvance(TK_VAR, TK_CONST)) {
-            variableDeclaration();
+            globalVariableDeclaration();
         } else if (matchAdvance(TK_FUN)) {
             functionDeclaration();
         }
     }
 
-    private void variableDeclaration() {
+    private void globalVariableDeclaration() {
+        String name = peekLiteral();
+        advance();
+
+        if (matchAdvance(TK_EQUAL)) {
+            expression();
+        } else {
+            makeOpCode(OP_NULL, peekLine());
+        }
+
+        makeOpCode(OP_STORE_GLOBAL, name, peekLine());
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
     }
 
     private void functionDeclaration() {
+        // TODO Finish Function Declarations
     }
 
     private void statement() {

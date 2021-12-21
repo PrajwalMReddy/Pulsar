@@ -1,19 +1,16 @@
 package org.codepulsar.pulsar;
 
-import org.codepulsar.primitives.Primitive;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Interpreter {
     private final String sourceCode;
     private ArrayList<Instruction> instructions;
-    public static HashMap<String, Primitive> variableValues;
+    public static Variable variableValues;
 
     public Interpreter(String sourceCode) {
         this.sourceCode = sourceCode;
         this.instructions = new ArrayList<>();
-        this.variableValues = new HashMap<>();
+        this.variableValues = new Variable();
     }
 
     public void interpret() {
