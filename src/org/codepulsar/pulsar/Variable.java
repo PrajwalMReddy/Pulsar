@@ -15,7 +15,20 @@ public class Variable {
         this.values.put(name, value);
     }
 
+    public void reassignVariable(String name, Primitive value) {
+        this.values.put(name, value);
+    }
+
     public Primitive getValue(String name) {
         return this.values.get(name);
+    }
+
+    public boolean containsKey(String name) {
+        Primitive value = this.values.get(name);
+
+        if (value == null) {
+            return false;
+        }
+        return true;
     }
 }

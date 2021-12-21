@@ -68,6 +68,7 @@ public class Parser {
         }
 
         makeOpCode(OP_STORE_GLOBAL, name, peekLine());
+        makeOpCode(OP_POP, peekLine());
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
     }
 
@@ -139,7 +140,31 @@ public class Parser {
     }
 
     private void assignment() {
-        logicalOr();
+        if (peekNext().getLiteral().contains("=")) {
+            Token next = peekNext();
+
+            String name = peekLiteral();
+            advance();
+            advance();
+            expression();
+
+            if (next.getLiteral().indexOf("=") > 0) {
+                makeOpCode(OP_LOAD_GLOBAL, name, peekLine());
+                if (next.getTtype() == TK_PLUSEQUAL) {
+                    makeOpCode(OP_ADD, next.getLine());
+                } else if (next.getTtype() == TK_MINUSEQUAL) {
+                    makeOpCode(OP_SUBTRACT, next.getLine());
+                } else if (next.getTtype() == TK_MULEQUAL) {
+                    makeOpCode(OP_MULTIPLY, next.getLine());
+                } else if (next.getTtype() == TK_DIVEQUAL) {
+                    makeOpCode(OP_DIVIDE, next.getLine());
+                }
+            }
+
+            makeOpCode(OP_STORE_GLOBAL, name, peekLine());
+        } else {
+            logicalOr();
+        }
     }
 
     private void logicalOr() {
@@ -376,6 +401,10 @@ public class Parser {
 
     private Token peek() {
         return this.tokens.get(this.current);
+    }
+
+    private Token peekNext() {
+        return this.tokens.get(this.current + 1);
     }
 
     private TokenType peekType() {
