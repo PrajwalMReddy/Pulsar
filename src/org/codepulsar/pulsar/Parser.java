@@ -35,10 +35,32 @@ public class Parser {
         }
 
         while (!match(TK_EOF)) {
-            statement();
+            declaration();
         }
 
         return this.instructions;
+    }
+
+    private void declaration() {
+        if (match(TK_VAR, TK_CONST, TK_FUN)) {
+            topLevelDeclaration();
+        } else {
+            statement();
+        }
+    }
+
+    private void topLevelDeclaration() {
+        if (matchAdvance(TK_VAR, TK_CONST)) {
+            variableDeclaration();
+        } else if (matchAdvance(TK_FUN)) {
+            functionDeclaration();
+        }
+    }
+
+    private void variableDeclaration() {
+    }
+
+    private void functionDeclaration() {
     }
 
     private void statement() {
@@ -229,6 +251,8 @@ public class Parser {
         } else if (matchAdvance(TK_MINUS)) {
             unary();
             makeOpCode(OP_NEGATE, peekLine());
+        } else if (matchAdvance(TK_PLUS)) {
+            unary();
         } else {
             primary();
         }

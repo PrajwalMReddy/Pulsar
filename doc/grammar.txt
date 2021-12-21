@@ -7,9 +7,32 @@ Key:
 
 -------------------------------GRAMMAR-------------------------------
 
+declaration:
+	| top_level_declaration
+	| statement
+
+top_level_declaration:
+	| variable_declaration
+	| function_declaration
+
+variable_declaration:
+	| ("var" | "const") IDENTIFIER (":" DATATYPE ("?")?)? ("=" expression)? ";"
+
+function_declaration:
+	| "fun" IDENTIFIER "(" parameter? ")" block
+
+parameter:
+	| parameter_signature ("," parameter_signature)*
+
+parameter_signature:
+	| IDENTIFIER ":" DATATYPE ("?")?
+	| IDENTIFIER "=" DATA
+
 statement:
 	| if_statement
 	| while_statement
+	| return_statement
+	| variable_declaration
 	| expression_statement
 
 if_statement:
@@ -50,7 +73,7 @@ factor:
 	| unary (("/" | "*" | "%") unary)*
 
 unary:
-    | ("!" | "-") unary
+    | ("!" | "-" | "+") unary
     | primary
 
 primary:
