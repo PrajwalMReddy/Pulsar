@@ -63,7 +63,7 @@ public class Lexer {
             case ':':
                 if (peek() == ':') {
                     advance();
-                    return makeToken(TK_DOUBLECOLON);
+                    return makeToken(TK_DOUBLE_COLON);
                 } else {
                     return makeToken(TK_COLON);
                 }
@@ -92,34 +92,34 @@ public class Lexer {
             case '+':
                 if (peek() == '='){
                     advance();
-                    return makeToken(TK_PLUSEQUAL);
+                    return makeToken(TK_PLUS_EQUAL);
                 } else {
                     return makeToken(TK_PLUS);
                 }
             case '-':if (peek() == '='){
                     advance();
-                    return makeToken(TK_MINUSEQUAL);
+                    return makeToken(TK_MINUS_EQUAL);
                 } else {
                     return makeToken(TK_MINUS);
                 }
             case '*':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(TK_MULEQUAL);
+                    return makeToken(TK_MUL_EQUAL);
                 } else {
                     return makeToken(TK_MULTIPLICATION);
                 }
             case '/':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(TK_DIVEQUAL);
+                    return makeToken(TK_DIV_EQUAL);
                 } else {
                     return makeToken(TK_DIVISION);
                 }
             case '%':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(TK_MODEQUAL);
+                    return makeToken(TK_MOD_EQUAL);
                 } else {
                     return makeToken(TK_MODULUS);
                 }
@@ -148,14 +148,14 @@ public class Lexer {
             case '|':
                 if (peek() == '|') {
                     advance();
-                    return makeToken(TK_LOGICALOR);
+                    return makeToken(TK_LOGICAL_OR);
                 } else {
                     return errorToken("Invalid Character: " + now + ". Perhaps You Meant Logical Or: ||");
                 }
             case '&':
                 if (peek() == '&') {
                     advance();
-                    return makeToken(TK_LOGICALAND);
+                    return makeToken(TK_LOGICAL_AND);
                 } else {
                     return errorToken("Invalid Character: " + now + ". Perhaps You Meant Logical AND: &&");
                 }

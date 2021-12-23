@@ -4,7 +4,7 @@ public enum ByteCode {
     // Operators,
     OP_NEGATE, OP_NOT, // Unary
     OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_MODULO, // Binary
-    OP_COMPARE_EQUAL, OP_GREATER, OP_LESSER, // Comparison
+    OP_COMPARE_EQUAL, OP_COMPARE_GREATER, OP_COMPARE_LESSER, // Comparison
 
     // Data Types and Variables
     OP_CONSTANT, OP_NULL, OP_STORE_GLOBAL, OP_LOAD_GLOBAL,

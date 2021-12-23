@@ -49,7 +49,7 @@ public class Disassembler {
             case OP_CONSTANT, OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,
                     OP_STORE_GLOBAL, OP_LOAD_GLOBAL -> operand(instruction);
             case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_MODULO, OP_NEGATE,
-                    OP_NOT, OP_COMPARE_EQUAL, OP_GREATER, OP_LESSER,
+                    OP_NOT, OP_COMPARE_EQUAL, OP_COMPARE_GREATER, OP_COMPARE_LESSER,
                     OP_POP, OP_NULL, OP_PRINT -> opcode(instruction);
         }
     }

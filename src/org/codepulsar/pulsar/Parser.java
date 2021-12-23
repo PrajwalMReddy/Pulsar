@@ -83,6 +83,8 @@ public class Parser {
             whileStatement();
         } else if (matchAdvance(TK_PRINT)) {
             printStatement();
+        } else if (matchAdvance(TK_VAR, TK_CONST)) {
+            localVariableDeclaration();
         } else {
             expressionStatement();
         }
@@ -137,6 +139,9 @@ public class Parser {
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
     }
 
+    private void localVariableDeclaration() {
+    }
+
     private void expressionStatement() {
         expression();
         makeOpCode(OP_POP, peekLine());
@@ -148,7 +153,7 @@ public class Parser {
     }
 
     private void assignment() {
-        if (peekType() == TK_IDENTIFIER && peekNext().getLiteral().contains("=")) {
+        if (peekType() == TK_IDENTIFIER && peekNext().getLiteral().contains("=") && peekNext().getTtype() != TK_EQUALEQUAL) {
             Token next = peekNext();
 
             String name = peekLiteral();
@@ -158,14 +163,16 @@ public class Parser {
 
             if (next.getLiteral().indexOf("=") > 0) {
                 makeOpCode(OP_LOAD_GLOBAL, name, peekLine());
-                if (next.getTtype() == TK_PLUSEQUAL) {
+                if (next.getTtype() == TK_PLUS_EQUAL) {
                     makeOpCode(OP_ADD, next.getLine());
-                } else if (next.getTtype() == TK_MINUSEQUAL) {
+                } else if (next.getTtype() == TK_MINUS_EQUAL) {
                     makeOpCode(OP_SUBTRACT, next.getLine());
-                } else if (next.getTtype() == TK_MULEQUAL) {
+                } else if (next.getTtype() == TK_MUL_EQUAL) {
                     makeOpCode(OP_MULTIPLY, next.getLine());
-                } else if (next.getTtype() == TK_DIVEQUAL) {
+                } else if (next.getTtype() == TK_DIV_EQUAL) {
                     makeOpCode(OP_DIVIDE, next.getLine());
+                } else if (next.getTtype() == TK_MOD_EQUAL) {
+                    makeOpCode(OP_MODULO, next.getLine());
                 }
             }
 
@@ -179,8 +186,8 @@ public class Parser {
         logicalAnd();
         int offset;
 
-        while (match(TK_LOGICALOR)) {
-            if (peekType() == TK_LOGICALOR) {
+        while (match(TK_LOGICAL_OR)) {
+            if (peekType() == TK_LOGICAL_OR) {
                 int line = peekLine();
                 advance();
                 offset = makeJump(OP_JUMP_IF_TRUE);
@@ -195,8 +202,8 @@ public class Parser {
         equality();
         int offset;
 
-        while (match(TK_LOGICALAND)) {
-            if (peekType() == TK_LOGICALAND) {
+        while (match(TK_LOGICAL_AND)) {
+            if (peekType() == TK_LOGICAL_AND) {
                 int line = peekLine();
                 advance();
                 offset = makeJump(OP_JUMP_IF_FALSE);
@@ -231,20 +238,20 @@ public class Parser {
             if (peekType() == TK_GT) {
                 advance();
                 term();
-                makeOpCode(OP_GREATER, peekLine());
+                makeOpCode(OP_COMPARE_GREATER, peekLine());
             } else if (peekType() == TK_LT) {
                 advance();
                 term();
-                makeOpCode(OP_LESSER, peekLine());
+                makeOpCode(OP_COMPARE_LESSER, peekLine());
             } else if (peekType() == TK_GTEQUAL) {
                 advance();
                 term();
-                makeOpCode(OP_LESSER, peekLine());
+                makeOpCode(OP_COMPARE_LESSER, peekLine());
                 makeOpCode(OP_NOT, peekLine());
             } else if (peekType() == TK_LTEQUAL) {
                 advance();
                 term();
-                makeOpCode(OP_GREATER, peekLine());
+                makeOpCode(OP_COMPARE_GREATER, peekLine());
                 makeOpCode(OP_NOT, peekLine());
             }
         }
