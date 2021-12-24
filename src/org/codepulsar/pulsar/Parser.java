@@ -67,7 +67,7 @@ public class Parser {
             makeOpCode(OP_NULL, peekLine());
         }
 
-        makeOpCode(OP_STORE_GLOBAL, name, peekLine());
+        makeOpCode(OP_SET_GLOBAL, name, peekLine());
         makeOpCode(OP_POP, peekLine());
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
     }
@@ -140,6 +140,7 @@ public class Parser {
     }
 
     private void localVariableDeclaration() {
+        // TODO Local Variable Code
     }
 
     private void expressionStatement() {
@@ -162,7 +163,7 @@ public class Parser {
             expression();
 
             if (next.getLiteral().indexOf("=") > 0) {
-                makeOpCode(OP_LOAD_GLOBAL, name, peekLine());
+                makeOpCode(OP_GET_GLOBAL, name, peekLine());
                 if (next.getTtype() == TK_PLUS_EQUAL) {
                     makeOpCode(OP_ADD, next.getLine());
                 } else if (next.getTtype() == TK_MINUS_EQUAL) {
@@ -176,7 +177,7 @@ public class Parser {
                 }
             }
 
-            makeOpCode(OP_STORE_GLOBAL, name, peekLine());
+            makeOpCode(OP_SET_GLOBAL, name, peekLine());
         } else {
             logicalOr();
         }
@@ -312,7 +313,7 @@ public class Parser {
             makeOpCode(OP_CONSTANT, peekLine());
             advance();
         } else if (match(TK_IDENTIFIER)) {
-            makeOpCode(OP_LOAD_GLOBAL, peekLiteral(), peekLine());
+            makeOpCode(OP_GET_GLOBAL, peekLiteral(), peekLine());
             advance();
         } else if (matchAdvance(TK_LPAR)) {
             expression();

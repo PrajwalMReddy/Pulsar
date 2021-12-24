@@ -5,12 +5,12 @@ import java.util.ArrayList;
 public class Interpreter {
     private final String sourceCode;
     private ArrayList<Instruction> instructions;
-    public static Variable variableValues;
+    public GlobalVariable globals;
 
     public Interpreter(String sourceCode) {
         this.sourceCode = sourceCode;
         this.instructions = new ArrayList<>();
-        this.variableValues = new Variable();
+        this.globals = new GlobalVariable();
     }
 
     public void interpret() {

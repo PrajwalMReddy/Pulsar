@@ -16,7 +16,7 @@ public class Disassembler {
                 System.out.print("            ");
             } else {
                 line = token.getLine();
-                System.out.print("\n" + line + "           ");
+                System.out.print("\n" + line + spaces(line));
             }
             if (Arrays.asList(literals).contains(token.getTtype())) {
                 System.out.println(token.getTtype() + spaces(token) + "(" + token.getLiteral() + ")");
@@ -33,10 +33,10 @@ public class Disassembler {
 
         for (Instruction instruction : instructions) {
             if (instruction.getLine() == line) {
-                System.out.print("          " + count + "  | ");
+                System.out.print("            " + count + "  | ");
             } else {
                 line = instruction.getLine();
-                System.out.print("\n" + line + "         " + count + "  | ");
+                System.out.print("\n" + line + spaces(line) + count + "  | ");
             }
             decide(instruction);
 
@@ -47,7 +47,7 @@ public class Disassembler {
     private static void decide(Instruction instruction) {
         switch (instruction.getOpcode()) {
             case OP_CONSTANT, OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,
-                    OP_STORE_GLOBAL, OP_LOAD_GLOBAL -> operand(instruction);
+                    OP_SET_GLOBAL, OP_GET_GLOBAL -> operand(instruction);
             case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_MODULO, OP_NEGATE,
                     OP_NOT, OP_COMPARE_EQUAL, OP_COMPARE_GREATER, OP_COMPARE_LESSER,
                     OP_POP, OP_NULL, OP_PRINT -> opcode(instruction);
@@ -68,9 +68,9 @@ public class Disassembler {
             System.out.println("OP_JUMP_IF_TRUE" + spaces(instruction) + instruction.getOperand());
         } else if (instruction.getOpcode() == ByteCode.OP_JUMP_IF_FALSE) {
             System.out.println("OP_JUMP_IF_FALSE" + spaces(instruction) + instruction.getOperand());
-        } else if (instruction.getOpcode() == ByteCode.OP_STORE_GLOBAL) {
+        } else if (instruction.getOpcode() == ByteCode.OP_SET_GLOBAL) {
             System.out.println("OP_STORE_GLOBAL" + spaces(instruction) + instruction.getOperand());
-        } else if (instruction.getOpcode() == ByteCode.OP_LOAD_GLOBAL) {
+        } else if (instruction.getOpcode() == ByteCode.OP_GET_GLOBAL) {
             System.out.println("OP_LOAD_GLOBAL" + spaces(instruction) + instruction.getOperand());
         }
     }
@@ -83,6 +83,11 @@ public class Disassembler {
     private static String spaces(Token token) {
         int length = token.getTtype().toString().length();
         return giveSpaces(length);
+    }
+
+    private static String spaces(int line) {
+        int length = String.valueOf(line).length();
+        return giveSpaces(length + 9);
     }
 
     private static String giveSpaces(int length) {

@@ -4,10 +4,10 @@ import org.codepulsar.primitives.Primitive;
 
 import java.util.HashMap;
 
-public class Variable {
+public class GlobalVariable {
     HashMap<String, Primitive> values;
 
-    public Variable() {
+    public GlobalVariable() {
         this.values = new HashMap<>();
     }
 
@@ -29,6 +29,7 @@ public class Variable {
         if (value == null) {
             return false;
         }
+
         return true;
     }
 }
