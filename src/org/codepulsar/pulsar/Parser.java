@@ -34,25 +34,21 @@ public class Parser {
             Disassembler.tokens(this.tokens);
         }
 
-        while (!match(TK_EOF)) {
-            declaration();
-        }
+        start();
 
         return this.instructions;
     }
 
-    private void declaration() {
-        if (match(TK_VAR, TK_CONST, TK_FUN)) {
-            topLevelDeclaration();
-        } else {
-            statement();
+    private void start() {
+        while (!match(TK_EOF)) {
+            declaration();
         }
     }
 
-    private void topLevelDeclaration() {
-        if (matchAdvance(TK_VAR, TK_CONST)) {
+    private void declaration() {
+        if (match(TK_VAR, TK_CONST)) {
             globalVariableDeclaration();
-        } else if (matchAdvance(TK_FUN)) {
+        } else if (match(TK_FUN)) {
             functionDeclaration();
         }
     }
@@ -74,6 +70,14 @@ public class Parser {
 
     private void functionDeclaration() {
         // TODO Finish Function Declarations
+    }
+
+    private void block() {
+        look(TK_LBRACE, "An Opening Brace Was Expected Before The Block", "Missing Character");
+        while (!match(TK_RBRACE)) {
+            statement();
+        }
+        look(TK_RBRACE, "A Closing Brace Was Expected Before The Block", "Missing Character");
     }
 
     private void statement() {
@@ -123,14 +127,6 @@ public class Parser {
 
         fixJump(offset, OP_JUMP_IF_FALSE);
         makeOpCode(OP_POP, peekLine());
-    }
-
-    private void block() {
-        look(TK_LBRACE, "An Opening Brace Was Expected Before The Block", "Missing Character");
-        while (!match(TK_RBRACE)) {
-            statement();
-        }
-        look(TK_RBRACE, "A Closing Brace Was Expected Before The Block", "Missing Character");
     }
 
     private void printStatement() {
