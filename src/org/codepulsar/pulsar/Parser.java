@@ -46,10 +46,13 @@ public class Parser {
     }
 
     private void declaration() {
-        if (match(TK_VAR, TK_CONST)) {
+        if (matchAdvance(TK_VAR, TK_CONST)) {
             globalVariableDeclaration();
-        } else if (match(TK_FUN)) {
+        } else if (matchAdvance(TK_FUN)) {
             functionDeclaration();
+        } else {
+            setErrors("Invalid Top Level Code", "Only Function And Global Variable Declarations Are Allowed At The Top Level", peek());
+            synchronizeTopLevel();
         }
     }
 
@@ -395,9 +398,23 @@ public class Parser {
     }
 
     private void synchronize() {
-        while (peek().getTtype() != TK_EOF) {
-            if (peek().getTtype() == TK_SEMICOLON) {
-                advance();
+        while (peekType() != TK_EOF) {
+            if (peekType() == TK_SEMICOLON) {
+                return;
+            }
+
+            switch (peekType()) {
+                case TK_VAR, TK_CONST,
+                        TK_IF, TK_WHILE, TK_PRINT -> { return; }
+            }
+
+            advance();
+        }
+    }
+
+    private void synchronizeTopLevel() {
+        while (peekType() != TK_EOF) {
+            if (peekType() == TK_FUN) {
                 return;
             }
 
