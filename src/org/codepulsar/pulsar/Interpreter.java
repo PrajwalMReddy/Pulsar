@@ -33,7 +33,7 @@ public class Interpreter {
     }
 
     private String reportError(Error error) {
-        String errorMessage = error.getEtype();
+        String errorMessage = error.getErrorType();
         errorMessage += " | " + error.getMessage();
         errorMessage += ";\nOn Line " + error.getToken().getLine();
         return errorMessage;

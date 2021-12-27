@@ -23,7 +23,7 @@ public class Lexer {
             Token toAdd = scanToken();
             tokens.add(toAdd);
 
-            if (toAdd.getTtype() == TK_EOF) {
+            if (toAdd.getTokenType() == TK_EOF) {
                 break;
             }
         }
@@ -85,7 +85,7 @@ public class Lexer {
             case '!':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(TK_NOTEQUAL);
+                    return makeToken(TK_NOT_EQUAL);
                 } else {
                     return makeToken(TK_NOT);
                 }
@@ -127,21 +127,21 @@ public class Lexer {
             case '=':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(TK_EQUALEQUAL);
+                    return makeToken(TK_EQUAL_EQUAL);
                 } else {
                     return makeToken(TK_EQUAL);
                 }
             case '>':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(TK_GTEQUAL);
+                    return makeToken(TK_GT_EQUAL);
                 } else {
                     return makeToken(TK_GT);
                 }
             case '<':
                 if (peek() == '=') {
                     advance();
-                    return makeToken(TK_LTEQUAL);
+                    return makeToken(TK_LT_EQUAL);
                 } else {
                     return makeToken(TK_LT);
                 }
@@ -202,7 +202,11 @@ public class Lexer {
                 case 'a' -> checkKeyword("lse", TK_FALSE, 2);
                 default -> TK_IDENTIFIER;
             };
-            case 'i' -> checkKeyword("f", TK_IF, 1);
+            case 'i' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'f' -> checkKeyword("", TK_IF, 2);
+                case 'm' -> checkKeyword("port", TK_IMPORT, 2);
+                default -> TK_IDENTIFIER;
+            };
             case 'm' -> checkKeyword("od", TK_MOD, 1);
             case 'n' -> checkKeyword("ull", TK_NULL, 1);
             case 'p' -> switch (this.sourceCode.charAt(this.start + 1)) {
@@ -212,19 +216,18 @@ public class Lexer {
             };
             case 'r' -> checkKeyword("eturn", TK_RETURN, 1);
             case 't' -> checkKeyword("rue", TK_TRUE, 1);
-            case 'u' -> checkKeyword("se", TK_USE, 1);
             case 'v' -> checkKeyword("ar", TK_VAR, 1);
             case 'w' -> checkKeyword("hile", TK_WHILE, 1);
             default -> TK_IDENTIFIER;
         };
     }
 
-    private TokenType checkKeyword(String remaining, TokenType ttype, int starter) {
+    private TokenType checkKeyword(String remaining, TokenType tokenType, int starter) {
         int length = remaining.length() + starter;
         String word = this.sourceCode.substring(start + starter, start + length);
 
         if (((this.current - this.start) == length) && (word.equals(remaining))) {
-            return ttype;
+            return tokenType;
         }
 
         return TK_IDENTIFIER;
@@ -250,8 +253,8 @@ public class Lexer {
         return makeToken(TK_INTEGER);
     }
 
-    private Token makeToken(TokenType ttype) {
-        return new Token(ttype, currentLiteral(), this.line);
+    private Token makeToken(TokenType tokenType) {
+        return new Token(tokenType, currentLiteral(), this.line);
     }
 
     private Token errorToken(String message) {

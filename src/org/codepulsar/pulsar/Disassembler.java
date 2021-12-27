@@ -7,7 +7,8 @@ import static org.codepulsar.pulsar.TokenType.*;
 
 public class Disassembler {
     public static void tokens(ArrayList<Token> tokens) {
-        TokenType[] literals = {TK_STRING, TK_INTEGER, TK_DOUBLE, TK_IDENTIFIER}; // Tokens With Meaningful Literals Attached To Them
+        // Tokens With Meaningful Literals Attached To Them
+        TokenType[] literals = {TK_STRING, TK_INTEGER, TK_DOUBLE, TK_IDENTIFIER};
         int line = 0;
         System.out.println("-- Tokens --");
 
@@ -18,10 +19,10 @@ public class Disassembler {
                 line = token.getLine();
                 System.out.print("\n" + line + spaces(line));
             }
-            if (Arrays.asList(literals).contains(token.getTtype())) {
-                System.out.println(token.getTtype() + spaces(token) + "(" + token.getLiteral() + ")");
+            if (Arrays.asList(literals).contains(token.getTokenType())) {
+                System.out.println(token.getTokenType() + spaces(token) + "(" + token.getLiteral() + ")");
             } else {
-                System.out.println(token.getTtype());
+                System.out.println(token.getTokenType());
             }
         }
     }
@@ -46,11 +47,14 @@ public class Disassembler {
 
     private static void decide(Instruction instruction) {
         switch (instruction.getOpcode()) {
+            // These Are OpCodes That Have Operands
             case OP_CONSTANT, OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,
-                    OP_SET_GLOBAL, OP_GET_GLOBAL -> operand(instruction); // These Are OpCodes That Have Operands
+                    OP_NEW_GLOBAL, OP_SET_GLOBAL, OP_GET_GLOBAL -> operand(instruction);
+
+            // These Are OpCodes That Don't Have Operands
             case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_MODULO, OP_NEGATE,
                     OP_NOT, OP_COMPARE_EQUAL, OP_COMPARE_GREATER, OP_COMPARE_LESSER,
-                    OP_POP, OP_NULL, OP_PRINT -> opcode(instruction); // These Are OpCodes That Don't Have Operands
+                    OP_POP, OP_NULL, OP_PRINT -> opcode(instruction);
         }
     }
 
@@ -63,16 +67,8 @@ public class Disassembler {
         if (instruction.getOpcode() == ByteCode.OP_CONSTANT) {
             System.out.println(ByteCode.OP_CONSTANT + spaces(instruction) + instruction.getOperand()
                     + "  (" + Parser.values.get((int) instruction.getOperand()) + ")");
-        } else if (instruction.getOpcode() == ByteCode.OP_JUMP) {
-            System.out.println(ByteCode.OP_JUMP + spaces(instruction) + instruction.getOperand());
-        } else if (instruction.getOpcode() == ByteCode.OP_JUMP_IF_TRUE) {
-            System.out.println(ByteCode.OP_JUMP_IF_TRUE + spaces(instruction) + instruction.getOperand());
-        } else if (instruction.getOpcode() == ByteCode.OP_JUMP_IF_FALSE) {
-            System.out.println(ByteCode.OP_JUMP_IF_FALSE + spaces(instruction) + instruction.getOperand());
-        } else if (instruction.getOpcode() == ByteCode.OP_SET_GLOBAL) {
-            System.out.println(ByteCode.OP_SET_GLOBAL + spaces(instruction) + instruction.getOperand());
-        } else if (instruction.getOpcode() == ByteCode.OP_GET_GLOBAL) {
-            System.out.println(ByteCode.OP_GET_GLOBAL + spaces(instruction) + instruction.getOperand());
+        } else {
+            System.out.println(instruction.getOpcode() + spaces(instruction) + instruction.getOperand());
         }
     }
 
@@ -85,7 +81,7 @@ public class Disassembler {
     }
 
     private static String spaces(Token token) {
-        int length = token.getTtype().toString().length();
+        int length = token.getTokenType().toString().length();
         return giveSpaces(length);
     }
 

@@ -8,13 +8,15 @@ import static org.codepulsar.pulsar.TokenType.*;
 import static org.codepulsar.pulsar.ByteCode.*;
 
 public class Parser {
-    private final String sourceCode;
-    private ArrayList<Token> tokens;
-    private final ArrayList<Instruction> instructions;
-    public static ArrayList<Primitive> values;
-    private int current;
-    public final ArrayList<Error> errors;
-    boolean hasErrors;
+    private final String sourceCode; // Original Source Code From User
+    private ArrayList<Token> tokens; // Fully Tokenized Output From Lexer
+
+    private final ArrayList<Instruction> instructions; // Instructions Produced From Parser
+    public static ArrayList<Primitive> values; // Constant Values To Be Stored
+    private int current; // Next Token To Be Used
+
+    public final ArrayList<Error> errors; // Full List Of Errors To Be Reported
+    boolean hasErrors; // Flag To Indicate If The Code Has Any Errors
 
     public Parser(String sourceCode) {
         this.sourceCode = sourceCode;
@@ -51,7 +53,8 @@ public class Parser {
         } else if (matchAdvance(TK_FUN)) {
             functionDeclaration();
         } else {
-            setErrors("Invalid Top Level Code", "Only Function And Global Variable Declarations Are Allowed At The Top Level", peek());
+            setErrors("Invalid Top Level Code", "Only Function And Global Variable Declarations Are " +
+                    "Allowed At The Top Level", peek());
             synchronizeTopLevel();
         }
     }
@@ -66,8 +69,7 @@ public class Parser {
             makeOpCode(OP_NULL, peekLine());
         }
 
-        makeOpCode(OP_SET_GLOBAL, name, peekLine());
-        makeOpCode(OP_POP, peekLine());
+        makeOpCode(OP_NEW_GLOBAL, name, peekLine());
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
     }
 
@@ -139,7 +141,7 @@ public class Parser {
     }
 
     private void localVariableDeclaration() {
-        // TODO Local Variable Code
+        // TODO Local Variable Declarations
     }
 
     private void expressionStatement() {
@@ -153,7 +155,8 @@ public class Parser {
     }
 
     private void assignment() {
-        if (peekType() == TK_IDENTIFIER && peekNext().getLiteral().contains("=") && peekNext().getTtype() != TK_EQUALEQUAL) {
+        if (peekType() == TK_IDENTIFIER && peekNext().getLiteral().contains("=")
+                && peekNext().getTokenType() != TK_EQUAL_EQUAL) {
             Token next = peekNext();
 
             String name = peekLiteral();
@@ -163,15 +166,15 @@ public class Parser {
 
             if (next.getLiteral().indexOf("=") > 0) {
                 makeOpCode(OP_GET_GLOBAL, name, peekLine());
-                if (next.getTtype() == TK_PLUS_EQUAL) {
+                if (next.getTokenType() == TK_PLUS_EQUAL) {
                     makeOpCode(OP_ADD, next.getLine());
-                } else if (next.getTtype() == TK_MINUS_EQUAL) {
+                } else if (next.getTokenType() == TK_MINUS_EQUAL) {
                     makeOpCode(OP_SUBTRACT, next.getLine());
-                } else if (next.getTtype() == TK_MUL_EQUAL) {
+                } else if (next.getTokenType() == TK_MUL_EQUAL) {
                     makeOpCode(OP_MULTIPLY, next.getLine());
-                } else if (next.getTtype() == TK_DIV_EQUAL) {
+                } else if (next.getTokenType() == TK_DIV_EQUAL) {
                     makeOpCode(OP_DIVIDE, next.getLine());
-                } else if (next.getTtype() == TK_MOD_EQUAL) {
+                } else if (next.getTokenType() == TK_MOD_EQUAL) {
                     makeOpCode(OP_MODULO, next.getLine());
                 }
             }
@@ -217,12 +220,12 @@ public class Parser {
     private void equality() {
         comparison();
 
-        while (match(TK_EQUALEQUAL, TK_NOTEQUAL)) {
-            if (peekType() == TK_EQUALEQUAL) {
+        while (match(TK_EQUAL_EQUAL, TK_NOT_EQUAL)) {
+            if (peekType() == TK_EQUAL_EQUAL) {
                 advance();
                 comparison();
                 makeOpCode(OP_COMPARE_EQUAL, peekLine());
-            } else if (peekType() == TK_NOTEQUAL) {
+            } else if (peekType() == TK_NOT_EQUAL) {
                 advance();
                 comparison();
                 makeOpCode(OP_COMPARE_EQUAL, peekLine());
@@ -234,7 +237,7 @@ public class Parser {
     private void comparison() {
         term();
 
-        while (match(TK_GT, TK_GTEQUAL, TK_LT, TK_LTEQUAL)) {
+        while (match(TK_GT, TK_GT_EQUAL, TK_LT, TK_LT_EQUAL)) {
             if (peekType() == TK_GT) {
                 advance();
                 term();
@@ -243,12 +246,12 @@ public class Parser {
                 advance();
                 term();
                 makeOpCode(OP_COMPARE_LESSER, peekLine());
-            } else if (peekType() == TK_GTEQUAL) {
+            } else if (peekType() == TK_GT_EQUAL) {
                 advance();
                 term();
                 makeOpCode(OP_COMPARE_LESSER, peekLine());
                 makeOpCode(OP_NOT, peekLine());
-            } else if (peekType() == TK_LTEQUAL) {
+            } else if (peekType() == TK_LT_EQUAL) {
                 advance();
                 term();
                 makeOpCode(OP_COMPARE_GREATER, peekLine());
@@ -316,9 +319,11 @@ public class Parser {
             advance();
         } else if (matchAdvance(TK_LPAR)) {
             expression();
-            look(TK_RPAR, "A Closing Parenthesis Was Expected Before The Block", "Missing Character");
+            look(TK_RPAR, "A Closing Parenthesis Was Expected Before The Block",
+                    "Missing Character");
         } else {
-            setErrors("Missing Expression", "An Expression Was Expected But Nothing Was Given", peek());
+            setErrors("Missing Expression",
+                    "An Expression Was Expected But Nothing Was Given", peek());
         }
     }
 
@@ -389,7 +394,7 @@ public class Parser {
     }
 
     private void look(TokenType token, String message, String errorType) {
-        if (peek().getTtype() != token) {
+        if (peek().getTokenType() != token) {
             setErrors(errorType, message, peek());
             synchronize();
         } else {
@@ -422,9 +427,9 @@ public class Parser {
         }
     }
 
-    private void setErrors(String etype, String message, Token token) {
+    private void setErrors(String errorType, String message, Token token) {
         this.hasErrors = true;
-        Error error = new Error(etype, message, token);
+        Error error = new Error(errorType, message, token);
         this.errors.add(error);
     }
 
@@ -437,7 +442,7 @@ public class Parser {
     }
 
     private TokenType peekType() {
-        return this.tokens.get(this.current).getTtype();
+        return this.tokens.get(this.current).getTokenType();
     }
 
     private int peekLine() {

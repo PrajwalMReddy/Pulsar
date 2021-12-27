@@ -7,11 +7,13 @@ public enum ByteCode {
     OP_COMPARE_EQUAL, OP_COMPARE_GREATER, OP_COMPARE_LESSER, // Comparison
 
     // Data Types and Variables
-    OP_CONSTANT, OP_NULL, OP_SET_GLOBAL, OP_GET_GLOBAL, OP_STORE_LOCAL, OP_LOAD_LOCAL,
+    OP_CONSTANT, OP_NULL,
+    OP_NEW_GLOBAL, OP_SET_GLOBAL, OP_GET_GLOBAL,
+    OP_STORE_LOCAL, OP_LOAD_LOCAL,
 
     // Control Flow OpCodes
     OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,
 
     // Special OpCodes
-    OP_PRINT, OP_POP
+    OP_PRINT, OP_POP,
 }

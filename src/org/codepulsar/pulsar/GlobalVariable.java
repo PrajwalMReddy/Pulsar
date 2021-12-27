@@ -25,11 +25,6 @@ public class GlobalVariable {
 
     public boolean containsKey(String name) {
         Primitive value = this.values.get(name);
-
-        if (value == null) {
-            return false;
-        }
-
-        return true;
+        return value != null;
     }
 }
