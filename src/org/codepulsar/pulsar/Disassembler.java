@@ -49,7 +49,8 @@ public class Disassembler {
         switch (instruction.getOpcode()) {
             // These Are OpCodes That Have Operands
             case OP_CONSTANT, OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,
-                    OP_NEW_GLOBAL, OP_SET_GLOBAL, OP_GET_GLOBAL -> operand(instruction);
+                    OP_NEW_GLOBAL, OP_STORE_GLOBAL, OP_LOAD_GLOBAL,
+                    OP_NEW_LOCAL, OP_SET_LOCAL, OP_GET_LOCAL -> operand(instruction);
 
             // These Are OpCodes That Don't Have Operands
             case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_MODULO, OP_NEGATE,

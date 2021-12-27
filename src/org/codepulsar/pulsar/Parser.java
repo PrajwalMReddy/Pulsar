@@ -15,15 +15,21 @@ public class Parser {
     public static ArrayList<Primitive> values; // Constant Values To Be Stored
     private int current; // Next Token To Be Used
 
+    private int depth; // The Total Depth Of The Current Scope
+
     public final ArrayList<Error> errors; // Full List Of Errors To Be Reported
     boolean hasErrors; // Flag To Indicate If The Code Has Any Errors
 
     public Parser(String sourceCode) {
         this.sourceCode = sourceCode;
         this.tokens = new ArrayList<>();
+
         this.instructions = new ArrayList<>();
         values = new ArrayList<>();
         this.current = 0;
+
+        this.depth = 1; // TODO When Functions Are Implemented, Change This Back To 'this.depth = 0;'
+
         this.errors = new ArrayList<>();
         this.hasErrors = false;
     }
@@ -43,7 +49,7 @@ public class Parser {
 
     private void start() {
         while (!match(TK_EOF)) {
-            declaration();
+            statement(); // TODO When Functions Are Implemented, Change This Back To 'declaration();'
         }
     }
 
@@ -70,7 +76,7 @@ public class Parser {
         }
 
         makeOpCode(OP_NEW_GLOBAL, name, peekLine());
-        look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration", "Missing Character");
     }
 
     private void functionDeclaration() {
@@ -78,11 +84,21 @@ public class Parser {
     }
 
     private void block() {
+        startScope();
         look(TK_LBRACE, "An Opening Brace Was Expected Before The Block", "Missing Character");
         while (!match(TK_RBRACE)) {
             statement();
         }
         look(TK_RBRACE, "A Closing Brace Was Expected Before The Block", "Missing Character");
+        endScope();
+    }
+
+    private void startScope() {
+        this.depth++;
+    }
+
+    private void endScope() {
+        this.depth--;
     }
 
     private void statement() {
@@ -137,11 +153,21 @@ public class Parser {
     private void printStatement() {
         expression();
         makeOpCode(OP_PRINT, peekLine());
-        look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Print Statement", "Missing Character");
     }
 
     private void localVariableDeclaration() {
-        // TODO Local Variable Declarations
+        String name = peekLiteral();
+        advance();
+
+        if (matchAdvance(TK_EQUAL)) {
+            expression();
+        } else {
+            makeOpCode(OP_NULL, peekLine());
+        }
+
+        makeOpCode(OP_NEW_LOCAL, name, peekLine());
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration", "Missing Character");
     }
 
     private void expressionStatement() {
@@ -165,7 +191,11 @@ public class Parser {
             expression();
 
             if (next.getLiteral().indexOf("=") > 0) {
-                makeOpCode(OP_GET_GLOBAL, name, peekLine());
+                if (!inGlobalScope()) {
+                    makeOpCode(OP_GET_LOCAL, name, peekLine());
+                } else {
+                    makeOpCode(OP_LOAD_GLOBAL, name, peekLine());
+                }
                 if (next.getTokenType() == TK_PLUS_EQUAL) {
                     makeOpCode(OP_ADD, next.getLine());
                 } else if (next.getTokenType() == TK_MINUS_EQUAL) {
@@ -179,7 +209,11 @@ public class Parser {
                 }
             }
 
-            makeOpCode(OP_SET_GLOBAL, name, peekLine());
+            if (!inGlobalScope()) {
+                makeOpCode(OP_SET_LOCAL, name, peekLine());
+            } else {
+                makeOpCode(OP_STORE_GLOBAL, name, peekLine());
+            }
         } else {
             logicalOr();
         }
@@ -315,7 +349,11 @@ public class Parser {
             makeOpCode(OP_CONSTANT, peekLine());
             advance();
         } else if (match(TK_IDENTIFIER)) {
-            makeOpCode(OP_GET_GLOBAL, peekLiteral(), peekLine());
+            if (!inGlobalScope()) {
+                makeOpCode(OP_GET_LOCAL, peekLiteral(), peekLine());
+            } else {
+                makeOpCode(OP_LOAD_GLOBAL, peekLiteral(), peekLine());
+            }
             advance();
         } else if (matchAdvance(TK_LPAR)) {
             expression();
@@ -431,6 +469,10 @@ public class Parser {
         this.hasErrors = true;
         Error error = new Error(errorType, message, token);
         this.errors.add(error);
+    }
+
+    private boolean inGlobalScope() {
+        return this.depth == 0;
     }
 
     private Token peek() {
