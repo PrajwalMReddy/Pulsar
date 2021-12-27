@@ -1,25 +1,4 @@
-// A file that shows an example of what works in the language.
+// Testing The Interpreter
 
-var age = 0; // Global Variable
 
-// While Statement
-while age < 128 {
-
-    // If Statement Chain
-    if age == 0 {
-        print 0;
-    } else if age < 5 {
-        print 1;
-    } else if age < 13 {
-        print 2;
-    } else if age < 18 {
-        print 3;
-    } else if age < 66 {
-        print 4;
-    } else {
-        print 5;
-    }
-
-    // Assignment
-    a += 1;
-}
+print 1;

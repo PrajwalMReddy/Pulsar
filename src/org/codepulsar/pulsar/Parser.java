@@ -65,6 +65,7 @@ public class Parser {
         }
     }
 
+    // TODO Find And Fix All Problems Relating To Global Variables
     private void globalVariableDeclaration() {
         String name = peekLiteral();
         advance();
@@ -156,6 +157,7 @@ public class Parser {
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Print Statement", "Missing Character");
     }
 
+    // TODO Find And Fix All Problems Relating To Local Variables
     private void localVariableDeclaration() {
         String name = peekLiteral();
         advance();
@@ -191,10 +193,10 @@ public class Parser {
             expression();
 
             if (next.getLiteral().indexOf("=") > 0) {
-                if (!inGlobalScope()) {
-                    makeOpCode(OP_GET_LOCAL, name, peekLine());
-                } else {
+                if (inGlobalScope()) {
                     makeOpCode(OP_LOAD_GLOBAL, name, peekLine());
+                } else {
+                    makeOpCode(OP_GET_LOCAL, name, peekLine());
                 }
                 if (next.getTokenType() == TK_PLUS_EQUAL) {
                     makeOpCode(OP_ADD, next.getLine());
@@ -209,10 +211,10 @@ public class Parser {
                 }
             }
 
-            if (!inGlobalScope()) {
-                makeOpCode(OP_SET_LOCAL, name, peekLine());
-            } else {
+            if (inGlobalScope()) {
                 makeOpCode(OP_STORE_GLOBAL, name, peekLine());
+            } else {
+                makeOpCode(OP_SET_LOCAL, name, peekLine());
             }
         } else {
             logicalOr();
@@ -349,10 +351,10 @@ public class Parser {
             makeOpCode(OP_CONSTANT, peekLine());
             advance();
         } else if (match(TK_IDENTIFIER)) {
-            if (!inGlobalScope()) {
-                makeOpCode(OP_GET_LOCAL, peekLiteral(), peekLine());
-            } else {
+            if (inGlobalScope()) {
                 makeOpCode(OP_LOAD_GLOBAL, peekLiteral(), peekLine());
+            } else {
+                makeOpCode(OP_GET_LOCAL, peekLiteral(), peekLine());
             }
             advance();
         } else if (matchAdvance(TK_LPAR)) {
@@ -367,15 +369,15 @@ public class Parser {
 
     private Instruction makeOpCode(ByteCode opcode, int line) {
         if (opcode == OP_CONSTANT) {
-            Primitive lr = new Primitive();
+            Primitive primitiveLiteral = new Primitive();
             switch (peekType()) {
-                case TK_INTEGER -> lr = new PInteger(Integer.parseInt(peekLiteral()));
-                case TK_DOUBLE -> lr = new PDouble(Double.parseDouble(peekLiteral()));
-                case TK_TRUE -> lr = new PBoolean(true);
-                case TK_FALSE -> lr = new PBoolean(false);
-                case TK_NULL -> lr = new PNull();
+                case TK_INTEGER -> primitiveLiteral = new PInteger(Integer.parseInt(peekLiteral()));
+                case TK_DOUBLE -> primitiveLiteral = new PDouble(Double.parseDouble(peekLiteral()));
+                case TK_TRUE -> primitiveLiteral = new PBoolean(true);
+                case TK_FALSE -> primitiveLiteral = new PBoolean(false);
+                case TK_NULL -> primitiveLiteral = new PNull();
             }
-            values.add(lr);
+            values.add(primitiveLiteral);
             Instruction instruction = new Instruction(OP_CONSTANT, values.size() - 1, line);
             this.instructions.add(instruction);
             return instruction;
