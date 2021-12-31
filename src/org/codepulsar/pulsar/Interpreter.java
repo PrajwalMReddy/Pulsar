@@ -76,6 +76,14 @@ public class Interpreter {
 
                 case OP_CONSTANT, OP_NULL -> push(Parser.values.get((int) instruction.getOperand()));
 
+                case OP_NEW_GLOBAL -> this.globals.newVariable(instruction.getOperand().toString(), pop());
+                case OP_STORE_GLOBAL -> {
+                    Primitive value = pop();
+                    this.globals.reassignVariable(instruction.getOperand().toString(), value);
+                    push(value);
+                }
+                case OP_LOAD_GLOBAL -> loadGlobal(instruction);
+
                 case OP_JUMP -> this.ip = ((int) instruction.getOperand()) - 1;
                 case OP_JUMP_IF_TRUE -> conditionalJump(instruction, OP_JUMP_IF_TRUE);
                 case OP_JUMP_IF_FALSE -> conditionalJump(instruction, OP_JUMP_IF_FALSE);
@@ -88,26 +96,6 @@ public class Interpreter {
             }
 
             this.ip++;
-        }
-    }
-
-    private void conditionalJump(Instruction instruction, ByteCode opcode) {
-        Primitive value = pop();
-        push(value);
-
-        if (!(value instanceof PBoolean)) {
-            runtimeError("Invalid Control Flow Condition");
-        }
-
-        PBoolean newValue = (PBoolean) value;
-        if (opcode == OP_JUMP_IF_TRUE) {
-            if (newValue.isValue()) {
-                this.ip = (int) instruction.getOperand();
-            }
-        } else if (opcode == OP_JUMP_IF_FALSE) {
-            if (!newValue.isValue()) {
-                this.ip = (int) instruction.getOperand();
-            }
         }
     }
 
@@ -148,7 +136,7 @@ public class Interpreter {
             newA = ((PDouble) a).getValue();
             isDouble = true;
         } else {
-            runtimeError("Invalid Type For A Binary Operation - " + a.getClass());
+            runtimeError("Invalid Type For A Binary Operation");
         }
 
         if (b instanceof PInteger) {
@@ -157,7 +145,7 @@ public class Interpreter {
             newB = ((PDouble) b).getValue();
             isDouble = true;
         } else {
-            runtimeError("Invalid Type For A Binary Operation - " + b.getClass());
+            runtimeError("Invalid Type For A Binary Operation");
         }
 
         if (opcode == OP_ADD) {
@@ -244,6 +232,44 @@ public class Interpreter {
                 push(new PBoolean(newA < newB));
             }
         }
+    }
+
+    private void conditionalJump(Instruction instruction, ByteCode opcode) {
+        Primitive value = pop();
+        push(value);
+
+        if (!(value instanceof PBoolean)) {
+            runtimeError("Invalid Control Flow Condition");
+        }
+
+        PBoolean newValue = (PBoolean) value;
+        if (opcode == OP_JUMP_IF_TRUE) {
+            if (newValue.isValue()) {
+                this.ip = (int) instruction.getOperand();
+            }
+        } else if (opcode == OP_JUMP_IF_FALSE) {
+            if (!newValue.isValue()) {
+                this.ip = (int) instruction.getOperand();
+            }
+        }
+    }
+
+    // TODO Find And Fix Weird Error
+    private void loadGlobal(Instruction instruction) {
+        Primitive value = this.globals.getValue(instruction.getOperand().toString());
+
+        if (value instanceof PInteger) {
+            push(new PInteger(((PInteger) value).getValue()));
+            return;
+        } else if (value instanceof PDouble) {
+            push(new PDouble(((PDouble) value).getValue()));
+            return;
+        } else if (value instanceof PBoolean) {
+            push(new PBoolean(((PBoolean) value).isValue()));
+            return;
+        }
+
+        push(value);
     }
 
     private void runtimeError(String message) {

@@ -28,7 +28,7 @@ public class Parser {
         values = new ArrayList<>();
         this.current = 0;
 
-        this.depth = 1; // TODO When Functions Are Implemented, Change This Back To 'this.depth = 0;'
+        this.depth = 0;
 
         this.errors = new ArrayList<>();
         this.hasErrors = false;
@@ -48,6 +48,7 @@ public class Parser {
     }
 
     private void start() {
+        declaration(); // TODO Delete This
         while (!match(TK_EOF)) {
             statement(); // TODO When Functions Are Implemented, Change This Back To 'declaration();'
         }
@@ -474,7 +475,8 @@ public class Parser {
     }
 
     private boolean inGlobalScope() {
-        return this.depth == 0;
+        return true;  // TODO Remove This And Uncomment Below Line
+        // return this.depth == 0;
     }
 
     private Token peek() {

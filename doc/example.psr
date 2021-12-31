@@ -1,2 +1,5 @@
 // Testing The Interpreter
 
+var age = 0;
+a += 1;
+print a;
