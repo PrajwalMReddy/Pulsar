@@ -369,7 +369,7 @@ public class Parser {
 
     private Instruction makeOpCode(ByteCode opcode, int line) {
         if (opcode == OP_CONSTANT) {
-            Primitive primitiveLiteral = new Primitive();
+            Primitive primitiveLiteral = null;
             switch (peekType()) {
                 case TK_INTEGER -> primitiveLiteral = new PInteger(Integer.parseInt(peekLiteral()));
                 case TK_DOUBLE -> primitiveLiteral = new PDouble(Double.parseDouble(peekLiteral()));

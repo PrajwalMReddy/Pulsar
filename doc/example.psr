@@ -1,4 +1,6 @@
 // Testing The Interpreter
 
-
-print 1;
+print (1 + 2 - 3 * 4 / 5) * 10 % 3; // Output: 8.881784197001252E-16
+print 1 > 3 == 6 < 4; // Output: true
+print null;
+print -4 > !true; // Triggers A Runtime Error

@@ -1,7 +1,7 @@
 package org.codepulsar.pulsar;
 
 public enum ByteCode {
-    // Operators,
+    // Operators
     OP_NEGATE, OP_NOT, // Unary
     OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_MODULO, // Binary
     OP_COMPARE_EQUAL, OP_COMPARE_GREATER, OP_COMPARE_LESSER, // Comparison
