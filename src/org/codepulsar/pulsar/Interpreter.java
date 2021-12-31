@@ -61,22 +61,53 @@ public class Interpreter {
             Instruction instruction = this.instructions.get(this.ip);
 
             switch (instruction.getOpcode()) {
+                case OP_NEGATE -> unaryOperation(OP_NEGATE);
+                case OP_NOT -> unaryOperation(OP_NOT);
+
                 case OP_ADD -> binaryOperation(OP_ADD);
+                case OP_SUBTRACT -> binaryOperation(OP_SUBTRACT);
+                case OP_MULTIPLY -> binaryOperation(OP_MULTIPLY);
+                case OP_DIVIDE -> binaryOperation(OP_DIVIDE);
+                case OP_MODULO -> binaryOperation(OP_MODULO);
+
                 case OP_COMPARE_EQUAL -> compareOperation(OP_COMPARE_EQUAL);
                 case OP_COMPARE_GREATER -> compareOperation(OP_COMPARE_GREATER);
                 case OP_COMPARE_LESSER -> compareOperation(OP_COMPARE_LESSER);
+
                 case OP_CONSTANT, OP_NULL -> push(Parser.values.get((int) instruction.getOperand()));
-                case OP_DIVIDE -> binaryOperation(OP_DIVIDE);
-                case OP_MODULO -> binaryOperation(OP_MODULO);
-                case OP_MULTIPLY -> binaryOperation(OP_MULTIPLY);
-                case OP_NEGATE -> unaryOperation(OP_NEGATE);
-                case OP_NOT -> unaryOperation(OP_NOT);
-                case OP_POP -> pop();
+
+                case OP_JUMP -> this.ip = ((int) instruction.getOperand()) - 1;
+                case OP_JUMP_IF_TRUE -> conditionalJump(instruction, OP_JUMP_IF_TRUE);
+                case OP_JUMP_IF_FALSE -> conditionalJump(instruction, OP_JUMP_IF_FALSE);
+
                 case OP_PRINT -> System.out.println(pop());
-                case OP_SUBTRACT -> binaryOperation(OP_SUBTRACT);
+                case OP_POP -> pop();
+
+                default -> runtimeError("Unhandled ByteCode Instruction - " + instruction.getOpcode() +
+                        "\nThis Is Not Your Fault And It Will Soon Be Fixed"); // Supposed To Be Unreachable
             }
 
             this.ip++;
+        }
+    }
+
+    private void conditionalJump(Instruction instruction, ByteCode opcode) {
+        Primitive value = pop();
+        push(value);
+
+        if (!(value instanceof PBoolean)) {
+            runtimeError("Invalid Control Flow Condition");
+        }
+
+        PBoolean newValue = (PBoolean) value;
+        if (opcode == OP_JUMP_IF_TRUE) {
+            if (newValue.isValue()) {
+                this.ip = (int) instruction.getOperand();
+            }
+        } else if (opcode == OP_JUMP_IF_FALSE) {
+            if (!newValue.isValue()) {
+                this.ip = (int) instruction.getOperand();
+            }
         }
     }
 
