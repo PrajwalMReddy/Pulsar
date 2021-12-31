@@ -76,10 +76,20 @@ public class Interpreter {
 
                 case OP_CONSTANT, OP_NULL -> push(Parser.values.get((int) instruction.getOperand()));
 
-                case OP_NEW_GLOBAL -> this.globals.newVariable(instruction.getOperand().toString(), pop());
+                case OP_NEW_GLOBAL -> {
+                    String varName = instruction.getOperand().toString();
+                    if (this.globals.containsKey(varName)) {
+                        runtimeError("Redefinition Of Global Variable Is Not Allowed");
+                    }
+                    this.globals.newVariable(varName, pop());
+                }
                 case OP_STORE_GLOBAL -> {
                     Primitive value = pop();
-                    this.globals.reassignVariable(instruction.getOperand().toString(), value);
+                    String varName = instruction.getOperand().toString();
+                    if (!this.globals.containsKey(varName)) {
+                        runtimeError("No Such Variable Named " + varName);
+                    }
+                    this.globals.reassignVariable(varName, value);
                     push(value);
                 }
                 case OP_LOAD_GLOBAL -> loadGlobal(instruction);
@@ -254,9 +264,14 @@ public class Interpreter {
         }
     }
 
-    // TODO Find And Fix Weird Error
     private void loadGlobal(Instruction instruction) {
-        Primitive value = this.globals.getValue(instruction.getOperand().toString());
+        String varName = instruction.getOperand().toString();
+
+        if (!this.globals.containsKey(varName)) {
+            runtimeError("No Such Variable Named " + varName);
+        }
+
+        Primitive value = this.globals.getValue(varName);
 
         if (value instanceof PInteger) {
             push(new PInteger(((PInteger) value).getValue()));

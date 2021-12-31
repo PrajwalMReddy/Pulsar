@@ -48,7 +48,6 @@ public class Parser {
     }
 
     private void start() {
-        declaration(); // TODO Delete This
         while (!match(TK_EOF)) {
             statement(); // TODO When Functions Are Implemented, Change This Back To 'declaration();'
         }
@@ -475,8 +474,7 @@ public class Parser {
     }
 
     private boolean inGlobalScope() {
-        return true;  // TODO Remove This And Uncomment Below Line
-        // return this.depth == 0;
+        return this.depth == 0;
     }
 
     private Token peek() {
