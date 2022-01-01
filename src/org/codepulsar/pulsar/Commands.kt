@@ -1,5 +1,7 @@
 package org.codepulsar.pulsar
 
+import kotlin.system.exitProcess
+
 var debug = false
 
 fun help() {
@@ -9,12 +11,13 @@ fun help() {
     println("    -i     : Interprets The Given File")
     println("    -c     : Compiles The Given File")
     println("    -d     : Displays Debug Information Including Generated Tokens and Bytecode Disassembly\n" +
-            "             And Interprets The File")
+            "             And Interprets The File\n")
 }
 
 fun error(message: String) {
     help()
     println(message)
+    exitProcess(1)
 }
 
 fun parseCommands(command: String) {

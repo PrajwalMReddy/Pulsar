@@ -3,6 +3,7 @@ package org.codepulsar.pulsar;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 
 public class Pulsar {
@@ -22,18 +23,24 @@ public class Pulsar {
     }
 
     public static void interpretFile(String file) throws IOException {
-        byte[] fileBytes = Files.readAllBytes(Paths.get(file));
-        String stringFile = new String(fileBytes, Charset.defaultCharset());
-
-        Interpreter interpreter = new Interpreter(stringFile);
+        Interpreter interpreter = new Interpreter(openFile(file));
         interpreter.interpret();
     }
 
     public static void compileFile(String file) throws IOException {
-        byte[] fileBytes = Files.readAllBytes(Paths.get(file));
-        String stringFile = new String(fileBytes, Charset.defaultCharset());
-
-        Compiler compiler = new Compiler(stringFile);
+        Compiler compiler = new Compiler(openFile(file));
         compiler.init();
+    }
+
+    private static String openFile(String file) throws IOException {
+        String stringFile;
+        try {
+            byte[] fileBytes = Files.readAllBytes(Paths.get(file));
+            stringFile = new String(fileBytes, Charset.defaultCharset());
+            return stringFile;
+        } catch (NoSuchFileException fileException) {
+            CommandsKt.error("The File Path That Was Provided Was Not Found");
+            return null;
+        }
     }
 }

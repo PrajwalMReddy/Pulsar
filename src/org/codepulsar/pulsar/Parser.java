@@ -184,7 +184,9 @@ public class Parser {
 
     private void assignment() {
         if (peekType() == TK_IDENTIFIER && peekNext().getLiteral().contains("=")
-                && peekNext().getTokenType() != TK_EQUAL_EQUAL) {
+                && peekNext().getTokenType() != TK_EQUAL_EQUAL
+                && peekNext().getTokenType() != TK_LT_EQUAL
+                && peekNext().getTokenType() != TK_GT_EQUAL) {
             Token next = peekNext();
 
             String name = peekLiteral();

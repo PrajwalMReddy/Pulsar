@@ -47,15 +47,6 @@ public class Interpreter {
         }
     }
 
-    private String reportError(Error error) {
-        String errorMessage = error.getErrorType();
-        errorMessage += " | " + error.getMessage();
-        if (error.getToken() != null) {
-            errorMessage += ";\nOn Line " + error.getToken().getLine();
-        }
-        return errorMessage;
-    }
-
     private void execute() {
         while (this.ip < this.instructions.size()) {
             Instruction instruction = this.instructions.get(this.ip);
@@ -74,16 +65,17 @@ public class Interpreter {
                 case OP_COMPARE_GREATER -> compareOperation(OP_COMPARE_GREATER);
                 case OP_COMPARE_LESSER -> compareOperation(OP_COMPARE_LESSER);
 
-                case OP_CONSTANT, OP_NULL -> push(Parser.values.get((int) instruction.getOperand()));
+                case OP_CONSTANT -> push(Parser.values.get((int) instruction.getOperand()));
+                case OP_NULL -> push(new PNull());
 
-                case OP_NEW_GLOBAL -> {
+                case OP_NEW_GLOBAL, OP_NEW_LOCAL -> {
                     String varName = instruction.getOperand().toString();
                     if (this.globals.containsKey(varName)) {
-                        runtimeError("Redefinition Of Global Variable Is Not Allowed");
+                        runtimeError("Redefinition Of Global Variable Is Not Allowed - " + varName);
                     }
                     this.globals.newVariable(varName, pop());
                 }
-                case OP_STORE_GLOBAL -> {
+                case OP_STORE_GLOBAL, OP_SET_LOCAL -> {
                     Primitive value = pop();
                     String varName = instruction.getOperand().toString();
                     if (!this.globals.containsKey(varName)) {
@@ -92,7 +84,7 @@ public class Interpreter {
                     this.globals.reassignVariable(varName, value);
                     push(value);
                 }
-                case OP_LOAD_GLOBAL -> loadGlobal(instruction);
+                case OP_LOAD_GLOBAL, OP_GET_LOCAL -> loadGlobal(instruction);
 
                 case OP_JUMP -> this.ip = ((int) instruction.getOperand()) - 1;
                 case OP_JUMP_IF_TRUE -> conditionalJump(instruction, OP_JUMP_IF_TRUE);
@@ -293,7 +285,21 @@ public class Interpreter {
         System.exit(1);
     }
 
+    private String reportError(Error error) {
+        String errorMessage = error.getErrorType();
+        errorMessage += " | " + error.getMessage();
+        if (error.getToken() != null) {
+            errorMessage += ";\nOn Line " + error.getToken().getLine();
+        }
+        return errorMessage;
+    }
+
     private void push(Primitive value) {
+        if (this.sp >= STACK_MAX) {
+            // TODO Fix The Stack Overflow Error That's Happening
+            runtimeError("A Stack Overflow Has Occurred");
+        }
+
         this.stack[this.sp] = value;
         this.sp++;
     }
@@ -305,7 +311,7 @@ public class Interpreter {
 
     // Stack Debugger (Prints Out The Stack)
     private void debugStack(int till) {
-        for (int i = 0; i <= till; i++) {
+        for (int i = 0; i < till; i++) {
             System.out.print(this.stack[i] + "  |  ");
         }
         System.out.println();

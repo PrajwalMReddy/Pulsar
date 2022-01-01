@@ -1,22 +1,24 @@
-// Testing The Interpreter
+// Find Prime Numbers From 0 - 100
 
-var age = 0;
+var start = 2;
+var i;
+var isPrime;
 
-while age < 128 {
+while start <= 100 {
+    i = 2;
+    isPrime = true;
 
-    if age == 0 {
-        print 0;
-    } else if age < 5 {
-        print 1;
-    } else if age < 13 {
-        print 2;
-    } else if age < 18 {
-        print 3;
-    } else if age < 66 {
-        print 4;
-    } else {
-        print 5;
+    while i < start {
+        if start % i == 0 {
+            isPrime = false;
+        }
+
+        i += 1;
     }
 
-    age += 1;
+    if isPrime {
+        print start;
+    }
+
+    start += 1;
 }
