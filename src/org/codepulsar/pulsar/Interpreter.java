@@ -78,6 +78,7 @@ public class Interpreter {
 
                 // TODO Make Sure That Local Variables Did Not Introduce Any NPEs
                 // TODO Make Sure That The Local Variable Not Found Error Works
+                // TODO Find And Handle Weird Edge Cases
 
                 case OP_STORE_GLOBAL -> {
                     Primitive value = pop();

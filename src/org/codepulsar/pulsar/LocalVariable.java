@@ -1,22 +1,24 @@
 package org.codepulsar.pulsar;
 
+import java.util.ArrayList;
+
 public class LocalVariable {
-    Local[] variables;
+    ArrayList<Local> variables;
     int scopeDepth;
     int localCount;
 
     public LocalVariable() {
-        this.variables = new Local[2048];
-        this.scopeDepth = 0;
+        this.variables = new ArrayList<>();
+        this.scopeDepth = 1; // TODO Change Back To 0 When Functions Are Implemented
         this.localCount = 0;
     }
 
     public void newLocal(Token name) {
-        this.variables[this.localCount] = new Local(name, this.scopeDepth);
+        this.variables.add(this.localCount, new Local(name, this.scopeDepth));
     }
 
     public Local getLocal(int index) {
-        return this.variables[index];
+        return this.variables.get(index);
     }
 
     public static class Local {
