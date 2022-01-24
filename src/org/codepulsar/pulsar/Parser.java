@@ -20,6 +20,8 @@ public class Parser {
     public final ArrayList<Error> errors; // Full List Of Errors To Be Reported
     boolean hasErrors; // Flag To Indicate If The Code Has Any Errors
 
+    private LocalVariable locals;
+
     public Parser(String sourceCode) {
         this.sourceCode = sourceCode;
         this.tokens = new ArrayList<>();
@@ -28,10 +30,13 @@ public class Parser {
         values = new ArrayList<>();
         this.current = 0;
 
+        // TODO Check To Make Sure It Starts In Global Scope
         this.depth = 0;
 
         this.errors = new ArrayList<>();
         this.hasErrors = false;
+
+        this.locals = new LocalVariable();
     }
 
     public ArrayList<Instruction> parse() {
@@ -65,7 +70,6 @@ public class Parser {
         }
     }
 
-    // TODO Find And Fix All Problems Relating To Global Variables
     private void globalVariableDeclaration() {
         String name = peekLiteral();
         advance();
@@ -87,7 +91,7 @@ public class Parser {
     private void block() {
         startScope();
         look(TK_LBRACE, "An Opening Brace Was Expected Before The Block", "Missing Character");
-        while (!match(TK_RBRACE)) {
+        while (!match(TK_RBRACE) && !match(TK_EOF)) {
             statement();
         }
         look(TK_RBRACE, "A Closing Brace Was Expected Before The Block", "Missing Character");
@@ -96,10 +100,18 @@ public class Parser {
 
     private void startScope() {
         this.depth++;
+        this.locals.scopeDepth++;
     }
 
     private void endScope() {
         this.depth--;
+        this.locals.scopeDepth--;
+
+        while (this.locals.localCount > 0 &&
+                (this.locals.getLocal(this.locals.localCount - 1).depth > this.depth)) {
+            makeOpCode(OP_POP, peekLine());
+            this.locals.localCount--;
+        }
     }
 
     private void statement() {
@@ -157,9 +169,10 @@ public class Parser {
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Print Statement", "Missing Character");
     }
 
-    // TODO Find And Fix All Problems Relating To Local Variables
     private void localVariableDeclaration() {
-        String name = peekLiteral();
+        Token localToken = peek();
+        addLocal(localToken);
+
         advance();
 
         if (matchAdvance(TK_EQUAL)) {
@@ -168,8 +181,12 @@ public class Parser {
             makeOpCode(OP_NULL, peekLine());
         }
 
-        makeOpCode(OP_NEW_LOCAL, name, peekLine());
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration", "Missing Character");
+    }
+
+    private void addLocal(Token name) {
+        this.locals.localCount++;
+        this.locals.newLocal(name);
     }
 
     private void expressionStatement() {
@@ -473,6 +490,10 @@ public class Parser {
         this.hasErrors = true;
         Error error = new Error(errorType, message, token);
         this.errors.add(error);
+    }
+
+    public LocalVariable getLocals() {
+        return this.locals;
     }
 
     private boolean inGlobalScope() {

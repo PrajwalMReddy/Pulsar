@@ -21,7 +21,6 @@ public class Interpreter {
         this.sourceCode = sourceCode;
         this.instructions = new ArrayList<>();
         this.globals = new GlobalVariable();
-        this.locals = new LocalVariable();
 
         this.stack = new Primitive[STACK_MAX];
         this.sp = 0;
@@ -31,6 +30,7 @@ public class Interpreter {
     public void interpret() {
         Parser parser = new Parser(this.sourceCode);
         this.instructions = parser.parse();
+        this.locals = parser.getLocals();
 
         if (CommandsKt.getDebug()) {
             Disassembler.disassemble(this.instructions);
@@ -68,13 +68,14 @@ public class Interpreter {
                 case OP_CONSTANT -> push(Parser.values.get((int) instruction.getOperand()));
                 case OP_NULL -> push(new PNull());
 
-                case OP_NEW_GLOBAL, OP_NEW_LOCAL -> {
+                case OP_NEW_GLOBAL -> {
                     String varName = instruction.getOperand().toString();
                     if (this.globals.containsKey(varName)) {
                         runtimeError("Redefinition Of Global Variable Is Not Allowed - " + varName);
                     }
                     this.globals.newVariable(varName, pop());
                 }
+                // TODO Make Local Variables Seperate From Global Variables
                 case OP_STORE_GLOBAL, OP_SET_LOCAL -> {
                     Primitive value = pop();
                     String varName = instruction.getOperand().toString();
@@ -296,7 +297,6 @@ public class Interpreter {
 
     private void push(Primitive value) {
         if (this.sp >= STACK_MAX) {
-            // TODO Fix The Stack Overflow Error That's Happening
             runtimeError("A Stack Overflow Has Occurred");
         }
 
