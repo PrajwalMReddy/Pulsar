@@ -75,8 +75,11 @@ public class Interpreter {
                     }
                     this.globals.newVariable(varName, pop());
                 }
-                // TODO Make Local Variables Seperate From Global Variables
-                case OP_STORE_GLOBAL, OP_SET_LOCAL -> {
+
+                // TODO Make Sure That Local Variables Did Not Introduce Any NPEs
+                // TODO Make Sure That The Local Variable Not Found Error Works
+
+                case OP_STORE_GLOBAL -> {
                     Primitive value = pop();
                     String varName = instruction.getOperand().toString();
                     if (!this.globals.containsKey(varName)) {
@@ -85,7 +88,18 @@ public class Interpreter {
                     this.globals.reassignVariable(varName, value);
                     push(value);
                 }
-                case OP_LOAD_GLOBAL, OP_GET_LOCAL -> loadGlobal(instruction);
+
+                case OP_SET_LOCAL -> {
+                    int slot = (int) instruction.getOperand();
+                    this.stack[slot] = this.stack[this.sp - 1];
+                }
+
+                case OP_LOAD_GLOBAL -> loadGlobal(instruction);
+
+                case OP_GET_LOCAL -> {
+                    int slot = (int) instruction.getOperand();
+                    push(this.stack[slot]);
+                }
 
                 case OP_JUMP -> this.ip = ((int) instruction.getOperand()) - 1;
                 case OP_JUMP_IF_TRUE -> conditionalJump(instruction, OP_JUMP_IF_TRUE);

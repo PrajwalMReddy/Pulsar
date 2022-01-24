@@ -1,7 +1,5 @@
 package org.codepulsar.pulsar;
 
-import java.util.ArrayList;
-
 public class LocalVariable {
     Local[] variables;
     int scopeDepth;

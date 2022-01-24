@@ -30,8 +30,7 @@ public class Parser {
         values = new ArrayList<>();
         this.current = 0;
 
-        // TODO Check To Make Sure It Starts In Global Scope
-        this.depth = 0;
+        this.depth = 1; // TODO Change Back To 0 When Functions Are Implemented
 
         this.errors = new ArrayList<>();
         this.hasErrors = false;
@@ -185,8 +184,8 @@ public class Parser {
     }
 
     private void addLocal(Token name) {
-        this.locals.localCount++;
         this.locals.newLocal(name);
+        this.locals.localCount++;
     }
 
     private void expressionStatement() {
@@ -205,6 +204,7 @@ public class Parser {
                 && peekNext().getTokenType() != TK_LT_EQUAL
                 && peekNext().getTokenType() != TK_GT_EQUAL) {
             Token next = peekNext();
+            Token localToken = peek();
 
             String name = peekLiteral();
             advance();
@@ -215,7 +215,7 @@ public class Parser {
                 if (inGlobalScope()) {
                     makeOpCode(OP_LOAD_GLOBAL, name, peekLine());
                 } else {
-                    makeOpCode(OP_GET_LOCAL, name, peekLine());
+                    makeOpCode(OP_GET_LOCAL, resolveLocal(localToken), peekLine());
                 }
                 if (next.getTokenType() == TK_PLUS_EQUAL) {
                     makeOpCode(OP_ADD, next.getLine());
@@ -233,11 +233,22 @@ public class Parser {
             if (inGlobalScope()) {
                 makeOpCode(OP_STORE_GLOBAL, name, peekLine());
             } else {
-                makeOpCode(OP_SET_LOCAL, name, peekLine());
+                makeOpCode(OP_SET_LOCAL, resolveLocal(localToken), peekLine());
             }
         } else {
             logicalOr();
         }
+    }
+
+    private Object resolveLocal(Token name) {
+        for (int i = this.locals.localCount - 1; i >= 0; i--) {
+            LocalVariable.Local local = this.locals.getLocal(i);
+            if (local.name.getLiteral().equals(name.getLiteral())) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private void logicalOr() {
@@ -373,7 +384,7 @@ public class Parser {
             if (inGlobalScope()) {
                 makeOpCode(OP_LOAD_GLOBAL, peekLiteral(), peekLine());
             } else {
-                makeOpCode(OP_GET_LOCAL, peekLiteral(), peekLine());
+                makeOpCode(OP_GET_LOCAL, resolveLocal(peek()), peekLine());
             }
             advance();
         } else if (matchAdvance(TK_LPAR)) {
