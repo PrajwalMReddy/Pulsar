@@ -263,6 +263,7 @@ public class Parser {
             }
         }
 
+        setErrors("Variable Error", "Local Variable Used But Never Defined - " + name.getLiteral(), peek());
         return -1;
     }
 
