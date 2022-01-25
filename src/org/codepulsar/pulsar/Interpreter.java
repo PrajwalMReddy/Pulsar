@@ -76,7 +76,6 @@ public class Interpreter {
                     this.globals.newVariable(varName, pop());
                 }
 
-                // TODO Make Sure That Local Variables Did Not Introduce Any NPEs
                 // TODO Make Sure That The Local Variable Not Found Error Works
                 // TODO Find And Handle Weird Edge Cases
 
@@ -173,6 +172,9 @@ public class Interpreter {
                 push(new PInteger((int) (newA + newB)));
             }
         } else if (opcode == OP_DIVIDE) {
+            if (newB == 0) {
+                runtimeError("Division By Zero Error");
+            }
             push(new PDouble(newA / newB));
         } else if (opcode == OP_MODULO) {
             if (isDouble) {

@@ -170,6 +170,20 @@ public class Parser {
 
     private void localVariableDeclaration() {
         Token localToken = peek();
+
+        for (int i = this.locals.localCount - 1; i >= 0; i--) {
+            LocalVariable.Local local = this.locals.getLocal(i);
+
+            if (local.depth < this.depth) {
+                break;
+            }
+
+            if (local.name.getLiteral().equals(localToken.getLiteral())) {
+                setErrors("Variable Error",
+                        "A Local Variable With This Name Already Exists - " + localToken.getLiteral(), peek());
+            }
+        }
+
         addLocal(localToken);
 
         advance();
@@ -201,6 +215,7 @@ public class Parser {
     private void assignment() {
         if (peekType() == TK_IDENTIFIER && peekNext().getLiteral().contains("=")
                 && peekNext().getTokenType() != TK_EQUAL_EQUAL
+                && peekNext().getTokenType() != TK_NOT_EQUAL
                 && peekNext().getTokenType() != TK_LT_EQUAL
                 && peekNext().getTokenType() != TK_GT_EQUAL) {
             Token next = peekNext();
@@ -420,6 +435,11 @@ public class Parser {
 
     private Instruction makeOpCode(ByteCode opcode, Object operand, int line) {
         Instruction instruction = new Instruction(opcode, operand, line);
+        this.instructions.add(instruction);
+        return instruction;
+    }
+
+    private Instruction makeOpCode(Instruction instruction) {
         this.instructions.add(instruction);
         return instruction;
     }
