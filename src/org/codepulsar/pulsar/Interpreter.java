@@ -76,7 +76,8 @@ public class Interpreter {
                     this.globals.newVariable(varName, pop());
                 }
 
-                // TODO Make Sure That The Local Variable Not Found Error Works
+                case OP_NEW_LOCAL -> {}
+
                 // TODO Find And Handle Weird Edge Cases
 
                 case OP_STORE_GLOBAL -> {
@@ -109,7 +110,7 @@ public class Interpreter {
                 case OP_POP -> pop();
 
                 default -> runtimeError("Unhandled ByteCode Instruction - " + instruction.getOpcode() +
-                        "\nThis Is Not Your Fault And It Will Soon Be Fixed"); // Supposed To Be Unreachable
+                        "\nThis Is Not Your Fault And It Will Be Fixed Soon"); // Supposed To Be Unreachable
             }
 
             this.ip++;

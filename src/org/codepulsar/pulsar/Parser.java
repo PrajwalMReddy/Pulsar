@@ -194,6 +194,7 @@ public class Parser {
             makeOpCode(OP_NULL, peekLine());
         }
 
+        makeOpCode(OP_NEW_LOCAL, localToken.getLiteral(), peekLine());
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration", "Missing Character");
     }
 
