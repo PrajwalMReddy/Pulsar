@@ -78,8 +78,6 @@ public class Interpreter {
 
                 case OP_NEW_LOCAL -> {}
 
-                // TODO Find And Handle Weird Edge Cases
-
                 case OP_STORE_GLOBAL -> {
                     Primitive value = pop();
                     String varName = instruction.getOperand().toString();

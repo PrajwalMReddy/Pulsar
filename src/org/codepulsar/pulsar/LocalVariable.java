@@ -13,8 +13,8 @@ public class LocalVariable {
         this.localCount = 0;
     }
 
-    public void newLocal(Token name) {
-        this.variables.add(this.localCount, new Local(name, this.scopeDepth));
+    public void newLocal(Token name, boolean isConstant) {
+        this.variables.add(this.localCount, new Local(name, this.scopeDepth, isConstant));
     }
 
     public Local getLocal(int index) {
@@ -24,10 +24,12 @@ public class LocalVariable {
     public static class Local {
         Token name;
         int depth;
+        boolean isConstant;
 
-        public Local(Token name, int depth) {
+        public Local(Token name, int depth, boolean isConstant) {
             this.name = name;
             this.depth = depth;
+            this.isConstant = isConstant;
         }
     }
 }

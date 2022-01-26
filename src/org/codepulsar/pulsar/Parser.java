@@ -120,8 +120,10 @@ public class Parser {
             whileStatement();
         } else if (matchAdvance(TK_PRINT)) {
             printStatement();
-        } else if (matchAdvance(TK_VAR, TK_CONST)) {
-            localVariableDeclaration();
+        } else if (matchAdvance(TK_VAR)) {
+            localVariableDeclaration(TK_VAR);
+        } else if (matchAdvance(TK_CONST)) {
+            localVariableDeclaration(TK_CONST);
         } else {
             expressionStatement();
         }
@@ -168,7 +170,7 @@ public class Parser {
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Print Statement", "Missing Character");
     }
 
-    private void localVariableDeclaration() {
+    private void localVariableDeclaration(TokenType varType) {
         Token localToken = peek();
 
         for (int i = this.locals.localCount - 1; i >= 0; i--) {
@@ -184,7 +186,7 @@ public class Parser {
             }
         }
 
-        addLocal(localToken);
+        addLocal(localToken, varType);
 
         advance();
 
@@ -198,8 +200,13 @@ public class Parser {
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration", "Missing Character");
     }
 
-    private void addLocal(Token name) {
-        this.locals.newLocal(name);
+    private void addLocal(Token name, TokenType type) {
+        if (type == TK_VAR) {
+            this.locals.newLocal(name, false);
+        } else if (type == TK_CONST) {
+            this.locals.newLocal(name, true);
+        }
+
         this.locals.localCount++;
     }
 
@@ -249,6 +256,10 @@ public class Parser {
             if (inGlobalScope()) {
                 makeOpCode(OP_STORE_GLOBAL, name, peekLine());
             } else {
+                if (isConstantVariable(localToken)) {
+                    setErrors("Variable Error",
+                            "Reassigning To Constants Is Not Allowed", peek());
+                }
                 makeOpCode(OP_SET_LOCAL, resolveLocal(localToken), peekLine());
             }
         } else {
@@ -256,7 +267,7 @@ public class Parser {
         }
     }
 
-    private Object resolveLocal(Token name) {
+    private int resolveLocal(Token name) {
         for (int i = this.locals.localCount - 1; i >= 0; i--) {
             LocalVariable.Local local = this.locals.getLocal(i);
             if (local.name.getLiteral().equals(name.getLiteral())) {
@@ -264,8 +275,22 @@ public class Parser {
             }
         }
 
-        setErrors("Variable Error", "Local Variable Used But Never Defined - " + name.getLiteral(), peek());
+        setErrors("Variable Error",
+                "Local Variable Used But Never Defined - " + name.getLiteral(), peek());
         return -1;
+    }
+
+    private boolean isConstantVariable(Token name) {
+        for (int i = this.locals.localCount - 1; i >= 0; i--) {
+            LocalVariable.Local local = this.locals.getLocal(i);
+            if (local.name.getLiteral().equals(name.getLiteral())) {
+                if (local.isConstant) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private void logicalOr() {
