@@ -4,6 +4,7 @@ import org.codepulsar.primitives.Primitive;
 
 import java.util.HashMap;
 
+// TODO Figure Out A Way To Make Constant Global Variables
 public class GlobalVariable {
     HashMap<String, Primitive> values;
 

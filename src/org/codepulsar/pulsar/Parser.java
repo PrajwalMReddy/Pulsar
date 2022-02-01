@@ -17,10 +17,10 @@ public class Parser {
 
     private int depth; // The Total Depth Of The Current Scope
 
-    public final ArrayList<Error> errors; // Full List Of Errors To Be Reported
+    public ArrayList<Error> errors; // Full List Of Errors To Be Reported
     boolean hasErrors; // Flag To Indicate If The Code Has Any Errors
 
-    private LocalVariable locals;
+    private final LocalVariable locals;
 
     public Parser(String sourceCode) {
         this.sourceCode = sourceCode;
@@ -32,7 +32,6 @@ public class Parser {
 
         this.depth = 1; // TODO Change Back To 0 When Functions Are Implemented
 
-        this.errors = new ArrayList<>();
         this.hasErrors = false;
 
         this.locals = new LocalVariable();
@@ -40,10 +39,15 @@ public class Parser {
 
     public ArrayList<Instruction> parse() {
         Lexer lexer = new Lexer(this.sourceCode + "\n");
+
         this.tokens = lexer.tokenize();
+        this.errors = lexer.getErrors();
 
         if (CommandsKt.getDebug()) {
             Disassembler.tokens(this.tokens);
+        } if (lexer.hasErrors) {
+            this.hasErrors = true;
+            return this.instructions;
         }
 
         start();

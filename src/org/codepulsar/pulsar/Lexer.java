@@ -9,11 +9,17 @@ public class Lexer {
     private int current;
     private int line;
 
+    private final ArrayList<Error> errors;
+    public boolean hasErrors;
+
     public Lexer(String sourceCode) {
         this.sourceCode = sourceCode;
         this.start = 0;
         this.current = 0;
         this.line = 1;
+
+        this.errors = new ArrayList<>();
+        this.hasErrors = false;
     }
 
     public ArrayList<Token> tokenize() {
@@ -150,14 +156,14 @@ public class Lexer {
                     advance();
                     return makeToken(TK_LOGICAL_OR);
                 } else {
-                    return errorToken("Invalid Character: " + now + ". Perhaps You Meant Logical Or: ||");
+                    return errorToken("Invalid Character: '" + now + "'. Perhaps You Meant Logical Or: ||");
                 }
             case '&':
                 if (peek() == '&') {
                     advance();
                     return makeToken(TK_LOGICAL_AND);
                 } else {
-                    return errorToken("Invalid Character: " + now + ". Perhaps You Meant Logical AND: &&");
+                    return errorToken("Invalid Character: '" + now + "'. Perhaps You Meant Logical AND: &&");
                 }
         }
 
@@ -258,7 +264,13 @@ public class Lexer {
     }
 
     private Token errorToken(String message) {
-        return new Token(TK_ERROR, message, this.line);
+        this.hasErrors = true;
+
+        Token errorToken = new Token(TK_ERROR, message, this.line);
+        Error error = new Error("Tokenizing Error", message, errorToken);
+
+        this.errors.add(error);
+        return errorToken;
     }
 
     private void skipWhitespace() {
@@ -288,6 +300,10 @@ public class Lexer {
                     return;
             }
         }
+    }
+
+    public ArrayList<Error> getErrors() {
+        return this.errors;
     }
 
     private String currentLiteral() {
