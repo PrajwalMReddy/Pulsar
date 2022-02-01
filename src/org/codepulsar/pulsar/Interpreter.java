@@ -264,11 +264,11 @@ public class Interpreter {
         PBoolean newValue = (PBoolean) value;
         if (opcode == OP_JUMP_IF_TRUE) {
             if (newValue.isValue()) {
-                this.ip = (int) instruction.getOperand();
+                this.ip = (int) instruction.getOperand() - 1;
             }
         } else if (opcode == OP_JUMP_IF_FALSE) {
             if (!newValue.isValue()) {
-                this.ip = (int) instruction.getOperand();
+                this.ip = (int) instruction.getOperand() - 1;
             }
         }
     }
