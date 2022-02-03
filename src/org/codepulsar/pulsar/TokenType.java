@@ -13,10 +13,17 @@ public enum TokenType {
     TK_LPAR, TK_RPAR, TK_LBRACE, TK_RBRACE,
 
     // Keywords
-    TK_PACKAGE, TK_IMPORT, TK_MOD, TK_CLASS,
+    TK_PACKAGE, TK_IMPORT,
+    TK_MOD, TK_CLASS, TK_ENUM,
     TK_VAR, TK_CONST,
-    TK_FUN, TK_RETURN,
+    TK_FUN, TK_NATIVE, TK_RETURN,
     TK_IF, TK_ELSE, TK_WHILE,
+    TK_CONTINUE, TK_BREAK,
+
+    // Reserved Keywords (For Possible Future Use)
+    TK_MATCH, TK_LOOP,
+    TK_ASYNC, TK_AWAIT,
+    TK_TRY, TK_EXCEPT, TK_UNSAFE,
 
     // Data Types and Variables
     TK_STRING, TK_INTEGER, TK_DOUBLE, TK_IDENTIFIER, TK_TRUE, TK_FALSE, TK_NULL,

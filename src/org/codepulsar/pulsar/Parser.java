@@ -20,7 +20,7 @@ public class Parser {
     public ArrayList<Error> errors; // Full List Of Errors To Be Reported
     boolean hasErrors; // Flag To Indicate If The Code Has Any Errors
 
-    private final LocalVariable locals;
+    private final LocalVariable locals; // Used To Track Locals
 
     public Parser(String sourceCode) {
         this.sourceCode = sourceCode;

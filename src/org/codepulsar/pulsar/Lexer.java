@@ -197,12 +197,27 @@ public class Lexer {
 
     private TokenType identifyIdentifier() {
         return switch (this.sourceCode.charAt(this.start)) {
-            case 'c' -> switch (this.sourceCode.charAt(this.start + 1)) {
-                case 'l' -> checkKeyword("ass", TK_CLASS, 2);
-                case 'o' -> checkKeyword("nst", TK_CONST, 2);
+            case 'a' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 's' -> checkKeyword("ync", TK_ASYNC, 2);
+                case 'w' -> checkKeyword("ait", TK_AWAIT, 2);
                 default -> TK_IDENTIFIER;
             };
-            case 'e' -> checkKeyword("lse", TK_ELSE, 1);
+            case 'b' -> checkKeyword("reak", TK_BREAK, 1);
+            case 'c' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'l' -> checkKeyword("ass", TK_CLASS, 2);
+                case 'o' -> switch (this.sourceCode.charAt(this.start + 3)) {
+                    case 's' -> checkKeyword("t", TK_CONST, 4);
+                    case 't' -> checkKeyword("inue", TK_CONTINUE, 4);
+                    default -> TK_IDENTIFIER;
+                };
+                default -> TK_IDENTIFIER;
+            };
+            case 'e' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'l' -> checkKeyword("se", TK_ELSE, 2);
+                case 'n' -> checkKeyword("um", TK_ENUM, 2);
+                case 'x' -> checkKeyword("cept", TK_EXCEPT, 2);
+                default -> TK_IDENTIFIER;
+            };
             case 'f' -> switch (this.sourceCode.charAt(this.start + 1)) {
                 case 'u' -> checkKeyword("n", TK_FUN, 2);
                 case 'a' -> checkKeyword("lse", TK_FALSE, 2);
@@ -213,15 +228,29 @@ public class Lexer {
                 case 'm' -> checkKeyword("port", TK_IMPORT, 2);
                 default -> TK_IDENTIFIER;
             };
-            case 'm' -> checkKeyword("od", TK_MOD, 1);
-            case 'n' -> checkKeyword("ull", TK_NULL, 1);
+            case 'l' -> checkKeyword("oop", TK_LOOP, 1);
+            case 'm' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'o' -> checkKeyword("d", TK_MOD, 2);
+                case 'a' -> checkKeyword("tch", TK_MATCH, 2);
+                default -> TK_IDENTIFIER;
+            };
+            case 'n' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'u' -> checkKeyword("ll", TK_NULL, 2);
+                case 'a' -> checkKeyword("tive", TK_NATIVE, 2);
+                default -> TK_IDENTIFIER;
+            };
             case 'p' -> switch (this.sourceCode.charAt(this.start + 1)) {
                 case 'a' -> checkKeyword("ckage", TK_PACKAGE, 2);
                 case 'r' -> checkKeyword("int", TK_PRINT, 2);
                 default -> TK_IDENTIFIER;
             };
             case 'r' -> checkKeyword("eturn", TK_RETURN, 1);
-            case 't' -> checkKeyword("rue", TK_TRUE, 1);
+            case 't' -> switch (this.sourceCode.charAt(this.start + 2)) {
+                case 'u' -> checkKeyword("e", TK_TRUE, 3);
+                case 'y' -> checkKeyword("", TK_TRY, 3);
+                default -> TK_IDENTIFIER;
+            };
+            case 'u' -> checkKeyword("nsafe", TK_UNSAFE, 1);
             case 'v' -> checkKeyword("ar", TK_VAR, 1);
             case 'w' -> checkKeyword("hile", TK_WHILE, 1);
             default -> TK_IDENTIFIER;
