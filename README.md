@@ -1,4 +1,5 @@
 # Pulsar
+
 Pulsar is a new programming language that aims to be as
 * powerful as Java,
 * simple as Python,
@@ -21,3 +22,5 @@ As of now, the following features are working:
 The following features are currently being worked upon:
 - User Defined Functions
 - Native Functions
+
+### Version: 0.0.5

@@ -3,6 +3,7 @@ package org.codepulsar.pulsar
 import kotlin.system.exitProcess
 
 var debug = false
+var version = "0.0.5"
 
 fun help() {
     println("Usage: pulsar [command] [file]")
@@ -23,6 +24,7 @@ fun error(message: String) {
 fun parseCommands(command: String) {
     when (command) {
         "-h" -> help()
+        "-v" -> version()
         else -> error("Invalid Command For One Argument: $command")
     }
 }
@@ -44,4 +46,8 @@ fun parseCommands(command: String, file: String) {
 
 fun debug() {
     debug = true
+}
+
+fun version() {
+        println("Version: $version")
 }
