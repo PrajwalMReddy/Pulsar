@@ -1,5 +1,7 @@
 package org.codepulsar.pulsar;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class Compiler {
@@ -11,7 +13,7 @@ public class Compiler {
         this.instructions = new ArrayList<>();
     }
 
-    public void init() {
+    public void init() throws FileNotFoundException {
         Parser parser = new Parser(this.sourceCode);
         this.instructions = parser.parse();
 
@@ -32,6 +34,9 @@ public class Compiler {
         return errorMessage;
     }
 
-    private void compile() {
+    private void compile() throws FileNotFoundException {
+        PrintWriter pw = new PrintWriter(Pulsar.fileIn + ".asm");
+        pw.print("");
+        pw.close();
     }
 }

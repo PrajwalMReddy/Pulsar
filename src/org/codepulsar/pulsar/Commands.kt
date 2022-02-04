@@ -9,6 +9,7 @@ fun help() {
     println("Usage: pulsar [command] [file]")
     println("Commands:")
     println("    -h     : Shows This Help Menu")
+    println("    -v     : Displays The Current Version Number")
     println("    -i     : Interprets The Given File")
     println("    -c     : Compiles The Given File")
     println("    -d     : Displays Debug Information Including Generated Tokens and Bytecode Disassembly\n" +
@@ -30,6 +31,7 @@ fun parseCommands(command: String) {
 }
 
 fun parseCommands(command: String, file: String) {
+    setUp(file)
     when (command) {
         "-h" -> help()
         "-i" -> Pulsar.interpretFile(file)
@@ -50,4 +52,8 @@ fun debug() {
 
 fun version() {
         println("Version: $version")
+}
+
+fun setUp(name: String) {
+    Pulsar.fileIn = name.substring(0, name.indexOf("."))
 }

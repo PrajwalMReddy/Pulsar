@@ -7,6 +7,9 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 
 public class Pulsar {
+    // TODO Consider Encapsulating All Set Up Details In Their Own Class
+    public static String fileIn; // The Name Of The Input File
+
     public static void main(String[] args) {
         if (args.length == 0) {
             repl(); // TODO Implement REPL
