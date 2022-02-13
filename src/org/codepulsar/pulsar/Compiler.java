@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class Compiler {
     private final String sourceCode;
     private ArrayList<Instruction> instructions;
+    private LocalVariable locals;
 
     public Compiler(String sourceCode) {
         this.sourceCode = sourceCode;
@@ -16,6 +17,12 @@ public class Compiler {
     public void init() throws FileNotFoundException {
         Parser parser = new Parser(this.sourceCode);
         this.instructions = parser.parse();
+        this.locals = parser.getLocals();
+
+        if (CommandsKt.getDebug()) {
+            Disassembler.disassemble(this.instructions);
+            System.out.println();
+        }
 
         if (parser.hasErrors) {
             System.out.println("-- Errors --");
@@ -27,16 +34,16 @@ public class Compiler {
         }
     }
 
+    private void compile() throws FileNotFoundException {
+        PrintWriter pw = new PrintWriter(Pulsar.fileIn + ".asm");
+        pw.println("");
+        pw.close();
+    }
+
     private String reportError(Error error) {
         String errorMessage = error.getErrorType();
         errorMessage += " | " + error.getMessage();
         errorMessage += ";\nOn Line " + error.getToken().getLine();
         return errorMessage;
-    }
-
-    private void compile() throws FileNotFoundException {
-        PrintWriter pw = new PrintWriter(Pulsar.fileIn + ".asm");
-        pw.print("");
-        pw.close();
     }
 }
