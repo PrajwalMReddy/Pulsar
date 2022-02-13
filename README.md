@@ -19,8 +19,10 @@ As of now, the following features are working:
 - Expressions (Including Basic Arithmetic Operators)
 
 ## TODO
-The following features are currently being worked upon:
+The following things are currently being worked upon:
+- A Double Pass Compiler (AST + Bytecode)
+- A Working Compiler
 - User Defined Functions
 - Native Functions
 
-### Version: 0.0.5
+### Current Version: 0.0.5
