@@ -12,11 +12,12 @@ This is the first implementation, written in Java with a bit of Kotlin. It featu
 
 ## Features
 As of now, the following features are working:
+- Expressions (Including Basic Arithmetic Operators)
+- Print Statements
 - Global Variables
 - Local Variables (Including Constants)
 - If/Else Statements
 - While Loops
-- Expressions (Including Basic Arithmetic Operators)
 
 ## TODO
 The following things are currently being worked upon:
