@@ -7,7 +7,7 @@ Key:
 
 -------------------------------GRAMMAR-------------------------------
 
-start:
+program:
 	| declaration*
 
 declaration:

@@ -22,6 +22,7 @@ As of now, the following features are working:
 The following things are currently being worked upon:
 - A Double Pass Compiler (AST + Bytecode)
 - A Working Compiler
+- Bytecode/AST Optimizations
 - User Defined Functions
 - Native Functions
 
