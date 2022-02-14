@@ -1,21 +1,22 @@
 package temp.pulsar;
 
 import temp.ast.Program;
+import temp.lang.Token;
 
 import java.util.ArrayList;
 
-public class AbstractSyntaxTree {
-    private String sourceCode;
+public class AST {
+    private final String sourceCode;
     private ArrayList<Token> tokens;
-    private Program program;
 
-    public AbstractSyntaxTree(String sourceCode) {
+    private final Program program;
+
+    public AST(String sourceCode) {
         this.sourceCode = sourceCode;
-        this.tokens = new ArrayList<Token>();
         this.program = new Program();
     }
 
-    public Program createTree() {
+    public Program parse() {
         Lexer lexer = new Lexer(this.sourceCode);
         this.tokens = lexer.tokenize();
 

@@ -1,4 +1,4 @@
-package temp.pulsar;
+package temp.lang;
 
 public enum TokenType {
 }

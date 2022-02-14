@@ -1,5 +1,6 @@
-package temp.pulsar
+package temp.lang
 
+import temp.pulsar.Pulsar
 import kotlin.system.exitProcess
 
 fun help() {
