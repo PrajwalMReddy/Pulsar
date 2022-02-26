@@ -3,6 +3,7 @@ package temp.pulsar;
 import temp.ast.Program;
 import temp.lang.CompilerError;
 import temp.lang.Token;
+import temp.util.TokenDisassembler;
 
 import java.util.ArrayList;
 
@@ -23,8 +24,12 @@ public class AST {
         this.tokens = lexer.tokenize();
         this.errors = lexer.getErrors();
 
-        System.out.println(tokens);
+        TokenDisassembler.display(this.tokens);
 
         return this.program;
+    }
+
+    public CompilerError getErrors() {
+        return this.errors;
     }
 }

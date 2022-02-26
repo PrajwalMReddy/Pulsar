@@ -46,10 +46,11 @@ print 100;
 Pulsar has a temporary print statement used for debugging. This will be replaced with a function in the standard library once implemented.
 
 ## Variables
-```kotlin
-var a; // Initializes a and sets it to null.
 
-var a = 0; // Assigns the value 0 to the variable a.
+```kotlin
+var a // Initializes a and sets it to null.
+
+var a = 0 // Assigns the value 0 to the variable a.
 ```
 Explicit type annotations will be added soon.
 

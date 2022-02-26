@@ -16,11 +16,15 @@ public class Lexer {
     private int current;
     private int line;
 
-    private CompilerError errors;
+    private final CompilerError errors;
 
     public Lexer(String sourceCode) {
         this.sourceCode = sourceCode;
         this.tokens = new ArrayList<>();
+
+        this.start = 0;
+        this.current = 0;
+        this.line = 1;
 
         this.errors = new CompilerError();
     }
@@ -356,7 +360,7 @@ public class Lexer {
     }
 
     private boolean isAtEnd() {
-        return this.current >= this.sourceCode.length() - 1;
+        return this.current >= this.sourceCode.length();
     }
 
     public CompilerError getErrors() {

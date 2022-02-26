@@ -3,7 +3,7 @@ package temp.lang;
 import java.util.ArrayList;
 
 public class CompilerError {
-    private ArrayList<Error> errors;
+    private final ArrayList<Error> errors;
 
     public CompilerError() {
         this.errors = new ArrayList<>();
@@ -23,15 +23,31 @@ public class CompilerError {
         return this.errors.size();
     }
 
+    public ArrayList<Error> getErrors() {
+        return this.errors;
+    }
+
     public static class Error {
-        private String errorType;
-        private String message;
-        private Token token;
+        private final String errorType;
+        private final String message;
+        private final Token token;
 
         public Error(String errorType, String message, Token token) {
             this.errorType = errorType;
             this.message = message;
             this.token = token;
+        }
+
+        public String getErrorType() {
+            return this.errorType;
+        }
+
+        public String getMessage() {
+            return this.message;
+        }
+
+        public Token getToken() {
+            return this.token;
         }
     }
 }
