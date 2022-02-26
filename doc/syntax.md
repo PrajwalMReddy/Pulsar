@@ -22,7 +22,7 @@ a * b; // Binary Multiplication
 a / b; // Binary Division
 a % b; // Modulus
 ```
-### Comparison and Logical Operations
+### Comparison Operations
 ```rust
 a > b; // Greater Than
 a >= b; // Greater Than Equal To
@@ -51,7 +51,7 @@ var a; // Initializes a and sets it to null.
 
 var a = 0; // Assigns the value 0 to the variable a.
 ```
-Explicit type annotations and null safety will be added soon.
+Explicit type annotations will be added soon.
 
 ## If/Else Statements
 ```rust

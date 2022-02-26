@@ -9,7 +9,6 @@ import java.util.ArrayList;
 public class Compiler {
     private final String sourceCode;
     private ArrayList<Instruction> instructions;
-
     private final PrintWriter pw;
 
     public Compiler(String sourceCode) throws FileNotFoundException {

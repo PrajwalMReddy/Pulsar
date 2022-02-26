@@ -8,7 +8,6 @@ import java.util.ArrayList;
 public class ByteCodeCompiler {
     private final String sourceCode;
     private Program program;
-
     private final ArrayList<Instruction> instructions;
 
     public ByteCodeCompiler(String sourceCode) {

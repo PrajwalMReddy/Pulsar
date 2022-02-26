@@ -16,6 +16,7 @@ fun help() {
 
 fun error(message: String) {
     help()
+    print("Set Up Error | ")
     println(message)
     exitProcess(1)
 }
