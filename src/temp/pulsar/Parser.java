@@ -7,14 +7,14 @@ import temp.util.TokenDisassembler;
 
 import java.util.ArrayList;
 
-public class AST {
+public class Parser {
     private final String sourceCode;
     private ArrayList<Token> tokens;
     private final Program program;
 
     private CompilerError errors;
 
-    public AST(String sourceCode) {
+    public Parser(String sourceCode) {
         this.sourceCode = sourceCode;
         this.program = new Program();
     }

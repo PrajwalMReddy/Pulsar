@@ -313,7 +313,9 @@ public class Lexer {
                     }
                 }
 
-                default -> { return; }
+                default -> {
+                    return;
+                }
             }
         }
     }

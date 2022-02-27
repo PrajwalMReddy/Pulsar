@@ -19,7 +19,7 @@ public class ByteCodeCompiler {
     }
 
     public ArrayList<Instruction> compileByteCode() {
-        AST ast = new AST(this.sourceCode);
+        Parser ast = new Parser(this.sourceCode);
         this.program = ast.parse();
         this.errors = ast.getErrors();
 
