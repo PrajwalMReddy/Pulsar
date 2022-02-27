@@ -1,6 +1,6 @@
 package temp.pulsar;
 
-import temp.ast.Program;
+import temp.ast.AST;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
 
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class ByteCodeCompiler {
     private final String sourceCode;
-    private Program program;
+    private AST program;
     private final ArrayList<Instruction> instructions;
 
     private CompilerError errors;

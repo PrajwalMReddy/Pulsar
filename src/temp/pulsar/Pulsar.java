@@ -28,6 +28,7 @@ public class Pulsar {
     }
 
     public static void interpretFile(String file) throws IOException {
+        compileFile(file);
     }
 
     public static void compileFile(String file) throws IOException {
