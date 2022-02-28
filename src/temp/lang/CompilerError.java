@@ -9,8 +9,8 @@ public class CompilerError {
         this.errors = new ArrayList<>();
     }
 
-    public Error addError(String errorType, String message, Token token) {
-        Error error = new Error(errorType, message, token);
+    public Error addError(String errorType, String message, int line) {
+        Error error = new Error(errorType, message, line);
         this.errors.add(error);
         return error;
     }
@@ -30,12 +30,12 @@ public class CompilerError {
     public static class Error {
         private final String errorType;
         private final String message;
-        private final Token token;
+        private final int line;
 
-        public Error(String errorType, String message, Token token) {
+        public Error(String errorType, String message, int line) {
             this.errorType = errorType;
             this.message = message;
-            this.token = token;
+            this.line = line;
         }
 
         public String getErrorType() {
@@ -46,8 +46,8 @@ public class CompilerError {
             return this.message;
         }
 
-        public Token getToken() {
-            return this.token;
+        public int getLine() {
+            return line;
         }
     }
 }

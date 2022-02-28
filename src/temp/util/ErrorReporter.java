@@ -19,7 +19,9 @@ public class ErrorReporter {
         for (CompilerError.Error error: errors.getErrors()) {
             System.out.print(error.getErrorType() + " | ");
             System.out.println(error.getMessage());
-            System.out.println("Line " + error.getToken().getLine() + ": " + lines[error.getToken().getLine() - 1] + "\n");
+            System.out.println("Line " + error.getLine() + ": " + lines[error.getLine() - 1] + "\n");
         }
+
+        System.exit(1);
     }
 }

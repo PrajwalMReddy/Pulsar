@@ -1,5 +1,6 @@
-package temp.ast;
+package temp.ast.expression;
 
+import temp.ast.Expression;
 import temp.lang.Token;
 
 public class Assignment extends Expression {

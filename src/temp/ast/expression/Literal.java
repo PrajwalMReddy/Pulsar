@@ -1,4 +1,6 @@
-package temp.ast;
+package temp.ast.expression;
+
+import temp.ast.Expression;
 
 public class Literal extends Expression {
     private final Object value;

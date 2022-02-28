@@ -342,7 +342,7 @@ public class Lexer {
 
     private Token errorToken(String message) {
         Token errorToken = new Token(TK_ERROR, message, this.line);
-        this.errors.addError("Tokenizing Error", message, errorToken);
+        this.errors.addError("Tokenizing Error", message, errorToken.getLine());
         return errorToken;
     }
 
