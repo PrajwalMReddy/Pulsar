@@ -13,4 +13,8 @@ public class Binary extends Expression {
         this.operator = operator;
         this.right = right;
     }
+
+    public String toString() {
+        return "(" + this.left + this.operator.getLiteral() + this.right + ")";
+    }
 }

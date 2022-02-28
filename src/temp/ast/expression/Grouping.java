@@ -8,4 +8,9 @@ public class Grouping extends Expression {
     public Grouping(Expression expression) {
         this.expression = expression;
     }
+
+    @Override
+    public String toString() {
+        return "(" + this.expression + ")";
+    }
 }

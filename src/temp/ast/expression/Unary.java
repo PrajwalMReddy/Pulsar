@@ -11,4 +11,8 @@ public class Unary extends Expression {
         this.operator = operator;
         this.right = right;
     }
+
+    public String toString() {
+        return "(" + this.operator.getLiteral() + this.right + ")";
+    }
 }

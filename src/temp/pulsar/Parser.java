@@ -1,5 +1,6 @@
 package temp.pulsar;
 
+import temp.ast.expression.Unary;
 import temp.lang.AST;
 import temp.ast.Expression;
 import temp.ast.expression.Grouping;
@@ -79,15 +80,21 @@ public class Parser {
     }
 
     private Expression unary() {
+        if (matchAdvance(TK_NOT, TK_MINUS)) {
+            return new Unary(previous(), unary());
+        } else if (matchAdvance(TK_PLUS)) {
+            return unary();
+        }
+
         return primary();
     }
 
     private Expression primary() {
-        if (match(TK_TRUE)) {
+        if (matchAdvance(TK_TRUE)) {
             return new Literal(true);
-        } else if (match(TK_FALSE)) {
+        } else if (matchAdvance(TK_FALSE)) {
             return new Literal(false);
-        } else if (match(TK_NULL)) {
+        } else if (matchAdvance(TK_NULL)) {
             return new Literal(null);
         }
 

@@ -8,4 +8,8 @@ public class Literal extends Expression {
     public Literal(Object value) {
         this.value = value;
     }
+
+    public String toString() {
+        return "(" + this.value + ")";
+    }
 }
