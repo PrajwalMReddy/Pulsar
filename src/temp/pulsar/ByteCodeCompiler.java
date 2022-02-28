@@ -7,10 +7,12 @@ import temp.lang.Instruction;
 import java.util.ArrayList;
 
 public class ByteCodeCompiler {
+    // Input Data
     private final String sourceCode;
     private AST program;
-    private final ArrayList<Instruction> instructions;
 
+    // Output Data
+    private final ArrayList<Instruction> instructions;
     private CompilerError errors;
 
     public ByteCodeCompiler(String sourceCode) {

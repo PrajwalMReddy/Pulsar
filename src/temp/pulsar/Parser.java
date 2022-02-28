@@ -9,12 +9,15 @@ import temp.util.TokenDisassembler;
 import java.util.ArrayList;
 
 public class Parser {
+    // Input Data
     private final String sourceCode;
     private ArrayList<Token> tokens;
-    private final AST program;
-    
+
+    // Data To Help In Generating An AST
     private int current; // Next Token To Be Used
 
+    // Output Data
+    private final AST program;
     private CompilerError errors;
 
     public Parser(String sourceCode) {

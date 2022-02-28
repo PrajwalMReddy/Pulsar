@@ -9,13 +9,16 @@ import java.util.ArrayList;
 import static temp.lang.TokenType.*;
 
 public class Lexer {
+    // Input Data
     private final String sourceCode;
-    private final ArrayList<Token> tokens;
 
+    // Data To Help In Lexing
     private int start;
     private int current;
     private int line;
 
+    // Output Data
+    private final ArrayList<Token> tokens;
     private final CompilerError errors;
 
     public Lexer(String sourceCode) {
@@ -86,8 +89,8 @@ public class Lexer {
                 return makeToken(TK_LBRACE);
             case '}':
                 return makeToken(TK_RBRACE);
-            case '"':
-                return string();
+            case '\'':
+                return charLiteral();
 
             case '!':
                 if (peek() == '=') {
@@ -171,8 +174,8 @@ public class Lexer {
         return errorToken("Invalid Character: " + now);
     }
 
-    private Token string() {
-        while (peek() != '"' && !isAtEnd()) {
+    private Token charLiteral() {
+        while (peek() != '\'' && !isAtEnd()) {
             if (peek() == '\n') {
                 this.line++;
             }
@@ -181,11 +184,16 @@ public class Lexer {
         }
 
         if (isAtEnd()) {
-            return errorToken("String Literal Not Closed");
+            return errorToken("Char Literal Not Closed");
         }
 
         advance();
-        return makeToken(TK_STRING);
+
+        if (currentLiteral().length() != 3) {
+            return errorToken("The Length Of A Char Can Only Be 1");
+        }
+
+        return makeToken(TK_CHAR);
     }
 
     private Token identifier() {

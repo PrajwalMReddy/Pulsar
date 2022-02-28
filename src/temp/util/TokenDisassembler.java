@@ -19,7 +19,7 @@ public class TokenDisassembler {
     private static void displayTokens(ArrayList<Token> tokens) {
         System.out.println("-- Tokens --");
 
-        TokenType[] literals = {TK_STRING, TK_INTEGER, TK_DOUBLE, TK_IDENTIFIER};
+        TokenType[] literals = {TK_CHAR, TK_INTEGER, TK_DOUBLE, TK_IDENTIFIER};
         int line = 0;
 
         for (Token token: tokens) {

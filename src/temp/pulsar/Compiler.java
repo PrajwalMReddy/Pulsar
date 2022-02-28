@@ -9,10 +9,12 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class Compiler {
+    // Input Data
     private final String sourceCode;
     private ArrayList<Instruction> instructions;
-    private final PrintWriter pw;
 
+    // Output Data
+    private final PrintWriter pw;
     private CompilerError errors;
 
     public Compiler(String sourceCode) throws FileNotFoundException {
