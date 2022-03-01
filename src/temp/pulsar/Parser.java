@@ -1,10 +1,7 @@
 package temp.pulsar;
 
-import temp.ast.expression.Unary;
-import temp.lang.AST;
 import temp.ast.Expression;
-import temp.ast.expression.Grouping;
-import temp.ast.expression.Literal;
+import temp.ast.expression.*;
 import temp.lang.CompilerError;
 import temp.lang.Token;
 import temp.lang.TokenType;
@@ -30,8 +27,6 @@ public class Parser {
         this.sourceCode = sourceCode;
 
         this.current = 0;
-
-        this.program = new Expression();
     }
 
     public Expression parse() {
@@ -56,32 +51,82 @@ public class Parser {
     }
 
     private Expression logicalOr() {
-        return logicalAnd();
+        Expression expression = logicalAnd();
+
+        while (matchAdvance(TK_LOGICAL_OR)) {
+            Token operator = previous();
+            Expression right = logicalAnd();
+            expression = new Logical(expression, operator, right);
+        }
+
+        return expression;
     }
 
     private Expression logicalAnd() {
-        return equality();
+        Expression expression = equality();
+
+        while (matchAdvance(TK_LOGICAL_AND)) {
+            Token operator = previous();
+            Expression right = equality();
+            expression = new Logical(expression, operator, right);
+        }
+
+        return expression;
     }
 
     private Expression equality() {
-        return comparison();
+        Expression expression = comparison();
+
+        while (matchAdvance(TK_EQUAL_EQUAL, TK_NOT_EQUAL)) {
+            Token operator = previous();
+            Expression right = comparison();
+            expression = new Binary(expression, operator, right);
+        }
+
+        return expression;
     }
 
     private Expression comparison() {
-        return term();
+        Expression expression = term();
+
+        while (matchAdvance(TK_GT, TK_GT_EQUAL, TK_LT, TK_LT_EQUAL)) {
+            Token operator = previous();
+            Expression right = term();
+            expression = new Binary(expression, operator, right);
+        }
+
+        return expression;
     }
 
     private Expression term() {
-        return factor();
+        Expression expression = factor();
+
+        while (matchAdvance(TK_PLUS, TK_MINUS)) {
+            Token operator = previous();
+            Expression right = factor();
+            expression = new Binary(expression, operator, right);
+        }
+
+        return expression;
     }
 
     private Expression factor() {
-        return unary();
+        Expression expression = unary();
+
+        while (matchAdvance(TK_MULTIPLICATION, TK_DIVISION)) {
+            Token operator = previous();
+            Expression right = unary();
+            expression = new Binary(expression, operator, right);
+        }
+
+        return expression;
     }
 
     private Expression unary() {
         if (matchAdvance(TK_NOT, TK_MINUS)) {
-            return new Unary(previous(), unary());
+            Token operator = previous();
+            Expression right = unary();
+            return new Unary(operator, right);
         } else if (matchAdvance(TK_PLUS)) {
             return unary();
         }
@@ -98,8 +143,8 @@ public class Parser {
             return new Literal(null);
         }
 
-        if (match(TK_INTEGER, TK_DOUBLE, TK_CHAR)) {
-            return new Literal(peekLiteral());
+        if (matchAdvance(TK_INTEGER, TK_DOUBLE, TK_CHAR)) {
+            return new Literal(previous().getLiteral());
         }
 
         if (matchAdvance(TK_LPAR)) {
@@ -108,7 +153,7 @@ public class Parser {
             return new Grouping((Expression) expression);
         }
 
-        error("An Expression Was Expected But None Given", peekLine());
+        error("An Expression Was Expected But Nothing Was Given", peekLine());
         return new Literal(TK_ERROR); // Reusing The Error Token To Indicate That There Is No Value Here
     }
 

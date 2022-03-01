@@ -10,6 +10,6 @@ public class Literal extends Expression {
     }
 
     public String toString() {
-        return "(" + this.value + ")";
+        return this.value.toString();
     }
 }
