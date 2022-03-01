@@ -2,6 +2,7 @@ package temp.ast.expression;
 
 import temp.ast.Expression;
 import temp.lang.Token;
+import temp.lang.Visitor;
 
 public class Logical extends Expression {
     private final Expression left;
@@ -14,7 +15,7 @@ public class Logical extends Expression {
         this.right = right;
     }
 
-    public String toString() {
-        return "(" + this.left + this.operator.getLiteral() + this.right + ")";
+    public <R> R accept(Visitor<R> visitor) {
+        return visitor.visitLogicalExpression(this);
     }
 }

@@ -12,13 +12,12 @@ import static temp.lang.TokenType.*;
 public class TokenDisassembler {
     public static void display(ArrayList<Token> tokens) {
         if (Pulsar.conditions.getDebug()) {
+            System.out.println("-- Tokens --");
             displayTokens(tokens);
         }
     }
 
     private static void displayTokens(ArrayList<Token> tokens) {
-        System.out.println("-- Tokens --");
-
         TokenType[] literals = {TK_CHAR, TK_INTEGER, TK_DOUBLE, TK_IDENTIFIER};
         int line = 0;
 

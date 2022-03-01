@@ -1,6 +1,7 @@
 package temp.ast.expression;
 
 import temp.ast.Expression;
+import temp.lang.Visitor;
 
 public class Literal extends Expression {
     private final Object value;
@@ -9,7 +10,7 @@ public class Literal extends Expression {
         this.value = value;
     }
 
-    public String toString() {
-        return this.value.toString();
+    public <R> R accept(Visitor<R> visitor) {
+        return visitor.visitLiteralExpression(this);
     }
 }

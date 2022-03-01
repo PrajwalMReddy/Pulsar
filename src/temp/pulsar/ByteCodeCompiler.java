@@ -27,7 +27,8 @@ public class ByteCodeCompiler {
         this.program = ast.parse();
         this.errors = ast.getErrors();
 
-        ASTPrinter.print(this.program);
+        ASTPrinter astPrinter = new ASTPrinter();
+        astPrinter.print(this.program);
         if (this.errors.hasError()) return instructions;
 
         return this.instructions;

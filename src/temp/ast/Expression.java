@@ -1,4 +1,7 @@
 package temp.ast;
 
-public class Expression {
+import temp.lang.Visitor;
+
+public abstract class Expression {
+    public abstract <R> R accept(Visitor<R> visitor);
 }

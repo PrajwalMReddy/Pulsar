@@ -8,12 +8,11 @@ public class ErrorReporter {
             return;
         }
 
+        System.out.println("\n-- Errors --\n");
         reportErrors(errors, code);
     }
 
     private static void reportErrors(CompilerError errors, String code) {
-        System.out.println("\n-- Errors --\n");
-
         String[] lines = code.split(System.getProperty("line.separator"));
 
         for (CompilerError.Error error: errors.getErrors()) {

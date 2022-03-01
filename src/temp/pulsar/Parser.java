@@ -1,6 +1,6 @@
 package temp.pulsar;
 
-import temp.ast.Expression;
+import temp.ast.*;
 import temp.ast.expression.*;
 import temp.lang.CompilerError;
 import temp.lang.Token;
@@ -150,7 +150,7 @@ public class Parser {
         if (matchAdvance(TK_LPAR)) {
             Expression expression = expression();
             look(TK_RPAR, "A Closing Parenthesis Was Expected");
-            return new Grouping((Expression) expression);
+            return new Grouping(expression);
         }
 
         error("An Expression Was Expected But Nothing Was Given", peekLine());

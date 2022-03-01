@@ -12,4 +12,4 @@ This holds code that isn't directly a part of the compilation pipeline but is ne
 This holds all the Abstract Syntax Tree nodes that will be used by the Abstract Syntax Tree Class.
 
 ## temp.util
-This holds other classes that aren't strictly needed for compilation, but are there for convenience. This only includes the disassembler for now.
+This holds other classes that aren't strictly needed for compilation but are there for convenience.
