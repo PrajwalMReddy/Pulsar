@@ -2,7 +2,6 @@ package temp.ast.expression;
 
 import temp.ast.Expression;
 import temp.lang.Token;
-import temp.lang.Visitor;
 
 public class Binary extends Expression {
     private final Expression left;
@@ -17,5 +16,17 @@ public class Binary extends Expression {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitBinaryExpression(this);
+    }
+
+    public Expression getLeft() {
+        return this.left;
+    }
+
+    public Token getOperator() {
+        return this.operator;
+    }
+
+    public Expression getRight() {
+        return this.right;
     }
 }

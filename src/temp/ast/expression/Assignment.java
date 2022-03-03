@@ -2,7 +2,6 @@ package temp.ast.expression;
 
 import temp.ast.Expression;
 import temp.lang.Token;
-import temp.lang.Visitor;
 
 public class Assignment extends Expression {
     private final Token identifier;
@@ -15,5 +14,13 @@ public class Assignment extends Expression {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitAssignmentExpression(this);
+    }
+
+    public Token getIdentifier() {
+        return this.identifier;
+    }
+
+    public Expression getValue() {
+        return this.value;
     }
 }

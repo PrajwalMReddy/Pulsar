@@ -1,13 +1,14 @@
 package temp.pulsar;
 
 import temp.ast.Expression;
+import temp.ast.expression.*;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
 import temp.util.ASTPrinter;
 
 import java.util.ArrayList;
 
-public class ByteCodeCompiler {
+public class ByteCodeCompiler implements Expression.Visitor<Void> {
     // Input Data
     private final String sourceCode;
     private Expression program; // TODO Also Change This Back To 'AST'
@@ -26,12 +27,49 @@ public class ByteCodeCompiler {
         Parser ast = new Parser(this.sourceCode);
         this.program = ast.parse();
         this.errors = ast.getErrors();
-
-        ASTPrinter astPrinter = new ASTPrinter();
-        astPrinter.print(this.program);
+        
+        new ASTPrinter().print(this.program);
         if (this.errors.hasError()) return instructions;
-
+        
+        compile();
+        
         return this.instructions;
+    }
+
+    private void compile() {
+        this.program.accept(this);
+    }
+
+    public Void visitAssignmentExpression(Assignment expression) {
+        return null;
+    }
+
+    public Void visitBinaryExpression(Binary expression) {
+        return null;
+    }
+
+    public Void visitGroupingExpression(Grouping expression) {
+        return null;
+    }
+
+    public Void visitLiteralExpression(Literal expression) {
+        return null;
+    }
+
+    public Void visitLogicalExpression(Logical expression) {
+        return null;
+    }
+
+    public Void visitOpAssignmentExpression(OpAssignment expression) {
+        return null;
+    }
+
+    public Void visitUnaryExpression(Unary expression) {
+        return null;
+    }
+
+    public Void visitVariableExpression(Variable expression) {
+        return null;
     }
 
     public CompilerError getErrors() {

@@ -2,7 +2,6 @@ package temp.ast.expression;
 
 import temp.ast.Expression;
 import temp.lang.Token;
-import temp.lang.Visitor;
 
 public class Unary extends Expression {
     private final Token operator;
@@ -15,5 +14,13 @@ public class Unary extends Expression {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitUnaryExpression(this);
+    }
+
+    public Token getOperator() {
+        return this.operator;
+    }
+
+    public Expression getRight() {
+        return this.right;
     }
 }

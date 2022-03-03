@@ -47,7 +47,38 @@ public class Parser {
     }
 
     private Expression assignment() {
-        return logicalOr();
+        if (peekType() == TK_IDENTIFIER) {
+            switch (peekNext().getTokenType()) {
+                case TK_EQUAL -> {
+                    Token next = peek();
+
+                    advance();
+                    advance();
+
+                    Expression expression = expression();
+                    return new Assignment(next, expression);
+                }
+
+                case TK_PLUS_EQUAL, TK_MINUS_EQUAL, TK_MUL_EQUAL, TK_DIV_EQUAL, TK_MOD_EQUAL -> {
+                    Token next = peek();
+
+                    advance();
+                    Token operator = peek();
+                    advance();
+
+                    Expression expression = expression();
+                    return new OpAssignment(next, operator, expression);
+                }
+
+                default -> {
+                    return logicalOr();
+                }
+            }
+        }
+
+        else {
+            return logicalOr();
+        }
     }
 
     private Expression logicalOr() {
@@ -145,6 +176,10 @@ public class Parser {
 
         if (matchAdvance(TK_INTEGER, TK_DOUBLE, TK_CHAR)) {
             return new Literal(previous().getLiteral());
+        }
+
+        if (matchAdvance(TK_IDENTIFIER)) {
+            return new Variable(previous());
         }
 
         if (matchAdvance(TK_LPAR)) {

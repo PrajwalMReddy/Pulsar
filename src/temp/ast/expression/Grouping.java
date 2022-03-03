@@ -1,7 +1,6 @@
 package temp.ast.expression;
 
 import temp.ast.Expression;
-import temp.lang.Visitor;
 
 public class Grouping extends Expression {
     private final Expression expression;
@@ -12,5 +11,9 @@ public class Grouping extends Expression {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitGroupingExpression(this);
+    }
+
+    public Expression getExpression() {
+        return this.expression;
     }
 }

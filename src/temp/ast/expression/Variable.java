@@ -2,7 +2,6 @@ package temp.ast.expression;
 
 import temp.ast.Expression;
 import temp.lang.Token;
-import temp.lang.Visitor;
 
 public class Variable extends Expression {
     Token name;
@@ -13,5 +12,9 @@ public class Variable extends Expression {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitVariableExpression(this);
+    }
+
+    public String getName() {
+        return this.name.getLiteral();
     }
 }

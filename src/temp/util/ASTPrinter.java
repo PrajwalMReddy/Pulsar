@@ -2,10 +2,9 @@ package temp.util;
 
 import temp.ast.Expression;
 import temp.ast.expression.*;
-import temp.lang.Visitor;
 import temp.pulsar.Pulsar;
 
-public class ASTPrinter implements Visitor<String> {
+public class ASTPrinter implements Expression.Visitor<String> {
     public void print(Expression ast) { // TODO Change 'Expression' To AST Later As Well
         if (Pulsar.conditions.getDebug()) {
             System.out.println("\n-- AST --\n");
@@ -17,33 +16,35 @@ public class ASTPrinter implements Visitor<String> {
         System.out.println(ast.accept(this));
     }
 
-    // TODO All Below
-
     public String visitAssignmentExpression(Assignment expression) {
-        return null;
+        return "Assignment(Variable(" + expression.getIdentifier().getLiteral() + ") = " + expression.getValue().accept(this) + ")";
     }
 
     public String visitBinaryExpression(Binary expression) {
-        return null;
+        return "Binary(" + expression.getLeft().accept(this) + " " + expression.getOperator().getLiteral() + " " + expression.getRight().accept(this) + ")";
     }
 
     public String visitGroupingExpression(Grouping expression) {
-        return null;
+        return "(" + expression.getExpression().accept(this) + ")";
     }
 
     public String visitLiteralExpression(Literal expression) {
-        return null;
+        return "Literal(" + expression.getValue() + ")";
     }
 
     public String visitLogicalExpression(Logical expression) {
-        return null;
+        return "Logical(" + expression.getLeft().accept(this) + " " + expression.getOperator().getLiteral() + " " + expression.getRight().accept(this) + ")";
+    }
+
+    public String visitOpAssignmentExpression(OpAssignment expression) {
+        return "Assignment(Variable(" + expression.getIdentifier().getLiteral() + ") " + expression.getAssignmentType().getLiteral() + " " + expression.getValue().accept(this) + ")";
     }
 
     public String visitUnaryExpression(Unary expression) {
-        return null;
+        return "Unary(" + expression.getOperator().getLiteral() + " " + expression.getRight().accept(this) + ")";
     }
 
     public String visitVariableExpression(Variable expression) {
-        return null;
+        return "Variable(" + expression.getName() + ")";
     }
 }
