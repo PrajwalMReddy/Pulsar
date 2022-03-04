@@ -1,13 +1,15 @@
 package temp.ast.expression;
 
 import temp.ast.Expression;
-import temp.lang.Token;
 
 public class Variable extends Expression {
-    Token name;
+    private final String name;
 
-    public Variable(Token name) {
+    private final int line;
+
+    public Variable(String name, int line) {
         this.name = name;
+        this.line = line;
     }
 
     public <R> R accept(Visitor<R> visitor) {
@@ -15,6 +17,10 @@ public class Variable extends Expression {
     }
 
     public String getName() {
-        return this.name.getLiteral();
+        return this.name;
+    }
+
+    public int getLine() {
+        return this.line;
     }
 }

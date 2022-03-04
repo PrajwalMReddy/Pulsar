@@ -10,7 +10,6 @@ public abstract class Expression {
         R visitGroupingExpression(Grouping expression);
         R visitLiteralExpression(Literal expression);
         R visitLogicalExpression(Logical expression);
-        R visitOpAssignmentExpression(OpAssignment expression);
         R visitUnaryExpression(Unary expression);
         R visitVariableExpression(Variable expression);
     }

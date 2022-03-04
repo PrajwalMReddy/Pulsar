@@ -2,6 +2,7 @@ package temp.pulsar;
 
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
+import temp.util.Disassembler;
 import temp.util.ErrorReporter;
 
 import java.io.FileNotFoundException;
@@ -27,6 +28,7 @@ public class Compiler {
         this.instructions = bcc.compileByteCode();
         this.errors = bcc.getErrors();
 
+        Disassembler.disassemble(this.instructions);
         ErrorReporter.report(this.errors, this.sourceCode);
 
         compile();

@@ -5,8 +5,11 @@ import temp.ast.Expression;
 public class Literal extends Expression {
     private final Object value;
 
-    public Literal(Object value) {
+    private final int line;
+
+    public Literal(Object value, int line) {
         this.value = value;
+        this.line = line;
     }
 
     public <R> R accept(Visitor<R> visitor) {
@@ -19,5 +22,9 @@ public class Literal extends Expression {
         }
 
         return this.value;
+    }
+
+    public int getLine() {
+        return this.line;
     }
 }

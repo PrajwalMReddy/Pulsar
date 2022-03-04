@@ -56,18 +56,28 @@ public class Parser {
                     advance();
 
                     Expression expression = expression();
-                    return new Assignment(next, expression);
+                    return new Assignment(next.getLiteral(), expression, next.getLine());
                 }
 
                 case TK_PLUS_EQUAL, TK_MINUS_EQUAL, TK_MUL_EQUAL, TK_DIV_EQUAL, TK_MOD_EQUAL -> {
                     Token next = peek();
+                    String identifier = next.getLiteral();
+                    int line = next.getLine();
 
                     advance();
                     Token operator = peek();
+                    String operatorType = operator.getLiteral();
                     advance();
 
                     Expression expression = expression();
-                    return new OpAssignment(next, operator, expression);
+
+                    // Expand An Operator Assignment Into A Normal Assignment
+                    return new Assignment(identifier,
+                                    new Binary(
+                                            new Variable(identifier, line
+                                            ), operatorType.substring(0, operatorType.length() - 1), expression, line
+                                    ), line
+                            );
                 }
 
                 default -> {
@@ -87,7 +97,7 @@ public class Parser {
         while (matchAdvance(TK_LOGICAL_OR)) {
             Token operator = previous();
             Expression right = logicalAnd();
-            expression = new Logical(expression, operator, right);
+            expression = new Logical(expression, operator.getLiteral(), right, operator.getLine());
         }
 
         return expression;
@@ -99,7 +109,7 @@ public class Parser {
         while (matchAdvance(TK_LOGICAL_AND)) {
             Token operator = previous();
             Expression right = equality();
-            expression = new Logical(expression, operator, right);
+            expression = new Logical(expression, operator.getLiteral(), right, operator.getLine());
         }
 
         return expression;
@@ -111,7 +121,7 @@ public class Parser {
         while (matchAdvance(TK_EQUAL_EQUAL, TK_NOT_EQUAL)) {
             Token operator = previous();
             Expression right = comparison();
-            expression = new Binary(expression, operator, right);
+            expression = new Binary(expression, operator.getLiteral(), right, operator.getLine());
         }
 
         return expression;
@@ -123,7 +133,7 @@ public class Parser {
         while (matchAdvance(TK_GT, TK_GT_EQUAL, TK_LT, TK_LT_EQUAL)) {
             Token operator = previous();
             Expression right = term();
-            expression = new Binary(expression, operator, right);
+            expression = new Binary(expression, operator.getLiteral(), right, operator.getLine());
         }
 
         return expression;
@@ -135,7 +145,7 @@ public class Parser {
         while (matchAdvance(TK_PLUS, TK_MINUS)) {
             Token operator = previous();
             Expression right = factor();
-            expression = new Binary(expression, operator, right);
+            expression = new Binary(expression, operator.getLiteral(), right, operator.getLine());
         }
 
         return expression;
@@ -147,7 +157,7 @@ public class Parser {
         while (matchAdvance(TK_MULTIPLICATION, TK_DIVISION)) {
             Token operator = previous();
             Expression right = unary();
-            expression = new Binary(expression, operator, right);
+            expression = new Binary(expression, operator.getLiteral(), right, operator.getLine());
         }
 
         return expression;
@@ -157,7 +167,7 @@ public class Parser {
         if (matchAdvance(TK_NOT, TK_MINUS)) {
             Token operator = previous();
             Expression right = unary();
-            return new Unary(operator, right);
+            return new Unary(operator.getLiteral(), right, operator.getLine());
         } else if (matchAdvance(TK_PLUS)) {
             return unary();
         }
@@ -167,19 +177,19 @@ public class Parser {
 
     private Expression primary() {
         if (matchAdvance(TK_TRUE)) {
-            return new Literal(true);
+            return new Literal(true, peekLine());
         } else if (matchAdvance(TK_FALSE)) {
-            return new Literal(false);
+            return new Literal(false, peekLine());
         } else if (matchAdvance(TK_NULL)) {
-            return new Literal(null);
+            return new Literal(null, peekLine());
         }
 
         if (matchAdvance(TK_INTEGER, TK_DOUBLE, TK_CHAR)) {
-            return new Literal(previous().getLiteral());
+            return new Literal(previous().getLiteral(), peekLine());
         }
 
         if (matchAdvance(TK_IDENTIFIER)) {
-            return new Variable(previous());
+            return new Variable(previous().getLiteral(), peekLine());
         }
 
         if (matchAdvance(TK_LPAR)) {
@@ -189,7 +199,7 @@ public class Parser {
         }
 
         error("An Expression Was Expected But Nothing Was Given", peekLine());
-        return new Literal(TK_ERROR); // Reusing The Error Token To Indicate That There Is No Value Here
+        return new Literal(TK_ERROR, peekLine()); // Reusing The Error Token To Indicate That There Is No Value Here
     }
 
     private boolean match(TokenType... types) {

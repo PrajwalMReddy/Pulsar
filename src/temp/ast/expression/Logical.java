@@ -1,17 +1,19 @@
 package temp.ast.expression;
 
 import temp.ast.Expression;
-import temp.lang.Token;
 
 public class Logical extends Expression {
     private final Expression left;
-    private final Token operator;
+    private final String operator;
     private final Expression right;
 
-    public Logical(Expression left, Token operator, Expression right) {
+    private final int line;
+
+    public Logical(Expression left, String operator, Expression right, int line) {
         this.left = left;
         this.operator = operator;
         this.right = right;
+        this.line = line;
     }
 
     public <R> R accept(Visitor<R> visitor) {
@@ -22,11 +24,15 @@ public class Logical extends Expression {
         return this.left;
     }
 
-    public Token getOperator() {
+    public String getOperator() {
         return this.operator;
     }
 
     public Expression getRight() {
         return this.right;
+    }
+
+    public int getLine() {
+        return this.line;
     }
 }

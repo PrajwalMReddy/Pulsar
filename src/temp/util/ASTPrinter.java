@@ -17,11 +17,11 @@ public class ASTPrinter implements Expression.Visitor<String> {
     }
 
     public String visitAssignmentExpression(Assignment expression) {
-        return "Assignment(Variable(" + expression.getIdentifier().getLiteral() + ") = " + expression.getValue().accept(this) + ")";
+        return "Assignment(Variable(" + expression.getIdentifier() + ") = " + expression.getValue().accept(this) + ")";
     }
 
     public String visitBinaryExpression(Binary expression) {
-        return "Binary(" + expression.getLeft().accept(this) + " " + expression.getOperator().getLiteral() + " " + expression.getRight().accept(this) + ")";
+        return "Binary(" + expression.getLeft().accept(this) + " " + expression.getOperator() + " " + expression.getRight().accept(this) + ")";
     }
 
     public String visitGroupingExpression(Grouping expression) {
@@ -33,15 +33,11 @@ public class ASTPrinter implements Expression.Visitor<String> {
     }
 
     public String visitLogicalExpression(Logical expression) {
-        return "Logical(" + expression.getLeft().accept(this) + " " + expression.getOperator().getLiteral() + " " + expression.getRight().accept(this) + ")";
-    }
-
-    public String visitOpAssignmentExpression(OpAssignment expression) {
-        return "Assignment(Variable(" + expression.getIdentifier().getLiteral() + ") " + expression.getAssignmentType().getLiteral() + " " + expression.getValue().accept(this) + ")";
+        return "Logical(" + expression.getLeft().accept(this) + " " + expression.getOperator() + " " + expression.getRight().accept(this) + ")";
     }
 
     public String visitUnaryExpression(Unary expression) {
-        return "Unary(" + expression.getOperator().getLiteral() + " " + expression.getRight().accept(this) + ")";
+        return "Unary(" + expression.getOperator() + " " + expression.getRight().accept(this) + ")";
     }
 
     public String visitVariableExpression(Variable expression) {

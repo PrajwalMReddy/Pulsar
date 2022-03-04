@@ -1,26 +1,32 @@
 package temp.ast.expression;
 
 import temp.ast.Expression;
-import temp.lang.Token;
 
 public class Unary extends Expression {
-    private final Token operator;
+    private final String operator;
     private final Expression right;
 
-    public Unary(Token operator, Expression right) {
+    private final int line;
+
+    public Unary(String operator, Expression right, int line) {
         this.operator = operator;
         this.right = right;
+        this.line = line;
     }
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitUnaryExpression(this);
     }
 
-    public Token getOperator() {
+    public String getOperator() {
         return this.operator;
     }
 
     public Expression getRight() {
         return this.right;
+    }
+
+    public int getLine() {
+        return this.line;
     }
 }
