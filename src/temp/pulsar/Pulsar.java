@@ -43,7 +43,7 @@ public class Pulsar {
             stringFile = new String(fileBytes, Charset.defaultCharset());
             return stringFile;
         } catch (NoSuchFileException fileException) {
-            CommandsKt.error("The Provided File Path Was Not Found");
+            CommandsKt.error("The File Path '" + file + "' Was Not Found");
             return null;
         }
     }

@@ -1,19 +1,25 @@
 package temp.util;
 
 import temp.ast.Expression;
+import temp.ast.Statement;
 import temp.ast.expression.*;
+import temp.ast.statement.ExpressionStmt;
 import temp.pulsar.Pulsar;
 
-public class ASTPrinter implements Expression.Visitor<String> {
-    public void print(Expression ast) { // TODO Change 'Expression' To AST Later As Well
+public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor<String> {
+    public void print(ExpressionStmt ast) {
         if (Pulsar.conditions.getDebug()) {
             System.out.println("\n-- AST --\n");
             constructTree(ast);
         }
     }
 
-    private void constructTree(Expression ast) { // TODO Here As Well
+    private void constructTree(ExpressionStmt ast) {
         System.out.println(ast.accept(this));
+    }
+
+    public String visitExpressionStatement(ExpressionStmt statement) {
+        return statement.getExpression().accept(this);
     }
 
     public String visitAssignmentExpression(Assignment expression) {

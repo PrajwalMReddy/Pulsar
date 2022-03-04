@@ -1,7 +1,9 @@
 package temp.pulsar;
 
 import temp.ast.Expression;
+import temp.ast.Statement;
 import temp.ast.expression.*;
+import temp.ast.statement.ExpressionStmt;
 import temp.lang.ByteCode;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
@@ -11,10 +13,10 @@ import java.util.ArrayList;
 
 import static temp.lang.ByteCode.*;
 
-public class ByteCodeCompiler implements Expression.Visitor<Instruction> {
+public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statement.Visitor<Instruction> {
     // Input Data
     private final String sourceCode;
-    private Expression program; // TODO Also Change This To 'AST'
+    private ExpressionStmt program;
 
     // Data To Help In Compiling To ByteCode
     private static ArrayList<Object> values; // Constant Values To Be Stored
@@ -35,10 +37,10 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction> {
         Parser ast = new Parser(this.sourceCode);
         this.program = ast.parse();
         this.errors = ast.getErrors();
-        
-        new ASTPrinter().print(this.program);
+
         if (this.errors.hasError()) return instructions;
-        
+        new ASTPrinter().print(this.program);
+
         compile();
         
         return this.instructions;
@@ -46,6 +48,13 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction> {
 
     private void compile() {
         this.program.accept(this);
+    }
+
+    public Instruction visitExpressionStatement(ExpressionStmt statement) {
+        Instruction instruction = statement.getExpression().accept(this);
+        makeOpCode(OP_POP, statement.getLine());
+
+        return instruction;
     }
 
     public Instruction visitAssignmentExpression(Assignment expression) {
@@ -58,7 +67,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction> {
 
         ArrayList<ByteCode> operators = identifyBinaryOperator(expression.getOperator());
         for (ByteCode op: operators) {
-            makeOpCode(op, null, expression.getLine());
+            makeOpCode(op, expression.getLine());
         }
 
         return null;
@@ -80,7 +89,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction> {
     public Instruction visitUnaryExpression(Unary expression) {
         expression.getRight().accept(this);
         ByteCode operator = identifyUnaryOperator(expression.getOperator());
-        return makeOpCode(operator, null, expression.getLine());
+        return makeOpCode(operator, expression.getLine());
     }
 
     public Instruction visitVariableExpression(Variable expression) {
@@ -88,8 +97,14 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction> {
     }
 
     private Instruction makeConstant(Object value, int line) {
-        this.values.add(value);
+        values.add(value);
         Instruction instruction = new Instruction(OP_CONSTANT, values.size() - 1, line);
+        this.instructions.add(instruction);
+        return instruction;
+    }
+
+    private Instruction makeOpCode(ByteCode opcode, int line) {
+        Instruction instruction = new Instruction(opcode, null, line);
         this.instructions.add(instruction);
         return instruction;
     }

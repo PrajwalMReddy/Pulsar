@@ -28,8 +28,8 @@ public class Compiler {
         this.instructions = bcc.compileByteCode();
         this.errors = bcc.getErrors();
 
-        Disassembler.disassemble(this.instructions);
         ErrorReporter.report(this.errors, this.sourceCode);
+        Disassembler.disassemble(this.instructions);
 
         compile();
         this.pw.close();

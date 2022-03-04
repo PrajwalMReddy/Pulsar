@@ -1,7 +1,8 @@
 package temp.pulsar;
 
-import temp.ast.*;
+import temp.ast.Expression;
 import temp.ast.expression.*;
+import temp.ast.statement.ExpressionStmt;
 import temp.lang.CompilerError;
 import temp.lang.Token;
 import temp.lang.TokenType;
@@ -20,7 +21,7 @@ public class Parser {
     private int current; // Next Token To Be Used
 
     // Output Data
-    private Expression program; // TODO Change Most 'Expression's To AST When Statements Are Added
+    private ExpressionStmt program;
     private CompilerError errors;
 
     public Parser(String sourceCode) {
@@ -29,17 +30,23 @@ public class Parser {
         this.current = 0;
     }
 
-    public Expression parse() {
+    public ExpressionStmt parse() {
         Lexer lexer = new Lexer(this.sourceCode);
         this.tokens = lexer.tokenize();
         this.errors = lexer.getErrors();
 
-        TokenDisassembler.display(this.tokens);
         if (this.errors.hasError()) return this.program;
+        TokenDisassembler.display(this.tokens);
 
-        this.program = expression();
+        this.program = expressionStatement();
         
         return this.program;
+    }
+
+    private ExpressionStmt expressionStatement() {
+        ExpressionStmt expression = new ExpressionStmt(expression(), peekLine());
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression");
+        return expression;
     }
 
     private Expression expression() {
@@ -199,7 +206,7 @@ public class Parser {
         }
 
         error("An Expression Was Expected But Nothing Was Given", peekLine());
-        return new Literal(TK_ERROR, peekLine()); // Reusing The Error Token To Indicate That There Is No Value Here
+        return new Literal("Error", peekLine()); // Returning An 'Error Literal'
     }
 
     private boolean match(TokenType... types) {
