@@ -6,6 +6,7 @@ import temp.ast.expression.*;
 import temp.ast.statement.Block;
 import temp.ast.statement.ExpressionStmt;
 import temp.ast.statement.If;
+import temp.ast.statement.While;
 import temp.lang.ByteCode;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
@@ -49,6 +50,10 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     }
 
     private void compile() {
+        if (this.program == null) {
+            return;
+        }
+
         this.program.accept(this);
     }
 
@@ -56,6 +61,22 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         for (Statement stmt: statement.getStatements()) {
             stmt.accept(this);
         }
+
+        return null;
+    }
+
+    public Void visitWhileStatement(While statement) {
+        int start = this.instructions.size();
+        statement.getCondition().accept(this);
+
+        int offset = makeJump(OP_JUMP_IF_FALSE, statement.getLine());
+        makeOpCode(OP_POP, statement.getLine());
+
+        statement.getStatements().accept(this);
+        makeOpCode(OP_JUMP, start, statement.getStatements().getLine());
+
+        fixJump(offset, OP_JUMP_IF_FALSE);
+        makeOpCode(OP_POP, statement.getStatements().getLine());
 
         return null;
     }

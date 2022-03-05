@@ -6,6 +6,7 @@ import temp.ast.expression.*;
 import temp.ast.statement.Block;
 import temp.ast.statement.ExpressionStmt;
 import temp.ast.statement.If;
+import temp.ast.statement.While;
 import temp.lang.CompilerError;
 import temp.lang.Token;
 import temp.lang.TokenType;
@@ -50,6 +51,8 @@ public class Parser {
         while (!match(TK_EOF)) {
             if (matchAdvance(TK_IF)) {
                 return ifStatement();
+            } else if (matchAdvance(TK_WHILE)) {
+                return whileStatement();
             } else {
                 return expressionStatement();
             }
@@ -68,6 +71,14 @@ public class Parser {
 
         look(TK_RBRACE, "A Closing Brace Was Expected After The Block");
         return new Block(statements, peekLine());
+    }
+
+    private Statement whileStatement() {
+        int line = peekLine();
+        Expression expression = expression();
+        Block statements = block();
+
+        return new While(expression, statements, line);
     }
 
     private Statement ifStatement() {

@@ -6,6 +6,7 @@ import temp.ast.expression.*;
 import temp.ast.statement.Block;
 import temp.ast.statement.ExpressionStmt;
 import temp.ast.statement.If;
+import temp.ast.statement.While;
 import temp.pulsar.Pulsar;
 
 public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor<String> {
@@ -43,6 +44,13 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         }
 
         return ifStmt;
+    }
+
+    public String visitWhileStatement(While statement) {
+        String stmt = "While(" + statement.getCondition().accept(this) + ")";
+        stmt += "\n\tDo(" + statement.getStatements().accept(this) + ")";
+
+        return stmt;
     }
 
     public String visitAssignmentExpression(Assignment expression) {
