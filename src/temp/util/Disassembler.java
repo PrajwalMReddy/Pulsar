@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Disassembler {
     public static void disassemble(ArrayList<Instruction> instructions) {
         if (Pulsar.conditions.getDebug()) {
-            System.out.println("\n-- Disassembled ByteCode --");
+            System.out.println("\n-- Disassembled Bytecode --");
             displayInstructions(instructions);
         }
     }

@@ -3,7 +3,9 @@ package temp.pulsar;
 import temp.ast.Expression;
 import temp.ast.Statement;
 import temp.ast.expression.*;
+import temp.ast.statement.Block;
 import temp.ast.statement.ExpressionStmt;
+import temp.ast.statement.If;
 import temp.lang.ByteCode;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
@@ -13,10 +15,10 @@ import java.util.ArrayList;
 
 import static temp.lang.ByteCode.*;
 
-public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statement.Visitor<Instruction> {
+public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statement.Visitor<Void> {
     // Input Data
     private final String sourceCode;
-    private ExpressionStmt program;
+    private Statement program;
 
     // Data To Help In Compiling To ByteCode
     private static ArrayList<Object> values; // Constant Values To Be Stored
@@ -38,8 +40,8 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         this.program = ast.parse();
         this.errors = ast.getErrors();
 
-        if (this.errors.hasError()) return instructions;
         new ASTPrinter().print(this.program);
+        if (this.errors.hasError()) return instructions;
 
         compile();
         
@@ -50,11 +52,37 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         this.program.accept(this);
     }
 
-    public Instruction visitExpressionStatement(ExpressionStmt statement) {
-        Instruction instruction = statement.getExpression().accept(this);
+    public Void visitBlockStatement(Block statement) {
+        for (Statement stmt: statement.getStatements()) {
+            stmt.accept(this);
+        }
+
+        return null;
+    }
+
+    public Void visitIFStatement(If statement) {
+        statement.getCondition().accept(this);
+        int ifOffset = makeJump(OP_JUMP_IF_FALSE, statement.getLine());
+        makeOpCode(OP_POP, statement.getLine());
+        statement.getThenBranch().accept(this);
+
+        int elseOffset = makeJump(OP_JUMP, statement.getThenBranch().getLine());
+        fixJump(ifOffset, OP_JUMP_IF_FALSE);
+        makeOpCode(OP_POP, statement.getThenBranch().getLine());
+
+        if (statement.hasElse()) {
+            statement.getElseBranch().accept(this);
+        }
+
+        fixJump(elseOffset, OP_JUMP);
+        return null;
+    }
+
+    public Void visitExpressionStatement(ExpressionStmt statement) {
+        statement.getExpression().accept(this);
         makeOpCode(OP_POP, statement.getLine());
 
-        return instruction;
+        return null;
     }
 
     public Instruction visitAssignmentExpression(Assignment expression) {
@@ -113,6 +141,21 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         Instruction instruction = new Instruction(opcode, operand, line);
         this.instructions.add(instruction);
         return instruction;
+    }
+
+    private int makeJump(ByteCode opcode, int line) {
+        int size = this.instructions.size();
+
+        makeOpCode(opcode, line);
+
+        return size;
+    }
+
+    private void fixJump(int offset, ByteCode opcode) {
+        Instruction oldJump = this.instructions.get(offset);
+        int line = oldJump.getLine();
+        Instruction jumpOpCode = new Instruction(opcode, this.instructions.size(), line);
+        this.instructions.set(offset, jumpOpCode);
     }
 
     private ByteCode identifyUnaryOperator(String operator) {

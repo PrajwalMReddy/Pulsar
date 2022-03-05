@@ -1,8 +1,11 @@
 package temp.pulsar;
 
 import temp.ast.Expression;
+import temp.ast.Statement;
 import temp.ast.expression.*;
+import temp.ast.statement.Block;
 import temp.ast.statement.ExpressionStmt;
+import temp.ast.statement.If;
 import temp.lang.CompilerError;
 import temp.lang.Token;
 import temp.lang.TokenType;
@@ -21,7 +24,7 @@ public class Parser {
     private int current; // Next Token To Be Used
 
     // Output Data
-    private ExpressionStmt program;
+    private Statement program;
     private CompilerError errors;
 
     public Parser(String sourceCode) {
@@ -30,7 +33,7 @@ public class Parser {
         this.current = 0;
     }
 
-    public ExpressionStmt parse() {
+    public Statement parse() {
         Lexer lexer = new Lexer(this.sourceCode);
         this.tokens = lexer.tokenize();
         this.errors = lexer.getErrors();
@@ -38,9 +41,50 @@ public class Parser {
         if (this.errors.hasError()) return this.program;
         TokenDisassembler.display(this.tokens);
 
-        this.program = expressionStatement();
+        this.program = statement();
         
         return this.program;
+    }
+
+    private Statement statement() {
+        while (!match(TK_EOF)) {
+            if (matchAdvance(TK_IF)) {
+                return ifStatement();
+            } else {
+                return expressionStatement();
+            }
+        }
+
+        return null;
+    }
+
+    private Block block() {
+        ArrayList<Statement> statements = new ArrayList<>();
+        look(TK_LBRACE, "An Opening Brace Was Expected Before The Block");
+
+        while (!match(TK_RBRACE) && !match(TK_EOF)) {
+            statements.add(statement());
+        }
+
+        look(TK_RBRACE, "A Closing Brace Was Expected After The Block");
+        return new Block(statements, peekLine());
+    }
+
+    private Statement ifStatement() {
+        int line = peekLine();
+        Expression expression = expression();
+        Block thenBranch = block();
+        Statement elseBranch = null;
+
+        if (matchAdvance(TK_ELSE)) {
+            if (matchAdvance(TK_IF)) {
+                elseBranch = ifStatement();
+            } else {
+                elseBranch = block();
+            }
+        }
+
+        return new If(expression, thenBranch, elseBranch, line);
     }
 
     private ExpressionStmt expressionStatement() {

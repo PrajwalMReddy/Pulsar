@@ -5,6 +5,7 @@ import temp.ast.Statement;
 
 public class ExpressionStmt extends Statement {
     private final Expression expression;
+
     private final int line;
 
     public ExpressionStmt(Expression expression, int line) {

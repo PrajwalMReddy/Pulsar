@@ -3,23 +3,46 @@ package temp.util;
 import temp.ast.Expression;
 import temp.ast.Statement;
 import temp.ast.expression.*;
+import temp.ast.statement.Block;
 import temp.ast.statement.ExpressionStmt;
+import temp.ast.statement.If;
 import temp.pulsar.Pulsar;
 
 public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor<String> {
-    public void print(ExpressionStmt ast) {
+    public void print(Statement ast) {
         if (Pulsar.conditions.getDebug()) {
             System.out.println("\n-- AST --\n");
             constructTree(ast);
         }
     }
 
-    private void constructTree(ExpressionStmt ast) {
-        System.out.println(ast.accept(this));
+    private void constructTree(Statement ast) {
+        if (ast == null) {
+            System.out.println("No AST Has Been Generated");
+        } else {
+            System.out.println(ast.accept(this));
+        }
+    }
+
+    public String visitBlockStatement(Block statement) {
+        StringBuilder stringBuilder = new StringBuilder("Block(\n");
+        for (Statement stmt: statement.getStatements()) {
+            stringBuilder.append("\t").append(stmt.accept(this));
+        }
+        return stringBuilder.append("\n)").toString();
     }
 
     public String visitExpressionStatement(ExpressionStmt statement) {
-        return statement.getExpression().accept(this);
+        return "Expression(" + statement.getExpression().accept(this) + ")";
+    }
+
+    public String visitIFStatement(If statement) {
+        String ifStmt = "If(" + statement.getCondition().accept(this) + ")\n\tThen(" + statement.getThenBranch().accept(this) + ")";
+        if (statement.hasElse()) {
+            ifStmt += "\n\tElse(" + statement.getElseBranch().accept(this) + ")";
+        }
+
+        return ifStmt;
     }
 
     public String visitAssignmentExpression(Assignment expression) {
