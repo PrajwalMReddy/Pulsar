@@ -10,6 +10,8 @@ import temp.ast.statement.While;
 import temp.lang.ByteCode;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
+import temp.lang.TokenType;
+import temp.primitives.*;
 import temp.util.ASTPrinter;
 
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     private Statement program;
 
     // Data To Help In Compiling To ByteCode
-    private static ArrayList<Object> values; // Constant Values To Be Stored
+    private static ArrayList<Primitive> values; // Constant Values To Be Stored
 
     // Output Data
     private final ArrayList<Instruction> instructions;
@@ -127,8 +129,8 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     }
 
     public Instruction visitLiteralExpression(Literal expression) {
-        Object value = expression.getValue();
-        return makeConstant(value, expression.getLine());
+        String value = expression.getValue();
+        return makeConstant(value, expression.getLine(), expression.getType());
     }
 
     public Instruction visitLogicalExpression(Logical expression) {
@@ -145,8 +147,20 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return null;
     }
 
-    private Instruction makeConstant(Object value, int line) {
-        values.add(value);
+    private Instruction makeConstant(String value, int line, TokenType type) {
+        Primitive primitiveLiteral = null;
+
+        switch (type) {
+            case TK_INTEGER -> primitiveLiteral = new PInteger(Integer.parseInt(value));
+            case TK_DOUBLE -> primitiveLiteral = new PDouble(Double.parseDouble(value));
+            case TK_CHAR -> primitiveLiteral = new PCharacter(value.charAt(0));
+            case TK_TRUE -> primitiveLiteral = new PBoolean(true);
+            case TK_FALSE -> primitiveLiteral = new PBoolean(false);
+            case TK_NULL -> primitiveLiteral = new PNull();
+        }
+
+        values.add(primitiveLiteral);
+
         Instruction instruction = new Instruction(OP_CONSTANT, values.size() - 1, line);
         this.instructions.add(instruction);
         return instruction;
@@ -219,7 +233,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return codes;
     }
 
-    public static ArrayList<Object> getValues() {
+    public static ArrayList<Primitive> getValues() {
         return values;
     }
 

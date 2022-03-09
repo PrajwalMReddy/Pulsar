@@ -13,3 +13,6 @@ This holds all the Abstract Syntax Tree nodes that will be used by the Abstract 
 
 ## temp.util
 This holds other classes that aren't strictly needed for compilation but are there for convenience.
+
+## temp.primitives
+This package is for the classes that refer to the primitive data types.

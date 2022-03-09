@@ -1,14 +1,17 @@
 package temp.ast.expression;
 
 import temp.ast.Expression;
+import temp.lang.TokenType;
 
 public class Literal extends Expression {
-    private final Object value;
+    private final String value;
+    private final TokenType type;
 
     private final int line;
 
-    public Literal(Object value, int line) {
+    public Literal(String value, TokenType type, int line) {
         this.value = value;
+        this.type = type;
         this.line = line;
     }
 
@@ -16,7 +19,7 @@ public class Literal extends Expression {
         return visitor.visitLiteralExpression(this);
     }
 
-    public Object getValue() {
+    public String getValue() {
         if (this.value == null) {
             return "null";
         }
@@ -26,5 +29,9 @@ public class Literal extends Expression {
 
     public int getLine() {
         return this.line;
+    }
+
+    public TokenType getType() {
+        return this.type;
     }
 }

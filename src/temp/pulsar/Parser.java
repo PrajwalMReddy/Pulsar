@@ -239,15 +239,19 @@ public class Parser {
 
     private Expression primary() {
         if (matchAdvance(TK_TRUE)) {
-            return new Literal(true, peekLine());
+            return new Literal("true", TK_TRUE, peekLine());
         } else if (matchAdvance(TK_FALSE)) {
-            return new Literal(false, peekLine());
+            return new Literal("false", TK_FALSE, peekLine());
         } else if (matchAdvance(TK_NULL)) {
-            return new Literal(null, peekLine());
+            return new Literal("null", TK_NULL, peekLine());
         }
 
-        if (matchAdvance(TK_INTEGER, TK_DOUBLE, TK_CHAR)) {
-            return new Literal(previous().getLiteral(), peekLine());
+        if (matchAdvance(TK_INTEGER)) {
+            return new Literal(previous().getLiteral(), TK_INTEGER, peekLine());
+        } else if (matchAdvance(TK_DOUBLE)) {
+            return new Literal(previous().getLiteral(), TK_DOUBLE, peekLine());
+        } else if (matchAdvance(TK_CHAR)) {
+            return new Literal(previous().getLiteral(), TK_CHAR, peekLine());
         }
 
         if (matchAdvance(TK_IDENTIFIER)) {
@@ -261,7 +265,7 @@ public class Parser {
         }
 
         error("An Expression Was Expected But Nothing Was Given", peekLine());
-        return new Literal("Error", peekLine()); // Returning An 'Error Literal'
+        return new Literal("Error", TK_ERROR, peekLine()); // Returning An 'Error Literal'
     }
 
     private boolean match(TokenType... types) {
