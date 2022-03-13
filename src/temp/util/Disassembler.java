@@ -8,14 +8,14 @@ import temp.pulsar.Pulsar;
 import java.util.ArrayList;
 
 public class Disassembler {
-    public static void disassemble(ArrayList<Instruction> instructions) {
+    public static void disassemble(ArrayList<Instruction> instructions, ByteCodeCompiler bcc) {
         if (Pulsar.conditions.getDebug()) {
             System.out.println("\n-- Disassembled Bytecode --");
-            displayInstructions(instructions);
+            displayInstructions(instructions, bcc);
         }
     }
 
-    private static void displayInstructions(ArrayList<Instruction> instructions) {
+    private static void displayInstructions(ArrayList<Instruction> instructions, ByteCodeCompiler bcc) {
         int line = 0;
         int count = 0;
 
@@ -27,17 +27,17 @@ public class Disassembler {
                 System.out.print("\n" + line + spaces(line) + count + "  | ");
             }
 
-            decide(instruction);
+            decide(instruction, bcc);
             count++;
         }
     }
 
-    private static void decide(Instruction instruction) {
+    private static void decide(Instruction instruction, ByteCodeCompiler bcc) {
         switch (instruction.getOpcode()) {
             // These Are OpCodes That Have Operands
             case OP_CONSTANT, OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,
                     OP_NEW_GLOBAL, OP_STORE_GLOBAL, OP_LOAD_GLOBAL,
-                    OP_SET_LOCAL, OP_GET_LOCAL, OP_NEW_LOCAL -> operand(instruction);
+                    OP_SET_LOCAL, OP_GET_LOCAL, OP_NEW_LOCAL -> operand(instruction, bcc);
 
             // These Are OpCodes That Don't Have Operands
             case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_MODULO, OP_NEGATE,
@@ -51,10 +51,10 @@ public class Disassembler {
     }
 
     // Displays the OpCode With The Necessary Spaces After It, And Then Prints Out The Operand
-    private static void operand(Instruction instruction) {
+    private static void operand(Instruction instruction, ByteCodeCompiler bcc) {
         if (instruction.getOpcode() == ByteCode.OP_CONSTANT) {
             System.out.println(ByteCode.OP_CONSTANT + spaces(instruction) + instruction.getOperand()
-                    + "  (" + ByteCodeCompiler.getValues().get((int) instruction.getOperand()) + ")");
+                    + "  (" + bcc.getValues().get((int) instruction.getOperand()) + ")");
         } else {
             System.out.println(instruction.getOpcode() + spaces(instruction) + instruction.getOperand());
         }

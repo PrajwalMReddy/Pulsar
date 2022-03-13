@@ -3,10 +3,7 @@ package temp.util;
 import temp.ast.Expression;
 import temp.ast.Statement;
 import temp.ast.expression.*;
-import temp.ast.statement.Block;
-import temp.ast.statement.ExpressionStmt;
-import temp.ast.statement.If;
-import temp.ast.statement.While;
+import temp.ast.statement.*;
 import temp.pulsar.Pulsar;
 
 public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor<String> {
@@ -23,6 +20,10 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         } else {
             System.out.println(ast.accept(this));
         }
+    }
+
+    public String visitVariableStatement(Variable statement) {
+        return "Variable(" + (statement.isGlobal() ? "Global:" : "Local:") + statement.getName() + " = " + statement.getInitializer().accept(this) + ")";
     }
 
     public String visitBlockStatement(Block statement) {
@@ -77,7 +78,7 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         return "Unary(" + expression.getOperator() + " " + expression.getRight().accept(this) + ")";
     }
 
-    public String visitVariableExpression(Variable expression) {
+    public String visitVariableExpression(VariableAccess expression) {
         return "Variable(" + expression.getName() + ")";
     }
 }

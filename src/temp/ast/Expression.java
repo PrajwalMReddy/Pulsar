@@ -11,7 +11,7 @@ public abstract class Expression {
         R visitLiteralExpression(Literal expression);
         R visitLogicalExpression(Logical expression);
         R visitUnaryExpression(Unary expression);
-        R visitVariableExpression(Variable expression);
+        R visitVariableExpression(VariableAccess expression);
     }
 
     public abstract <R> R accept(Visitor<R> visitor);

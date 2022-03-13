@@ -26,7 +26,7 @@ public enum TokenType {
     TK_TRY, TK_EXCEPT, TK_UNSAFE,
 
     // Data Types and Variables
-    TK_IDENTIFIER,
+    TK_IDENTIFIER, TK_DATA_TYPE,
     TK_TRUE, TK_FALSE, TK_NULL, TK_CHAR, TK_INTEGER, TK_DOUBLE, // TODO Temporary Types Until Classes Are Added
 
     // Special Tokens

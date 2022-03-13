@@ -2,12 +2,12 @@ package temp.ast.expression;
 
 import temp.ast.Expression;
 
-public class Variable extends Expression {
+public class VariableAccess extends Expression {
     private final String name;
 
     private final int line;
 
-    public Variable(String name, int line) {
+    public VariableAccess(String name, int line) {
         this.name = name;
         this.line = line;
     }

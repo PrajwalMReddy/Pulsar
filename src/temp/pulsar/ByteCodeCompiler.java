@@ -3,10 +3,7 @@ package temp.pulsar;
 import temp.ast.Expression;
 import temp.ast.Statement;
 import temp.ast.expression.*;
-import temp.ast.statement.Block;
-import temp.ast.statement.ExpressionStmt;
-import temp.ast.statement.If;
-import temp.ast.statement.While;
+import temp.ast.statement.*;
 import temp.lang.ByteCode;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
@@ -24,7 +21,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     private Statement program;
 
     // Data To Help In Compiling To ByteCode
-    private static ArrayList<Primitive> values; // Constant Values To Be Stored
+    private ArrayList<Primitive> values; // Constant Values To Be Stored
 
     // Output Data
     private final ArrayList<Instruction> instructions;
@@ -33,7 +30,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     public ByteCodeCompiler(String sourceCode) {
         this.sourceCode = sourceCode;
 
-        values = new ArrayList<>();
+        this.values = new ArrayList<>();
 
         this.instructions = new ArrayList<>();
     }
@@ -57,6 +54,13 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         }
 
         this.program.accept(this);
+    }
+
+    public Void visitVariableStatement(Variable statement) {
+        statement.getInitializer().accept(this);
+        makeOpCode(OP_NEW_LOCAL, statement.getName(), statement.getLine());
+
+        return null;
     }
 
     public Void visitBlockStatement(Block statement) {
@@ -143,7 +147,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return makeOpCode(operator, expression.getLine());
     }
 
-    public Instruction visitVariableExpression(Variable expression) {
+    public Instruction visitVariableExpression(VariableAccess expression) {
         return null;
     }
 
@@ -159,9 +163,9 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
             case TK_NULL -> primitiveLiteral = new PNull();
         }
 
-        values.add(primitiveLiteral);
+        this.values.add(primitiveLiteral);
 
-        Instruction instruction = new Instruction(OP_CONSTANT, values.size() - 1, line);
+        Instruction instruction = new Instruction(OP_CONSTANT, this.values.size() - 1, line);
         this.instructions.add(instruction);
         return instruction;
     }
@@ -233,8 +237,8 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return codes;
     }
 
-    public static ArrayList<Primitive> getValues() {
-        return values;
+    public ArrayList<Primitive> getValues() {
+        return this.values;
     }
 
     public CompilerError getErrors() {

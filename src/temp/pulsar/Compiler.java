@@ -1,7 +1,9 @@
 package temp.pulsar;
 
+import temp.lang.ByteCode;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
+import temp.primitives.Primitive;
 import temp.util.Disassembler;
 import temp.util.ErrorReporter;
 
@@ -14,12 +16,16 @@ public class Compiler {
     private final String sourceCode;
     private ArrayList<Instruction> instructions;
 
+    // Data To Help In Compiling To Assembly
+    private ArrayList<Primitive> values;
+
     // Output Data
     private final PrintWriter pw;
     private CompilerError errors;
 
     public Compiler(String sourceCode) throws FileNotFoundException {
         this.sourceCode = sourceCode;
+
         this.pw = new PrintWriter(Pulsar.conditions.getFileIn() + ".asm");
     }
 
@@ -27,9 +33,10 @@ public class Compiler {
         ByteCodeCompiler bcc = new ByteCodeCompiler(this.sourceCode);
         this.instructions = bcc.compileByteCode();
         this.errors = bcc.getErrors();
+        this.values = bcc.getValues();
 
         ErrorReporter.report(this.errors, this.sourceCode);
-        Disassembler.disassemble(this.instructions);
+        Disassembler.disassemble(this.instructions, bcc);
 
         compile();
         this.pw.close();

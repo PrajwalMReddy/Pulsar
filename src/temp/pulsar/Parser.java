@@ -3,10 +3,7 @@ package temp.pulsar;
 import temp.ast.Expression;
 import temp.ast.Statement;
 import temp.ast.expression.*;
-import temp.ast.statement.Block;
-import temp.ast.statement.ExpressionStmt;
-import temp.ast.statement.If;
-import temp.ast.statement.While;
+import temp.ast.statement.*;
 import temp.lang.CompilerError;
 import temp.lang.Token;
 import temp.lang.TokenType;
@@ -53,12 +50,27 @@ public class Parser {
                 return ifStatement();
             } else if (matchAdvance(TK_WHILE)) {
                 return whileStatement();
+            } else if (matchAdvance(TK_VAR, TK_CONST)) {
+                return localVariableDeclaration();
             } else {
                 return expressionStatement();
             }
         }
 
         return null;
+    }
+
+    private Statement localVariableDeclaration() {
+        Token localToken = advance();
+
+        Expression expression;
+        if (matchAdvance(TK_EQUAL)) {
+            expression = expression();
+        } else {
+            expression = new Literal(null, TK_NULL, peekLine());
+        }
+
+        return new Variable(localToken.getLiteral(), expression, false, localToken.getLine());
     }
 
     private Block block() {
@@ -136,7 +148,7 @@ public class Parser {
                     // Expand An Operator Assignment Into A Normal Assignment
                     return new Assignment(identifier,
                                     new Binary(
-                                            new Variable(identifier, line
+                                            new VariableAccess(identifier, line
                                             ), operatorType.substring(0, operatorType.length() - 1), expression, line
                                     ), line
                             );
@@ -255,7 +267,7 @@ public class Parser {
         }
 
         if (matchAdvance(TK_IDENTIFIER)) {
-            return new Variable(previous().getLiteral(), peekLine());
+            return new VariableAccess(previous().getLiteral(), peekLine());
         }
 
         if (matchAdvance(TK_LPAR)) {

@@ -1,9 +1,6 @@
 package temp.ast;
 
-import temp.ast.statement.Block;
-import temp.ast.statement.ExpressionStmt;
-import temp.ast.statement.If;
-import temp.ast.statement.While;
+import temp.ast.statement.*;
 
 public abstract class Statement {
     public interface Visitor<R> {
@@ -11,6 +8,7 @@ public abstract class Statement {
         R visitBlockStatement(Block statement);
         R visitExpressionStatement(ExpressionStmt statement);
         R visitIFStatement(If statement);
+        R visitVariableStatement(Variable statement);
         R visitWhileStatement(While statement);
     }
 
