@@ -12,6 +12,7 @@ import temp.util.TokenDisassembler;
 import java.util.ArrayList;
 
 import static temp.lang.TokenType.*;
+import static temp.primitives.PrimitiveType.*;
 
 public class Parser {
     // Input Data
@@ -39,8 +40,14 @@ public class Parser {
         if (this.errors.hasError()) return this.program;
         TokenDisassembler.display(this.tokens);
 
-        this.program = statement();
-        
+        // TODO Temporary Code To Allow More Than One Statement At A Time
+        int line = peekLine();
+        ArrayList<Statement> statements = new ArrayList<>();
+        while (!match(TK_EOF)) {
+            statements.add(statement());
+        }
+
+        this.program = new Block(statements, line);
         return this.program;
     }
 
@@ -67,9 +74,10 @@ public class Parser {
         if (matchAdvance(TK_EQUAL)) {
             expression = expression();
         } else {
-            expression = new Literal(null, TK_NULL, peekLine());
+            expression = new Literal(null, PR_NULL, peekLine());
         }
 
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
         return new Variable(localToken.getLiteral(), expression, false, localToken.getLine());
     }
 
@@ -251,19 +259,19 @@ public class Parser {
 
     private Expression primary() {
         if (matchAdvance(TK_TRUE)) {
-            return new Literal("true", TK_TRUE, peekLine());
+            return new Literal("true", PR_TRUE, peekLine());
         } else if (matchAdvance(TK_FALSE)) {
-            return new Literal("false", TK_FALSE, peekLine());
+            return new Literal("false", PR_FALSE, peekLine());
         } else if (matchAdvance(TK_NULL)) {
-            return new Literal("null", TK_NULL, peekLine());
+            return new Literal("null", PR_NULL, peekLine());
         }
 
         if (matchAdvance(TK_INTEGER)) {
-            return new Literal(previous().getLiteral(), TK_INTEGER, peekLine());
+            return new Literal(previous().getLiteral(), PR_INTEGER, peekLine());
         } else if (matchAdvance(TK_DOUBLE)) {
-            return new Literal(previous().getLiteral(), TK_DOUBLE, peekLine());
+            return new Literal(previous().getLiteral(), PR_DOUBLE, peekLine());
         } else if (matchAdvance(TK_CHAR)) {
-            return new Literal(previous().getLiteral(), TK_CHAR, peekLine());
+            return new Literal(previous().getLiteral(), PR_CHARACTER, peekLine());
         }
 
         if (matchAdvance(TK_IDENTIFIER)) {
@@ -277,7 +285,7 @@ public class Parser {
         }
 
         error("An Expression Was Expected But Nothing Was Given", peekLine());
-        return new Literal("Error", TK_ERROR, peekLine()); // Returning An 'Error Literal'
+        return new Literal("Error", PR_ERROR, peekLine()); // Returning An 'Error Literal'
     }
 
     private boolean match(TokenType... types) {
@@ -304,12 +312,15 @@ public class Parser {
         return this.tokens.get(this.current - 1);
     }
 
-    private void look(TokenType token, String message) {
+    // Returns true if there's been a look ahead error.
+    private boolean look(TokenType token, String message) {
         if (peekType() != token) {
             error(message, peekLine());
             synchronize();
+            return true;
         } else {
             advance();
+            return false;
         }
     }
 

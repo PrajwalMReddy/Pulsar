@@ -4,10 +4,10 @@ import temp.ast.Expression;
 import temp.ast.Statement;
 import temp.ast.expression.*;
 import temp.ast.statement.*;
+import temp.lang.Analyzer;
 import temp.lang.ByteCode;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
-import temp.lang.TokenType;
 import temp.primitives.*;
 import temp.util.ASTPrinter;
 
@@ -42,6 +42,9 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
         new ASTPrinter().print(this.program);
         if (this.errors.hasError()) return instructions;
+
+        Analyzer analyzer = new Analyzer(this.program);
+        analyzer.analyze();
 
         compile();
         
@@ -170,16 +173,16 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return makeOpCode(OP_GET_LOCAL, (int) (Math.random() * 99), expression.getLine());
     }
 
-    private Instruction makeConstant(String value, int line, TokenType type) {
+    private Instruction makeConstant(String value, int line, PrimitiveType type) {
         Primitive primitiveLiteral = null;
 
         switch (type) {
-            case TK_INTEGER -> primitiveLiteral = new PInteger(Integer.parseInt(value));
-            case TK_DOUBLE -> primitiveLiteral = new PDouble(Double.parseDouble(value));
-            case TK_CHAR -> primitiveLiteral = new PCharacter(value.charAt(0));
-            case TK_TRUE -> primitiveLiteral = new PBoolean(true);
-            case TK_FALSE -> primitiveLiteral = new PBoolean(false);
-            case TK_NULL -> primitiveLiteral = new PNull();
+            case PR_INTEGER -> primitiveLiteral = new PInteger(Integer.parseInt(value));
+            case PR_DOUBLE -> primitiveLiteral = new PDouble(Double.parseDouble(value));
+            case PR_CHARACTER -> primitiveLiteral = new PCharacter(value.charAt(0));
+            case PR_TRUE -> primitiveLiteral = new PBoolean(true);
+            case PR_FALSE -> primitiveLiteral = new PBoolean(false);
+            case PR_NULL -> primitiveLiteral = new PNull();
         }
 
         this.values.add(primitiveLiteral);

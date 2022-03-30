@@ -1,13 +1,11 @@
 # Pulsar
 
-Pulsar is a new programming language that aims to be as easy to use and learn as possible.
-
-This is the first implementation, written in Java with a bit of Kotlin. It features both a compiler, which will compile down to native code, and an interpreter, both of which are currently being developed.
+Pulsar is a new programming language that I am currently working on to learn how compilers and interpreters work as well as for a personal challenge. This is the first implementation, written in Java with a bit of Kotlin. It features both a compiler, which will compile down to native code, and an interpreter, both of which are currently being developed.
 
 ## Features
 As of now, the following features are working:
 - Expressions (Including Basic Arithmetic Operators)
-- Local Variables (Including Constants)
+- Local Variables
 - If/Else Statements
 - While Loops
 

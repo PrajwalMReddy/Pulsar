@@ -1,15 +1,15 @@
 package temp.ast.expression;
 
 import temp.ast.Expression;
-import temp.lang.TokenType;
+import temp.primitives.PrimitiveType;
 
 public class Literal extends Expression {
     private final String value;
-    private final TokenType type;
+    private final PrimitiveType type;
 
     private final int line;
 
-    public Literal(String value, TokenType type, int line) {
+    public Literal(String value, PrimitiveType type, int line) {
         this.value = value;
         this.type = type;
         this.line = line;
@@ -31,7 +31,7 @@ public class Literal extends Expression {
         return this.line;
     }
 
-    public TokenType getType() {
+    public PrimitiveType getType() {
         return this.type;
     }
 }
