@@ -17,8 +17,12 @@ import temp.ast.statement.*;
 public class Analyzer implements Expression.Visitor<Void>, Statement.Visitor<Void> {
     private Statement program;
 
+    private CompilerError errors;
+
     public Analyzer(Statement program) {
         this.program = program;
+
+        this.errors = new CompilerError();
     }
 
     public void analyze() {
@@ -36,6 +40,8 @@ public class Analyzer implements Expression.Visitor<Void>, Statement.Visitor<Voi
 
     // TODO
     public Void visitBinaryExpression(Binary expression) {
+        // Test Error
+        this.errors.addError("Static Analysis Error", "Illegal Binary Expression", expression.getLine());
         return null;
     }
 
@@ -96,5 +102,9 @@ public class Analyzer implements Expression.Visitor<Void>, Statement.Visitor<Voi
         statement.getStatements().accept(this);
 
         return null;
+    }
+
+    public CompilerError getErrors() {
+        return this.errors;
     }
 }

@@ -22,6 +22,7 @@ public class Compiler {
     // Output Data
     private final PrintWriter pw;
     private CompilerError errors;
+    private CompilerError staticErrors;
 
     public Compiler(String sourceCode) throws FileNotFoundException {
         this.sourceCode = sourceCode;
@@ -32,10 +33,15 @@ public class Compiler {
     public void init() {
         ByteCodeCompiler bcc = new ByteCodeCompiler(this.sourceCode);
         this.instructions = bcc.compileByteCode();
+
         this.errors = bcc.getErrors();
+        this.staticErrors = bcc.getStaticErrors();
+
         this.values = bcc.getValues();
 
         ErrorReporter.report(this.errors, this.sourceCode);
+        ErrorReporter.report(this.staticErrors, this.sourceCode);
+
         Disassembler.disassemble(this.instructions, bcc);
 
         compile();

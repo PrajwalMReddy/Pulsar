@@ -26,6 +26,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     // Output Data
     private final ArrayList<Instruction> instructions;
     private CompilerError errors;
+    private CompilerError staticErrors;
 
     public ByteCodeCompiler(String sourceCode) {
         this.sourceCode = sourceCode;
@@ -45,6 +46,9 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
         Analyzer analyzer = new Analyzer(this.program);
         analyzer.analyze();
+
+        this.staticErrors = analyzer.getErrors();
+        if (this.staticErrors.hasError()) return instructions;
 
         compile();
         
@@ -265,5 +269,9 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
     public CompilerError getErrors() {
         return this.errors;
+    }
+
+    public CompilerError getStaticErrors() {
+        return this.staticErrors;
     }
 }
