@@ -2,7 +2,7 @@ package temp.primitives;
 
 public enum PrimitiveType {
     // Booleans
-    PR_TRUE, PR_FALSE, PR_BOOLEAN, // PR_BOOLEAN Is A Dummy Type
+    PR_BOOLEAN,
 
     // Numeric Types
     PR_CHARACTER, PR_DOUBLE, PR_INTEGER,

@@ -184,8 +184,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
             case PR_INTEGER -> primitiveLiteral = new PInteger(Integer.parseInt(value));
             case PR_DOUBLE -> primitiveLiteral = new PDouble(Double.parseDouble(value));
             case PR_CHARACTER -> primitiveLiteral = new PCharacter(value.charAt(0));
-            case PR_TRUE -> primitiveLiteral = new PBoolean(true);
-            case PR_FALSE -> primitiveLiteral = new PBoolean(false);
+            case PR_BOOLEAN -> primitiveLiteral = new PBoolean(Boolean.parseBoolean(value));
             case PR_NULL -> primitiveLiteral = new PNull();
         }
 

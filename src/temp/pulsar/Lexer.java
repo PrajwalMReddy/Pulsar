@@ -193,7 +193,7 @@ public class Lexer {
             return errorToken("The Length Of A Char Can Only Be 1");
         }
 
-        return makeToken(TK_CHAR);
+        return makeToken(TK_CHARACTER);
     }
 
     private Token identifier() {
@@ -211,8 +211,13 @@ public class Lexer {
                 case 'w' -> checkKeyword("ait", TK_AWAIT, 2);
                 default -> TK_IDENTIFIER;
             };
-            case 'b' -> checkKeyword("reak", TK_BREAK, 1);
+            case 'b' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'r' -> checkKeyword("eak", TK_BREAK, 2);
+                case 'o' -> checkKeyword("olean", TK_DATA_TYPE, 2);
+                default -> TK_IDENTIFIER;
+            };
             case 'c' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'h' -> checkKeyword("ar", TK_DATA_TYPE, 2);
                 case 'l' -> checkKeyword("ass", TK_CLASS, 2);
                 case 'o' -> switch (this.sourceCode.charAt(this.start + 3)) {
                     case 's' -> checkKeyword("t", TK_CONST, 4);
@@ -221,6 +226,7 @@ public class Lexer {
                 };
                 default -> TK_IDENTIFIER;
             };
+            case 'd' -> checkKeyword("ouble", TK_DATA_TYPE, 1);
             case 'e' -> switch (this.sourceCode.charAt(this.start + 1)) {
                 case 'l' -> checkKeyword("se", TK_ELSE, 2);
                 case 'n' -> checkKeyword("um", TK_ENUM, 2);
@@ -235,6 +241,7 @@ public class Lexer {
             case 'i' -> switch (this.sourceCode.charAt(this.start + 1)) {
                 case 'f' -> checkKeyword("", TK_IF, 2);
                 case 'm' -> checkKeyword("port", TK_IMPORT, 2);
+                case 'n' -> checkKeyword("t", TK_DATA_TYPE, 2);
                 default -> TK_IDENTIFIER;
             };
             case 'l' -> checkKeyword("oop", TK_LOOP, 1);

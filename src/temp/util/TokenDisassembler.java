@@ -18,7 +18,7 @@ public class TokenDisassembler {
     }
 
     private static void displayTokens(ArrayList<Token> tokens) {
-        TokenType[] literals = {TK_CHAR, TK_INTEGER, TK_DOUBLE, TK_IDENTIFIER};
+        TokenType[] literals = {TK_CHARACTER, TK_INTEGER, TK_DOUBLE, TK_IDENTIFIER, TK_DATA_TYPE};
         int line = 0;
 
         for (Token token: tokens) {

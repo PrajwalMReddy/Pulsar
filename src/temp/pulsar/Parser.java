@@ -7,6 +7,7 @@ import temp.ast.statement.*;
 import temp.lang.CompilerError;
 import temp.lang.Token;
 import temp.lang.TokenType;
+import temp.primitives.PrimitiveType;
 import temp.util.TokenDisassembler;
 
 import java.util.ArrayList;
@@ -71,6 +72,10 @@ public class Parser {
         Token localToken = advance();
 
         Expression expression;
+
+        look(TK_COLON, "A Colon Was Expected After The Variable Name");
+        Token type = advance();
+
         if (matchAdvance(TK_EQUAL)) {
             expression = expression();
         } else {
@@ -78,7 +83,17 @@ public class Parser {
         }
 
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
-        return new Variable(localToken.getLiteral(), expression, false, localToken.getLine());
+        return new Variable(localToken.getLiteral(), expression, checkType(type),false, localToken.getLine());
+    }
+
+    private PrimitiveType checkType(Token type) {
+        return switch (type.getLiteral()) {
+            case "boolean" -> PR_BOOLEAN;
+            case "char" -> PR_CHARACTER;
+            case "double" -> PR_DOUBLE;
+            case "int" -> PR_INTEGER;
+            default -> PR_ERROR;
+        };
     }
 
     private Block block() {
@@ -259,9 +274,9 @@ public class Parser {
 
     private Expression primary() {
         if (matchAdvance(TK_TRUE)) {
-            return new Literal("true", PR_TRUE, peekLine());
+            return new Literal("true", PR_BOOLEAN, peekLine());
         } else if (matchAdvance(TK_FALSE)) {
-            return new Literal("false", PR_FALSE, peekLine());
+            return new Literal("false", PR_BOOLEAN, peekLine());
         } else if (matchAdvance(TK_NULL)) {
             return new Literal("null", PR_NULL, peekLine());
         }
@@ -270,7 +285,7 @@ public class Parser {
             return new Literal(previous().getLiteral(), PR_INTEGER, peekLine());
         } else if (matchAdvance(TK_DOUBLE)) {
             return new Literal(previous().getLiteral(), PR_DOUBLE, peekLine());
-        } else if (matchAdvance(TK_CHAR)) {
+        } else if (matchAdvance(TK_CHARACTER)) {
             return new Literal(previous().getLiteral(), PR_CHARACTER, peekLine());
         }
 

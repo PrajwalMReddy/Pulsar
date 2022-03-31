@@ -45,7 +45,7 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         PrimitiveType a = expression.getLeft().accept(this);
         PrimitiveType b = expression.getRight().accept(this);
 
-        if (isOfType(a, PR_TRUE, PR_FALSE) || isOfType(b, PR_TRUE, PR_FALSE)) {
+        if (isOfType(a, PR_BOOLEAN) || isOfType(b, PR_BOOLEAN)) {
             if (!isOperation(expression.getOperator(), "==", "!=")) {
                 newError("Boolean Operands May Not Be Used For Non Logical Operations", expression.getLine());
                 return PR_ERROR;
@@ -70,24 +70,24 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         PrimitiveType a = expression.getLeft().accept(this);
         PrimitiveType b = expression.getRight().accept(this);
 
-        if (!isOfType(a, PR_TRUE, PR_FALSE) || !isOfType(b, PR_TRUE, PR_FALSE)) {
+        if (!isOfType(a, PR_BOOLEAN) || !isOfType(b, PR_BOOLEAN)) {
             newError("Logical Operation Has Non Boolean Operand(s)", expression.getLine());
             return PR_ERROR;
         }
 
-        return PR_TRUE;
+        return PR_BOOLEAN;
     }
 
     public PrimitiveType visitUnaryExpression(Unary expression) {
         PrimitiveType a = expression.getRight().accept(this);
 
         if (isOperation(expression.getOperator(), "!")) {
-            if (!isOfType(a, PR_TRUE, PR_FALSE)) {
+            if (!isOfType(a, PR_BOOLEAN)) {
                 newError("Unary Not Operation Has Non Boolean Operand", expression.getLine());
                 return PR_ERROR;
             }
         } else if (isOperation(expression.getOperator(), "-")) {
-            if (isOfType(a, PR_TRUE, PR_FALSE)) {
+            if (isOfType(a, PR_BOOLEAN)) {
                 newError("Unary Negation Has A Boolean Operand", expression.getLine());
             }
         }
@@ -95,8 +95,9 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return a;
     }
 
+    // TODO
     public PrimitiveType visitVariableExpression(VariableAccess expression) {
-        return expression.getType();
+        return null;
     }
 
     public Void visitBlockStatement(Block statements) {
@@ -125,6 +126,13 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
 
     // TODO
     public Void visitVariableStatement(Variable statement) {
+        PrimitiveType variableType = statement.getType();
+        PrimitiveType initializerType = statement.getInitializer().accept(this);
+
+        if ((variableType != initializerType) && (initializerType != PR_NULL)) {
+            newError("Variable Has Been Initialized With The Wrong Type", statement.getLine());
+        }
+
         return null;
     }
 

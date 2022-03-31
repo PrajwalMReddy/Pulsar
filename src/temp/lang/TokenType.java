@@ -27,7 +27,7 @@ public enum TokenType {
 
     // Data Types and Variables
     TK_IDENTIFIER, TK_DATA_TYPE,
-    TK_TRUE, TK_FALSE, TK_NULL, TK_CHAR, TK_INTEGER, TK_DOUBLE, // TODO Temporary Types Until Classes Are Added
+    TK_TRUE, TK_FALSE, TK_NULL, TK_CHARACTER, TK_INTEGER, TK_DOUBLE, // TODO Temporary Types Until Classes Are Added
 
     // Special Tokens
     TK_PRINT, // TODO Temporary Statement For Debugging Until Functions Are Added
