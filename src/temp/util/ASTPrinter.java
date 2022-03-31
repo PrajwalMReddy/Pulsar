@@ -7,6 +7,21 @@ import temp.ast.statement.*;
 import temp.pulsar.Pulsar;
 
 public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor<String> {
+    public void print(Expression ast) {
+        if (Pulsar.conditions.getDebug()) {
+            System.out.println("\n-- AST --\n");
+            constructTree(ast);
+        }
+    }
+
+    private void constructTree(Expression ast) {
+        if (ast == null) {
+            System.out.println("No AST Has Been Generated");
+        } else {
+            System.out.println(ast.accept(this));
+        }
+    }
+
     public void print(Statement ast) {
         if (Pulsar.conditions.getDebug()) {
             System.out.println("\n-- AST --\n");

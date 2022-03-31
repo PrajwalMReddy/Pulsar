@@ -11,6 +11,9 @@ This holds code that isn't directly a part of the compilation pipeline but is ne
 ## temp.ast
 This holds all the Abstract Syntax Tree nodes that will be used by the Abstract Syntax Tree Class.
 
+## temp.analysis
+This holds all the classes that are used for the static analysis of the source code; for now this only includes the type checker.
+
 ## temp.util
 This holds other classes that aren't strictly needed for compilation but are there for convenience.
 

@@ -4,7 +4,7 @@ import temp.ast.Expression;
 import temp.ast.Statement;
 import temp.ast.expression.*;
 import temp.ast.statement.*;
-import temp.lang.Analyzer;
+import temp.analysis.TypeChecker;
 import temp.lang.ByteCode;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
@@ -44,8 +44,8 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         new ASTPrinter().print(this.program);
         if (this.errors.hasError()) return instructions;
 
-        Analyzer analyzer = new Analyzer(this.program);
-        analyzer.analyze();
+        TypeChecker analyzer = new TypeChecker(this.program);
+        analyzer.check();
 
         this.staticErrors = analyzer.getErrors();
         if (this.staticErrors.hasError()) return instructions;
