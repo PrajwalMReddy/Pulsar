@@ -7,6 +7,12 @@ import temp.ast.statement.*;
 import temp.pulsar.Pulsar;
 
 public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor<String> {
+    private int indentCount;
+
+    public ASTPrinter() {
+        this.indentCount = 0;
+    }
+
     public void print(Expression ast) {
         if (Pulsar.conditions.getDebug()) {
             System.out.println("\n-- AST --\n");
@@ -47,6 +53,10 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
             stringBuilder.append("\t").append(stmt.accept(this));
         }
         return stringBuilder.append("\n)").toString();
+    }
+
+    public String visitEndScopeStatement(EndScope statement) {
+        return "";
     }
 
     public String visitExpressionStatement(ExpressionStmt statement) {

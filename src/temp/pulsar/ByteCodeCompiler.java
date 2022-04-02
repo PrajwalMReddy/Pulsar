@@ -9,6 +9,7 @@ import temp.lang.ByteCode;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
 import temp.primitives.*;
+import temp.primitives.types.*;
 import temp.util.ASTPrinter;
 
 import java.util.ArrayList;
@@ -39,9 +40,11 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     public ArrayList<Instruction> compileByteCode() {
         Parser ast = new Parser(this.sourceCode);
         this.program = ast.parse();
-        this.errors = ast.getErrors();
 
-        new ASTPrinter().print(this.program);
+        ASTPrinter astPrinter = new ASTPrinter();
+        astPrinter.print(this.program);
+
+        this.errors = ast.getErrors();
         if (this.errors.hasError()) return instructions;
 
         TypeChecker analyzer = new TypeChecker(this.program);
@@ -73,6 +76,14 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     public Void visitBlockStatement(Block statement) {
         for (Statement stmt: statement.getStatements()) {
             stmt.accept(this);
+        }
+
+        return null;
+    }
+
+    public Void visitEndScopeStatement(EndScope statement) {
+        for (int i = 0; i < statement.getLocalsToDelete(); i++) {
+            makeOpCode(OP_POP, statement.getLine());
         }
 
         return null;

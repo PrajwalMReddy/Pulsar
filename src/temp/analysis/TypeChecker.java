@@ -19,9 +19,9 @@ import temp.primitives.PrimitiveType;
 import static temp.primitives.PrimitiveType.*;
 
 public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement.Visitor<Void> {
-    private Statement program;
+    private final Statement program;
 
-    private CompilerError errors;
+    private final CompilerError errors;
 
     public TypeChecker(Statement program) {
         this.program = program;
@@ -108,6 +108,10 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return null;
     }
 
+    public Void visitEndScopeStatement(EndScope statement) {
+        return null;
+    }
+
     public Void visitExpressionStatement(ExpressionStmt statement) {
         statement.getExpression().accept(this);
         return null;
@@ -124,7 +128,6 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return null;
     }
 
-    // TODO
     public Void visitVariableStatement(Variable statement) {
         PrimitiveType variableType = statement.getType();
         PrimitiveType initializerType = statement.getInitializer().accept(this);
@@ -164,7 +167,7 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
     }
 
     public void newError(String message, int line) {
-        this.errors.addError("Static Analysis Error", message, line);
+        this.errors.addError("Type Error", message, line);
     }
 
     public CompilerError getErrors() {

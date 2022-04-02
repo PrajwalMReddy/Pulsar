@@ -6,6 +6,7 @@ public abstract class Statement {
     public interface Visitor<R> {
         // Statement Visitor Methods
         R visitBlockStatement(Block statement);
+        R visitEndScopeStatement(EndScope statement);
         R visitExpressionStatement(ExpressionStmt statement);
         R visitIFStatement(If statement);
         R visitVariableStatement(Variable statement);

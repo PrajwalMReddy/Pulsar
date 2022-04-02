@@ -5,6 +5,7 @@ import temp.ast.Statement;
 import temp.ast.expression.*;
 import temp.ast.statement.*;
 import temp.lang.CompilerError;
+import temp.lang.LocalVariable;
 import temp.lang.Token;
 import temp.lang.TokenType;
 import temp.primitives.PrimitiveType;
@@ -22,6 +23,8 @@ public class Parser {
 
     // Data To Help In Generating An AST
     private int current; // Next Token To Be Used
+    private int depth;
+    private LocalVariable locals;
 
     // Output Data
     private Statement program;
@@ -31,6 +34,8 @@ public class Parser {
         this.sourceCode = sourceCode;
 
         this.current = 0;
+        this.depth = 1;
+        this.locals = new LocalVariable();
     }
 
     public Statement parse() {
@@ -58,8 +63,10 @@ public class Parser {
                 return ifStatement();
             } else if (matchAdvance(TK_WHILE)) {
                 return whileStatement();
-            } else if (matchAdvance(TK_VAR, TK_CONST)) {
-                return localVariableDeclaration();
+            } else if (matchAdvance(TK_VAR)) {
+                return localVariableDeclaration(TK_VAR);
+            } else if (matchAdvance(TK_CONST)) {
+                return localVariableDeclaration(TK_CONST);
             } else {
                 return expressionStatement();
             }
@@ -68,7 +75,7 @@ public class Parser {
         return null;
     }
 
-    private Statement localVariableDeclaration() {
+    private Statement localVariableDeclaration(TokenType accessType) {
         Token localToken = advance();
 
         Expression expression;
@@ -83,7 +90,29 @@ public class Parser {
         }
 
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
+
+        for (int i = this.locals.getLocalCount() - 1; i >= 0; i--) {
+            LocalVariable.Local local = this.locals.getLocal(i);
+
+            if (local.getDepth() < this.depth) {
+                break;
+            }
+
+            if (local.getName().equals(localToken.getLiteral())) {
+                error("Local Variable '" + localToken.getLiteral() + "' Already Exists", localToken.getLine());
+            }
+        }
+
+        addLocal(localToken, accessType, checkType(type));
         return new Variable(localToken.getLiteral(), expression, checkType(type),false, localToken.getLine());
+    }
+
+    private void addLocal(Token name, TokenType accessType, PrimitiveType variableType) {
+        if (accessType == TK_VAR) {
+            this.locals.newLocal(name, name.getLiteral(), variableType, false);
+        } else if (accessType == TK_CONST) {
+            this.locals.newLocal(name, name.getLiteral(), variableType, true);
+        }
     }
 
     private PrimitiveType checkType(Token type) {
@@ -96,8 +125,14 @@ public class Parser {
         };
     }
 
+    private void startScope() {
+        this.depth++;
+        this.locals.incrementDepth();
+    }
+
     private Block block() {
         ArrayList<Statement> statements = new ArrayList<>();
+        startScope();
         look(TK_LBRACE, "An Opening Brace Was Expected Before The Block");
 
         while (!match(TK_RBRACE) && !match(TK_EOF)) {
@@ -105,7 +140,23 @@ public class Parser {
         }
 
         look(TK_RBRACE, "A Closing Brace Was Expected After The Block");
+        statements.add(endScope());
         return new Block(statements, peekLine());
+    }
+
+    private Statement endScope() {
+        this.depth--;
+        this.locals.decrementDepth();
+        int localsToDelete = 0;
+
+
+        while (this.locals.getLocalCount() > 0 &&
+                (this.locals.getLocal(this.locals.getLocalCount() - 1).getDepth() > this.depth)) {
+            localsToDelete++;
+            this.locals.decrementLocalCount();
+        }
+
+        return new EndScope(localsToDelete, this.peekLine());
     }
 
     private Statement whileStatement() {
