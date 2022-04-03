@@ -8,6 +8,7 @@ import temp.analysis.TypeChecker;
 import temp.lang.ByteCode;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
+import temp.lang.LocalVariable;
 import temp.primitives.*;
 import temp.primitives.types.*;
 import temp.util.ASTPrinter;
@@ -23,6 +24,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
     // Data To Help In Compiling To ByteCode
     private ArrayList<Primitive> values; // Constant Values To Be Stored
+    private LocalVariable locals;
 
     // Output Data
     private final ArrayList<Instruction> instructions;
@@ -40,6 +42,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     public ArrayList<Instruction> compileByteCode() {
         Parser ast = new Parser(this.sourceCode);
         this.program = ast.parse();
+        this.locals = ast.getLocals();
 
         ASTPrinter astPrinter = new ASTPrinter();
         astPrinter.print(this.program);
@@ -47,7 +50,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         this.errors = ast.getErrors();
         if (this.errors.hasError()) return instructions;
 
-        TypeChecker analyzer = new TypeChecker(this.program);
+        TypeChecker analyzer = new TypeChecker(this.program, this.locals);
         analyzer.check();
 
         this.staticErrors = analyzer.getErrors();
@@ -174,6 +177,10 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         expression.getRight().accept(this);
         fixJump(offset, jumpType);
 
+        return null;
+    }
+
+    public Instruction visitNoneExpression(None expression) {
         return null;
     }
 

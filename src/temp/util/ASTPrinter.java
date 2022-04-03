@@ -99,6 +99,10 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         return "Logical(" + expression.getLeft().accept(this) + " " + expression.getOperator() + " " + expression.getRight().accept(this) + ")";
     }
 
+    public String visitNoneExpression(None expression) {
+        return "";
+    }
+
     public String visitUnaryExpression(Unary expression) {
         return "Unary(" + expression.getOperator() + " " + expression.getRight().accept(this) + ")";
     }

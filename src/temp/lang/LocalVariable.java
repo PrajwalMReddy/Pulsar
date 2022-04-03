@@ -24,6 +24,18 @@ public class LocalVariable {
         return this.variables.get(index);
     }
 
+    public Local getLocal(String name) {
+        for (int i = 0; i < this.getLocalCount(); i++) {
+            LocalVariable.Local local = this.getLocal(i);
+
+            if (local.getName().equals(name)) {
+                return local;
+            }
+        }
+
+        return null;
+    }
+
     public int getLocalCount() {
         return this.localCount;
     }
@@ -61,6 +73,10 @@ public class LocalVariable {
 
         public String getName() {
             return this.name;
+        }
+
+        public PrimitiveType getType() {
+            return this.type;
         }
 
         public boolean isConstant() {

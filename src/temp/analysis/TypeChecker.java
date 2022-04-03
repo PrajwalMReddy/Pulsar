@@ -14,17 +14,20 @@ import temp.ast.Statement;
 import temp.ast.expression.*;
 import temp.ast.statement.*;
 import temp.lang.CompilerError;
+import temp.lang.LocalVariable;
 import temp.primitives.PrimitiveType;
 
 import static temp.primitives.PrimitiveType.*;
 
 public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement.Visitor<Void> {
     private final Statement program;
+    private final LocalVariable locals;
 
     private final CompilerError errors;
 
-    public TypeChecker(Statement program) {
+    public TypeChecker(Statement program, LocalVariable locals) {
         this.program = program;
+        this.locals = locals;
 
         this.errors = new CompilerError();
     }
@@ -78,6 +81,10 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return PR_BOOLEAN;
     }
 
+    public PrimitiveType visitNoneExpression(None expression) {
+        return PR_ERROR;
+    }
+
     public PrimitiveType visitUnaryExpression(Unary expression) {
         PrimitiveType a = expression.getRight().accept(this);
 
@@ -95,9 +102,9 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return a;
     }
 
-    // TODO
     public PrimitiveType visitVariableExpression(VariableAccess expression) {
-        return null;
+        LocalVariable.Local local = this.locals.getLocal(expression.getName());
+        return local.getType();
     }
 
     public Void visitBlockStatement(Block statements) {

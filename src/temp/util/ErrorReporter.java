@@ -18,7 +18,7 @@ public class ErrorReporter {
         for (CompilerError.Error error: errors.getErrors()) {
             System.out.print(error.getErrorType() + " | ");
             System.out.println(error.getMessage());
-            System.out.println("Line " + error.getLine() + ": " + lines[error.getLine() - 1] + "\n");
+            System.out.println("Line " + error.getLine() + ": " + lines[error.getLine() - 1].strip() + "\n");
         }
 
         System.exit(1);

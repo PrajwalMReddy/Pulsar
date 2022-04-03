@@ -91,12 +91,8 @@ public class Parser {
 
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
 
-        for (int i = this.locals.getLocalCount() - 1; i >= 0; i--) {
+        for (int i = 0; i < this.locals.getLocalCount(); i++) {
             LocalVariable.Local local = this.locals.getLocal(i);
-
-            if (local.getDepth() < this.depth) {
-                break;
-            }
 
             if (local.getName().equals(localToken.getLiteral())) {
                 error("Local Variable '" + localToken.getLiteral() + "' Already Exists", localToken.getLine());
@@ -196,8 +192,18 @@ public class Parser {
 
     private Expression assignment() {
         if (peekType() == TK_IDENTIFIER) {
+            Token variable = peek();
+
             switch (peekNext().getTokenType()) {
                 case TK_EQUAL -> {
+                    if (this.locals.getLocal(variable.getLiteral()).isConstant()) {
+                        error("Local Variable '" + this.locals.getLocal(variable.getLiteral()).getName()
+                                + "' Is A Constant", peekLine());
+
+                        synchronize();
+                        return new None();
+                    }
+
                     Token next = peek();
 
                     advance();
@@ -208,6 +214,14 @@ public class Parser {
                 }
 
                 case TK_PLUS_EQUAL, TK_MINUS_EQUAL, TK_MUL_EQUAL, TK_DIV_EQUAL, TK_MOD_EQUAL -> {
+                    if (this.locals.getLocal(variable.getLiteral()).isConstant()) {
+                        error("Local Variable '" + this.locals.getLocal(variable.getLiteral())
+                                + "' Is A Constant", peekLine());
+
+                        synchronize();
+                        return new None();
+                    }
+
                     Token next = peek();
                     String identifier = next.getLiteral();
                     int line = next.getLine();
@@ -434,6 +448,10 @@ public class Parser {
 
     private void error(String message, int line) {
         this.errors.addError("Parsing Error", message, line);
+    }
+
+    public LocalVariable getLocals() {
+        return this.locals;
     }
 
     public CompilerError getErrors() {
