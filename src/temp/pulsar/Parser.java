@@ -210,7 +210,7 @@ public class Parser {
                     advance();
 
                     Expression expression = expression();
-                    return new Assignment(next.getLiteral(), expression, next.getLine());
+                    return new Assignment(next.getLiteral(), resolveLocal(variable), expression, next.getLine());
                 }
 
                 case TK_PLUS_EQUAL, TK_MINUS_EQUAL, TK_MUL_EQUAL, TK_DIV_EQUAL, TK_MOD_EQUAL -> {
@@ -234,12 +234,12 @@ public class Parser {
                     Expression expression = expression();
 
                     // Expand An Operator Assignment Into A Normal Assignment
-                    return new Assignment(identifier,
-                                    new Binary(
-                                            new VariableAccess(identifier, line
-                                            ), operatorType.substring(0, operatorType.length() - 1), expression, line
-                                    ), line
-                            );
+                    return new Assignment(identifier, resolveLocal(variable),
+                            new Binary(
+                                        new VariableAccess(identifier, resolveLocal(variable), line
+                                    ), operatorType.substring(0, operatorType.length() - 1), expression, line
+                            ), line
+                    );
                 }
 
                 default -> {
@@ -354,8 +354,9 @@ public class Parser {
             return new Literal(previous().getLiteral(), PR_CHARACTER, peekLine());
         }
 
-        if (matchAdvance(TK_IDENTIFIER)) {
-            return new VariableAccess(previous().getLiteral(), peekLine());
+        if (match(TK_IDENTIFIER)) {
+            Token name = advance();
+            return new VariableAccess(previous().getLiteral(), resolveLocal(name), peekLine());
         }
 
         if (matchAdvance(TK_LPAR)) {
@@ -366,6 +367,19 @@ public class Parser {
 
         error("An Expression Was Expected But Nothing Was Given", peekLine());
         return new Literal("Error", PR_ERROR, peekLine()); // Returning An 'Error Literal'
+    }
+
+    private int resolveLocal(Token name) {
+        for (int i = this.locals.getLocalCount() - 1; i >= 0; i--) {
+            LocalVariable.Local local = this.locals.getLocal(i);
+
+            if (local.getName().equals(name.getLiteral())) {
+                return i;
+            }
+        }
+
+        error("Local Variable Used But Never Defined - " + name.getLiteral(), peekLine());
+        return -1;
     }
 
     private boolean match(TokenType... types) {

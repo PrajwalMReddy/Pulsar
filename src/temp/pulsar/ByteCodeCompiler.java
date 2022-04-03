@@ -135,9 +135,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
     public Instruction visitAssignmentExpression(Assignment expression) {
         expression.getValue().accept(this);
-
-        // TODO Change The Math.random() Once The Symbol Table Is Added
-        return makeOpCode(OP_SET_LOCAL, (int) (Math.random() * 99), expression.getLine());
+        return makeOpCode(OP_SET_LOCAL, expression.getNumber(), expression.getLine());
     }
 
     public Instruction visitBinaryExpression(Binary expression) {
@@ -191,8 +189,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     }
 
     public Instruction visitVariableExpression(VariableAccess expression) {
-        // TODO Change The Math.random() Once The Symbol Table Is Added
-        return makeOpCode(OP_GET_LOCAL, (int) (Math.random() * 99), expression.getLine());
+        return makeOpCode(OP_GET_LOCAL, expression.getNumber(), expression.getLine());
     }
 
     private Instruction makeConstant(String value, int line, PrimitiveType type) {
