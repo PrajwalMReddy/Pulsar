@@ -23,7 +23,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     private Statement program;
 
     // Data To Help In Compiling To ByteCode
-    private ArrayList<Primitive> values; // Constant Values To Be Stored
+    private final ArrayList<Primitive> values; // Constant Values To Be Stored
     private LocalVariable locals;
 
     // Output Data

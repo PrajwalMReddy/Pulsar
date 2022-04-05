@@ -55,11 +55,11 @@ public class LocalVariable {
     public static class Local {
         Token token;
 
-        private String name;
-        private PrimitiveType type;
+        private final String name;
+        private final PrimitiveType type;
 
-        private boolean isConstant;
-        private int depth;
+        private final boolean isConstant;
+        private final int depth;
 
         public Local(Token token, String name, PrimitiveType type, boolean isConstant, int depth) {
             this.token = token;

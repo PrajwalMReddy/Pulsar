@@ -8,8 +8,8 @@ public class Variable extends Statement {
     private final String name;
     private final Expression initializer;
 
-    private PrimitiveType type;
-    private boolean isGlobal;
+    private final PrimitiveType type;
+    private final boolean isGlobal;
 
     private final int line;
 

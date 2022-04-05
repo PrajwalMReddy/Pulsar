@@ -24,7 +24,7 @@ public class Parser {
     // Data To Help In Generating An AST
     private int current; // Next Token To Be Used
     private int depth;
-    private LocalVariable locals;
+    private final LocalVariable locals;
 
     // Output Data
     private Statement program;
@@ -91,8 +91,12 @@ public class Parser {
 
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
 
-        for (int i = 0; i < this.locals.getLocalCount(); i++) {
+        for (int i = this.locals.getLocalCount() - 1; i >= 0; i--) {
             LocalVariable.Local local = this.locals.getLocal(i);
+
+            if (local.getDepth() < this.depth) {
+                break;
+            }
 
             if (local.getName().equals(localToken.getLiteral())) {
                 error("Local Variable '" + localToken.getLiteral() + "' Already Exists", localToken.getLine());
@@ -193,6 +197,11 @@ public class Parser {
     private Expression assignment() {
         if (peekType() == TK_IDENTIFIER) {
             Token variable = peek();
+            if (this.locals.getLocal(variable.getLiteral()) == null) {
+                error("Local Variable '" + variable.getLiteral() + "' Is Used But Never Defined", peekLine());
+                synchronize();
+                return new None();
+            }
 
             switch (peekNext().getTokenType()) {
                 case TK_EQUAL -> {
@@ -378,7 +387,7 @@ public class Parser {
             }
         }
 
-        error("Local Variable Used But Never Defined - " + name.getLiteral(), peekLine());
+        error("Local Variable '" + name.getLiteral() + "' Is Used But Never Defined", peekLine());
         return -1;
     }
 
