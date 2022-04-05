@@ -125,6 +125,10 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         return stringBuilder.toString();
     }
 
+    public String visitPrintExpression(Print statement) {
+        return "Print(" + statement.getExpression().accept(this) + ")\n";
+    }
+
     public String visitVariableStatement(Variable statement) {
         return "Variable(" + (statement.isGlobal() ? "Global:" : "Local:") + statement.getName() + " = " + statement.getInitializer().accept(this) + ")\n";
     }

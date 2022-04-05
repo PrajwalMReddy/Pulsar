@@ -67,6 +67,8 @@ public class Parser {
                 return localVariableDeclaration(TK_VAR);
             } else if (matchAdvance(TK_CONST)) {
                 return localVariableDeclaration(TK_CONST);
+            } else if (matchAdvance(TK_PRINT)) {
+                return printStatement();
             } else {
                 return expressionStatement();
             }
@@ -182,6 +184,12 @@ public class Parser {
         }
 
         return new If(expression, thenBranch, elseBranch, line);
+    }
+
+    private Statement printStatement() {
+        Print statement = new Print(expression(), peekLine());
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Print Statement");
+        return statement;
     }
 
     private ExpressionStmt expressionStatement() {

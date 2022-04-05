@@ -126,6 +126,13 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return null;
     }
 
+    public Void visitPrintExpression(Print statement) {
+        statement.getExpression().accept(this);
+        makeOpCode(OP_PRINT, statement.getLine());
+
+        return null;
+    }
+
     public Void visitExpressionStatement(ExpressionStmt statement) {
         statement.getExpression().accept(this);
         makeOpCode(OP_POP, statement.getLine());
@@ -254,6 +261,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
             case "-" -> codes.add(OP_SUBTRACT);
             case "*" -> codes.add(OP_MULTIPLY);
             case "/" -> codes.add(OP_DIVIDE);
+            case "%" -> codes.add(OP_MODULO);
 
             case ">" -> codes.add(OP_COMPARE_GREATER);
             case ">=" -> {

@@ -41,7 +41,13 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
     }
 
     public PrimitiveType visitAssignmentExpression(Assignment expression) {
-        return expression.getValue().accept(this);
+        LocalVariable.Local local = this.locals.getLocal(expression.getIdentifier());
+
+        if (local.getType() != expression.getValue().accept(this)) {
+            newError("Variable Is Being Assigned To The Wrong Type", expression.getLine());
+        }
+
+        return local.getType();
     }
 
     public PrimitiveType visitBinaryExpression(Binary expression) {
@@ -131,6 +137,12 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         if (statement.hasElse()) {
             statement.getElseBranch().accept(this);
         }
+
+        return null;
+    }
+
+    public Void visitPrintExpression(Print statement) {
+        statement.getExpression().accept(this);
 
         return null;
     }
