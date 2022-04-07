@@ -91,6 +91,12 @@ public class Parser {
         look(TK_COLON, "A Colon Was Expected After The Variable Name");
         Token type = advance();
 
+        if (checkType(type) == PR_ERROR) {
+            error("Invalid Type For Variable", peekLine());
+            synchronize();
+            return new NoneStatement();
+        }
+
         if (matchAdvance(TK_EQUAL)) {
             expression = expression();
         } else {

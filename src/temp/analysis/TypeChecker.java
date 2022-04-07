@@ -54,7 +54,9 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         PrimitiveType a = expression.getLeft().accept(this);
         PrimitiveType b = expression.getRight().accept(this);
 
-        if (isOfType(a, PR_BOOLEAN) || isOfType(b, PR_BOOLEAN)) {
+        if (isOfType(a, PR_NULL) || isOfType(b, PR_NULL)) {
+            newError("Cannot Operate On Null Values", expression.getLine());
+        } else if (isOfType(a, PR_BOOLEAN) || isOfType(b, PR_BOOLEAN)) {
             if (!isOperation(expression.getOperator(), "==", "!=")) {
                 newError("Boolean Operands May Not Be Used For This Operation Operations", expression.getLine());
                 return PR_ERROR;
@@ -79,7 +81,9 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         PrimitiveType a = expression.getLeft().accept(this);
         PrimitiveType b = expression.getRight().accept(this);
 
-        if (!isOfType(a, PR_BOOLEAN) || !isOfType(b, PR_BOOLEAN)) {
+        if (isOfType(a, PR_NULL) || isOfType(b, PR_NULL)) {
+            newError("Cannot Operate On Null Values", expression.getLine());
+        } else if (!isOfType(a, PR_BOOLEAN) || !isOfType(b, PR_BOOLEAN)) {
             newError("Logical Operation Has Non Boolean Operand(s)", expression.getLine());
             return PR_ERROR;
         }
@@ -94,7 +98,9 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
     public PrimitiveType visitUnaryExpression(Unary expression) {
         PrimitiveType a = expression.getRight().accept(this);
 
-        if (isOperation(expression.getOperator(), "!")) {
+        if (isOfType(a, PR_NULL)) {
+            newError("Cannot Operate On Null Values", expression.getLine());
+        } else if (isOperation(expression.getOperator(), "!")) {
             if (!isOfType(a, PR_BOOLEAN)) {
                 newError("Unary Not Operation Has Non Boolean Operand", expression.getLine());
                 return PR_ERROR;
