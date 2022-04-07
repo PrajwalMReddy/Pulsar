@@ -293,6 +293,10 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return this.values;
     }
 
+    public LocalVariable getLocals() {
+        return this.locals;
+    }
+
     public CompilerError getErrors() {
         return this.errors;
     }

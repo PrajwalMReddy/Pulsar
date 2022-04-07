@@ -1,8 +1,8 @@
 package temp.pulsar;
 
-import temp.lang.ByteCode;
 import temp.lang.CompilerError;
 import temp.lang.Instruction;
+import temp.lang.LocalVariable;
 import temp.primitives.Primitive;
 import temp.util.Disassembler;
 import temp.util.ErrorReporter;
@@ -17,6 +17,7 @@ public class Compiler {
     private ArrayList<Instruction> instructions;
 
     // Data To Help In Compiling To Assembly
+    private LocalVariable locals;
     private ArrayList<Primitive> values;
 
     // Output Data
@@ -33,6 +34,7 @@ public class Compiler {
     public void init() {
         ByteCodeCompiler bcc = new ByteCodeCompiler(this.sourceCode);
         this.instructions = bcc.compileByteCode();
+        this.locals = bcc.getLocals();
 
         this.errors = bcc.getErrors();
         this.staticErrors = bcc.getStaticErrors();

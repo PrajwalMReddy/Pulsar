@@ -50,7 +50,6 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return local.getType();
     }
 
-    // TODO Add A Division By Zero Error Once Error Handling Is Added
     public PrimitiveType visitBinaryExpression(Binary expression) {
         PrimitiveType a = expression.getLeft().accept(this);
         PrimitiveType b = expression.getRight().accept(this);

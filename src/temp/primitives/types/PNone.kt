@@ -2,16 +2,16 @@ package temp.primitives.types
 
 import temp.primitives.Primitive
 
-class PDouble(var value: Double) : Primitive() {
+/*
+    Used to implement a method that isn't applicable for that class.
+*/
+
+class PNone : Primitive() {
     override fun negate(): Primitive {
-        return PDouble(-this.value)
+        return PNone()
     }
 
     override fun not(): Primitive {
         return PNone()
-    }
-
-    override fun toString(): String {
-        return value.toString()
     }
 }
