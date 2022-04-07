@@ -6,8 +6,8 @@ import temp.ast.Expression;
     Indicates nothing should be done. This can be used if a return statement is needed, but an error occurred.
 */
 
-public class None extends Expression {
-    public None() {
+public class NoneExpression extends Expression {
+    public NoneExpression() {
     }
 
     public <R> R accept(Visitor<R> visitor) {

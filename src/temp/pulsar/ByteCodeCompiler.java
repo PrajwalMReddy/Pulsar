@@ -126,6 +126,10 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return null;
     }
 
+    public Void visitNoneStatement(NoneStatement statement) {
+        return null;
+    }
+
     public Void visitPrintExpression(Print statement) {
         statement.getExpression().accept(this);
         makeOpCode(OP_PRINT, statement.getLine());
@@ -185,7 +189,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return null;
     }
 
-    public Instruction visitNoneExpression(None expression) {
+    public Instruction visitNoneExpression(NoneExpression expression) {
         return null;
     }
 

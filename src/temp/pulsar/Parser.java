@@ -80,6 +80,12 @@ public class Parser {
     private Statement localVariableDeclaration(TokenType accessType) {
         Token localToken = advance();
 
+        if (localToken.getTokenType() != TK_IDENTIFIER) {
+            error("Invalid Identifier Name", peekLine());
+            synchronize();
+            return new NoneStatement();
+        }
+
         Expression expression;
 
         look(TK_COLON, "A Colon Was Expected After The Variable Name");
@@ -208,7 +214,7 @@ public class Parser {
             if (this.locals.getLocal(variable.getLiteral()) == null) {
                 error("Local Variable '" + variable.getLiteral() + "' Is Used But Never Defined", peekLine());
                 synchronize();
-                return new None();
+                return new NoneExpression();
             }
 
             switch (peekNext().getTokenType()) {
@@ -218,7 +224,7 @@ public class Parser {
                                 + "' Is A Constant", peekLine());
 
                         synchronize();
-                        return new None();
+                        return new NoneExpression();
                     }
 
                     Token next = peek();
@@ -236,7 +242,7 @@ public class Parser {
                                 + "' Is A Constant", peekLine());
 
                         synchronize();
-                        return new None();
+                        return new NoneExpression();
                     }
 
                     Token next = peek();

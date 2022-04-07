@@ -63,7 +63,7 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         return "Logical(" + expression.getLeft().accept(this) + " " + expression.getOperator() + " " + expression.getRight().accept(this) + ")";
     }
 
-    public String visitNoneExpression(None expression) {
+    public String visitNoneExpression(NoneExpression expression) {
         return "";
     }
 
@@ -123,6 +123,10 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
 
         stringBuilder.append("\n");
         return stringBuilder.toString();
+    }
+
+    public String visitNoneStatement(NoneStatement statement) {
+        return "";
     }
 
     public String visitPrintExpression(Print statement) {

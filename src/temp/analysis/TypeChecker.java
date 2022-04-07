@@ -50,13 +50,14 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return local.getType();
     }
 
+    // TODO Add A Division By Zero Error Once Error Handling Is Added
     public PrimitiveType visitBinaryExpression(Binary expression) {
         PrimitiveType a = expression.getLeft().accept(this);
         PrimitiveType b = expression.getRight().accept(this);
 
         if (isOfType(a, PR_BOOLEAN) || isOfType(b, PR_BOOLEAN)) {
             if (!isOperation(expression.getOperator(), "==", "!=")) {
-                newError("Boolean Operands May Not Be Used For Non Logical Operations", expression.getLine());
+                newError("Boolean Operands May Not Be Used For This Operation Operations", expression.getLine());
                 return PR_ERROR;
             }
         } else if (a != b) {
@@ -87,7 +88,7 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return PR_BOOLEAN;
     }
 
-    public PrimitiveType visitNoneExpression(None expression) {
+    public PrimitiveType visitNoneExpression(NoneExpression expression) {
         return PR_ERROR;
     }
 
@@ -131,13 +132,21 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
     }
 
     public Void visitIFStatement(If statement) {
-        statement.getCondition().accept(this);
+        PrimitiveType type = statement.getCondition().accept(this);
         statement.getThenBranch().accept(this);
 
         if (statement.hasElse()) {
             statement.getElseBranch().accept(this);
         }
 
+        if (type != PR_BOOLEAN) {
+            newError("If Statement Has Non Boolean Condition", statement.getLine());
+        }
+
+        return null;
+    }
+
+    public Void visitNoneStatement(NoneStatement statement) {
         return null;
     }
 
@@ -159,8 +168,12 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
     }
 
     public Void visitWhileStatement(While statement) {
-        statement.getCondition().accept(this);
+        PrimitiveType type = statement.getCondition().accept(this);
         statement.getStatements().accept(this);
+
+        if (type != PR_BOOLEAN) {
+            newError("While Statement Has Non Boolean Condition", statement.getLine());
+        }
 
         return null;
     }
