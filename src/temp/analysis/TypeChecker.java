@@ -56,9 +56,11 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
 
         if (isOfType(a, PR_NULL) || isOfType(b, PR_NULL)) {
             newError("Cannot Operate On Null Values", expression.getLine());
+        } else if (isOfType(a, PR_CHARACTER) || isOfType(b, PR_CHARACTER)) {
+            newError("Cannot Operate On Character Values", expression.getLine());
         } else if (isOfType(a, PR_BOOLEAN) || isOfType(b, PR_BOOLEAN)) {
             if (!isOperation(expression.getOperator(), "==", "!=")) {
-                newError("Boolean Operands May Not Be Used For This Operation Operations", expression.getLine());
+                newError("Boolean Operands May Not Be Used For This Operation's Operands", expression.getLine());
                 return PR_ERROR;
             }
         } else if (a != b) {
@@ -66,7 +68,11 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
             return PR_ERROR;
         }
 
-        return a;
+        if (isOperation(expression.getOperator(), "==", "!=", "<", "<=", ">", ">=")) {
+            return PR_BOOLEAN;
+        } else {
+            return a;
+        }
     }
 
     public PrimitiveType visitGroupingExpression(Grouping expression) {
@@ -165,7 +171,9 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         PrimitiveType variableType = statement.getType();
         PrimitiveType initializerType = statement.getInitializer().accept(this);
 
-        if ((variableType != initializerType) && (initializerType != PR_NULL)) {
+        if (initializerType == PR_NULL) {
+            newError("Variables May Not Be Initialized To Null", statement.getLine());
+        } else if ((variableType != initializerType) && (initializerType != PR_NULL)) {
             newError("Variable Has Been Initialized With The Wrong Type", statement.getLine());
         }
 

@@ -345,7 +345,7 @@ public class Parser {
     private Expression factor() {
         Expression expression = unary();
 
-        while (matchAdvance(TK_MULTIPLICATION, TK_DIVISION)) {
+        while (matchAdvance(TK_MULTIPLICATION, TK_DIVISION, TK_MODULUS)) {
             Token operator = previous();
             Expression right = unary();
             expression = new Binary(expression, operator.getLiteral(), right, operator.getLine());
