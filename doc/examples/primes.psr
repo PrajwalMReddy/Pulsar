@@ -1,10 +1,11 @@
-// Find Prime Numbers From 0 - 100
+// Find Prime Numbers That Are Less Than 100
 
-var start = 2;
-var i;
-var isPrime;
 
-while start <= 100 {
+var start: int = 2;
+var i: int = -1;
+var isPrime: boolean = false;
+
+while start < 100 {
     i = 2;
     isPrime = true;
 

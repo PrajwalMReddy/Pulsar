@@ -1,0 +1,20 @@
+// Find First 25 Fibonacci Numbers
+
+
+var previous: int = 0;
+var a: int = 0;
+var b: int = 1;
+
+var count: int = 0;
+
+print 0;
+print 1;
+
+while count < 23 {
+    previous = a;
+    a = b;
+    b = previous + a;
+
+    print b;
+    count += 1;
+}

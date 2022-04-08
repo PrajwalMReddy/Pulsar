@@ -227,7 +227,7 @@ public class Parser {
                 case TK_EQUAL -> {
                     if (this.locals.getLocal(variable.getLiteral()).isConstant()) {
                         error("Local Variable '" + this.locals.getLocal(variable.getLiteral()).getName()
-                                + "' Is A Constant", peekLine());
+                                + "' Is A Constant And Cannot Be Reassigned", peekLine());
 
                         synchronize();
                         return new NoneExpression();
@@ -244,8 +244,8 @@ public class Parser {
 
                 case TK_PLUS_EQUAL, TK_MINUS_EQUAL, TK_MUL_EQUAL, TK_DIV_EQUAL, TK_MOD_EQUAL -> {
                     if (this.locals.getLocal(variable.getLiteral()).isConstant()) {
-                        error("Local Variable '" + this.locals.getLocal(variable.getLiteral())
-                                + "' Is A Constant", peekLine());
+                        error("Local Variable '" + this.locals.getLocal(variable.getLiteral()).getName()
+                                + "' Is A Constant And Cannot Be Reassigned", peekLine());
 
                         synchronize();
                         return new NoneExpression();
