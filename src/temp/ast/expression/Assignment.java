@@ -4,13 +4,16 @@ import temp.ast.Expression;
 
 public class Assignment extends Expression {
     private final String identifier;
+
+    private final boolean isGlobalAssignment;
     private final int number;
 
     private final Expression value;
     private final int line;
 
-    public Assignment(String identifier, int number, Expression value, int line) {
+    public Assignment(String identifier, boolean isGlobalAssignment, int number, Expression value, int line) {
         this.identifier = identifier;
+        this.isGlobalAssignment = isGlobalAssignment;
         this.number = number;
         this.value = value;
         this.line = line;
@@ -22,6 +25,10 @@ public class Assignment extends Expression {
 
     public String getIdentifier() {
         return this.identifier;
+    }
+
+    public boolean isGlobalAssignment() {
+        return this.isGlobalAssignment;
     }
 
     public int getNumber() {

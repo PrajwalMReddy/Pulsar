@@ -5,10 +5,7 @@ import temp.ast.Statement;
 import temp.ast.expression.*;
 import temp.ast.statement.*;
 import temp.analysis.TypeChecker;
-import temp.lang.ByteCode;
-import temp.lang.CompilerError;
-import temp.lang.Instruction;
-import temp.lang.LocalVariable;
+import temp.lang.*;
 import temp.primitives.*;
 import temp.primitives.types.*;
 import temp.util.ASTPrinter;
@@ -23,8 +20,9 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     private Statement program;
 
     // Data To Help In Compiling To ByteCode
-    private final ArrayList<Primitive> values; // Constant Values To Be Stored
+    private GlobalVariable globals;
     private LocalVariable locals;
+    private final ArrayList<Primitive> values; // Constant Values To Be Stored
 
     // Output Data
     private final ArrayList<Instruction> instructions;
@@ -42,13 +40,15 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     public ArrayList<Instruction> compileByteCode() {
         Parser ast = new Parser(this.sourceCode);
         this.program = ast.parse();
-        this.locals = ast.getLocals();
 
-        ASTPrinter astPrinter = new ASTPrinter();
-        astPrinter.print(this.program);
+        this.globals = ast.getGlobals();
+        this.locals = ast.getLocals();
 
         this.errors = ast.getErrors();
         if (this.errors.hasError()) return instructions;
+
+        ASTPrinter astPrinter = new ASTPrinter();
+        astPrinter.print(this.program);
 
         TypeChecker analyzer = new TypeChecker(this.program, this.locals);
         analyzer.check();
@@ -71,8 +71,15 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
     public Void visitVariableStatement(Variable statement) {
         statement.getInitializer().accept(this);
-        makeOpCode(OP_NEW_LOCAL, statement.getName(), statement.getLine());
+        ByteCode type;
 
+        if (statement.isGlobal()) {
+            type = OP_NEW_GLOBAL;
+        } else {
+            type = OP_NEW_LOCAL;
+        }
+
+        makeOpCode(type, statement.getName(), statement.getLine());
         return null;
     }
 
@@ -146,7 +153,15 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
     public Instruction visitAssignmentExpression(Assignment expression) {
         expression.getValue().accept(this);
-        return makeOpCode(OP_SET_LOCAL, expression.getNumber(), expression.getLine());
+        ByteCode type;
+
+        if (expression.isGlobalAssignment()) {
+            type = OP_STORE_GLOBAL;
+        } else {
+            type = OP_SET_LOCAL;
+        }
+
+        return makeOpCode(type, expression.getNumber(), expression.getLine());
     }
 
     public Instruction visitBinaryExpression(Binary expression) {
@@ -200,7 +215,15 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     }
 
     public Instruction visitVariableExpression(VariableAccess expression) {
-        return makeOpCode(OP_GET_LOCAL, expression.getNumber(), expression.getLine());
+        ByteCode type;
+
+        if (expression.isGlobalVariable()) {
+            type = OP_LOAD_GLOBAL;
+        } else {
+            type = OP_GET_LOCAL;
+        }
+
+        return makeOpCode(type, expression.getNumber(), expression.getLine());
     }
 
     private Instruction makeConstant(String value, int line, PrimitiveType type) {
@@ -291,6 +314,10 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
     public ArrayList<Primitive> getValues() {
         return this.values;
+    }
+
+    public GlobalVariable getGlobals() {
+        return this.globals;
     }
 
     public LocalVariable getLocals() {

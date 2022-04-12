@@ -4,12 +4,15 @@ import temp.ast.Expression;
 
 public class VariableAccess extends Expression {
     private final String name;
+
+    private final boolean isGlobalVariable;
     private final int number;
 
     private final int line;
 
-    public VariableAccess(String name, int number, int line) {
+    public VariableAccess(String name, boolean isGlobalVariable, int number, int line) {
         this.name = name;
+        this.isGlobalVariable = isGlobalVariable;
         this.number = number;
 
         this.line = line;
@@ -21,6 +24,10 @@ public class VariableAccess extends Expression {
 
     public String getName() {
         return this.name;
+    }
+
+    public boolean isGlobalVariable() {
+        return this.isGlobalVariable;
     }
 
     public int getNumber() {

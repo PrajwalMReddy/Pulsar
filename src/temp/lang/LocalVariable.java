@@ -53,7 +53,7 @@ public class LocalVariable {
     }
 
     public static class Local {
-        Token token;
+        private Token token;
 
         private final String name;
         private final PrimitiveType type;

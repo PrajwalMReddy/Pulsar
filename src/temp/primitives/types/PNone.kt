@@ -1,12 +1,18 @@
 package temp.primitives.types
 
 import temp.primitives.Primitive
+import temp.primitives.PrimitiveType
 
 /*
     Used to implement a method that isn't applicable for that class.
 */
 
 class PNone : Primitive() {
+    override fun getPrimitiveType(): PrimitiveType {
+        // A Primitive Of Type PNone Cannot Be On The Stack
+        return PrimitiveType.PR_ERROR
+    }
+
     override fun getPrimitiveValue(): Any {
         return PNone()
     }

@@ -1,8 +1,13 @@
 package temp.primitives.types
 
 import temp.primitives.Primitive
+import temp.primitives.PrimitiveType
 
 class PCharacter(var value: Char) : Primitive() {
+    override fun getPrimitiveType(): PrimitiveType {
+        return PrimitiveType.PR_CHARACTER
+    }
+
     override fun getPrimitiveValue(): Any {
         return this.value
     }

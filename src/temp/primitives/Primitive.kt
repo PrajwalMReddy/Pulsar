@@ -1,6 +1,7 @@
 package temp.primitives
 
 abstract class Primitive {
+    abstract fun getPrimitiveType(): PrimitiveType
     abstract fun getPrimitiveValue(): Any
 
     abstract fun negate(): Primitive

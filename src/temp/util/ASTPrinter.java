@@ -108,7 +108,7 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
     public String visitIFStatement(If statement) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("If(" + statement.getCondition().accept(this) + ") (\n");
+        stringBuilder.append("\n" + giveTabs() + "If(" + statement.getCondition().accept(this) + ") (\n");
         stringBuilder.append(blockStatement(statement.getThenBranch()) + "\n" + giveTabs() + ")");
 
         if (statement.hasElse()) {
@@ -140,7 +140,7 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
     public String visitWhileStatement(While statement) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("While(" + statement.getCondition().accept(this) + ") (\n");
+        stringBuilder.append("\n" + giveTabs() + "While(" + statement.getCondition().accept(this) + ") (\n");
         stringBuilder.append(blockStatement(statement.getStatements()) + "\n" + giveTabs() + ")");
 
         return stringBuilder.toString();

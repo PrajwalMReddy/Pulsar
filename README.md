@@ -6,6 +6,7 @@ Pulsar is a new programming language that I am currently working on to learn how
 As of now, the following features are working:
 - Expressions (Including Basic Arithmetic Operators)
 - Local Variables
+- Global Variables
 - If/Else Statements
 - While Loops
 

@@ -4,10 +4,7 @@ import temp.ast.Expression;
 import temp.ast.Statement;
 import temp.ast.expression.*;
 import temp.ast.statement.*;
-import temp.lang.CompilerError;
-import temp.lang.LocalVariable;
-import temp.lang.Token;
-import temp.lang.TokenType;
+import temp.lang.*;
 import temp.primitives.PrimitiveType;
 import temp.util.TokenDisassembler;
 
@@ -24,6 +21,8 @@ public class Parser {
     // Data To Help In Generating An AST
     private int current; // Next Token To Be Used
     private int depth;
+
+    private final GlobalVariable globals;
     private final LocalVariable locals;
 
     // Output Data
@@ -35,6 +34,8 @@ public class Parser {
 
         this.current = 0;
         this.depth = 1;
+
+        this.globals = new GlobalVariable();
         this.locals = new LocalVariable();
     }
 
@@ -55,6 +56,36 @@ public class Parser {
 
         this.program = new Block(statements, line);
         return this.program;
+    }
+
+    private Statement globalVariableDeclaration(TokenType accessType) {
+        Token name = advance();
+
+        if (name.getTokenType() != TK_IDENTIFIER) {
+            error("Invalid Identifier Name", peekLine());
+            synchronize();
+            return new NoneStatement();
+        }
+
+        Expression expression;
+
+        look(TK_COLON, "A Colon Was Expected After The Variable Name");
+        Token type = advance();
+
+        if (checkType(type) == PR_ERROR) {
+            error("Invalid Type For Variable", peekLine());
+            synchronize();
+            return new NoneStatement();
+        }
+
+        if (matchAdvance(TK_EQUAL)) {
+            expression = expression();
+        } else {
+            expression = new Literal(null, PR_NULL, peekLine());
+        }
+
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
+        return new Variable(name.getLiteral(), expression, checkType(type), true, name.getLine());
     }
 
     private Statement statement() {
@@ -239,7 +270,7 @@ public class Parser {
                     advance();
 
                     Expression expression = expression();
-                    return new Assignment(next.getLiteral(), resolveLocal(variable), expression, next.getLine());
+                    return new Assignment(next.getLiteral(), inGlobalScope(), resolveLocal(variable), expression, next.getLine());
                 }
 
                 case TK_PLUS_EQUAL, TK_MINUS_EQUAL, TK_MUL_EQUAL, TK_DIV_EQUAL, TK_MOD_EQUAL -> {
@@ -263,9 +294,9 @@ public class Parser {
                     Expression expression = expression();
 
                     // Expand An Operator Assignment Into A Normal Assignment
-                    return new Assignment(identifier, resolveLocal(variable),
+                    return new Assignment(identifier, inGlobalScope(), resolveLocal(variable),
                             new Binary(
-                                        new VariableAccess(identifier, resolveLocal(variable), line
+                                        new VariableAccess(identifier, inGlobalScope(), resolveLocal(variable), line
                                     ), operatorType.substring(0, operatorType.length() - 1), expression, line
                             ), line
                     );
@@ -385,7 +416,7 @@ public class Parser {
 
         if (match(TK_IDENTIFIER)) {
             Token name = advance();
-            return new VariableAccess(previous().getLiteral(), resolveLocal(name), peekLine());
+            return new VariableAccess(previous().getLiteral(), inGlobalScope(), resolveLocal(name), peekLine());
         }
 
         if (matchAdvance(TK_LPAR)) {
@@ -395,7 +426,7 @@ public class Parser {
         }
 
         error("An Expression Was Expected But Nothing Was Given", peekLine());
-        return new Literal("Error", PR_ERROR, peekLine()); // Returning An 'Error Literal'
+        return new NoneExpression();
     }
 
     private int resolveLocal(Token name) {
@@ -465,6 +496,10 @@ public class Parser {
         }
     }
 
+    private boolean inGlobalScope() {
+        return this.depth == 0;
+    }
+
     private Token previous() {
         return this.tokens.get(this.current - 1);
     }
@@ -491,6 +526,10 @@ public class Parser {
 
     private void error(String message, int line) {
         this.errors.addError("Parsing Error", message, line);
+    }
+
+    public GlobalVariable getGlobals() {
+        return this.globals;
     }
 
     public LocalVariable getLocals() {

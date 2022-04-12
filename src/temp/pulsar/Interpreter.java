@@ -1,10 +1,7 @@
 package temp.pulsar;
 
 import org.codepulsar.pulsar.Error;
-import temp.lang.ByteCode;
-import temp.lang.CompilerError;
-import temp.lang.Instruction;
-import temp.lang.LocalVariable;
+import temp.lang.*;
 import temp.primitives.Primitive;
 import temp.primitives.types.PBoolean;
 import temp.primitives.types.PNull;
@@ -21,6 +18,7 @@ public class Interpreter {
     private ArrayList<Instruction> instructions;
 
     // Data To Help In Interpreting
+    private GlobalVariable globals;
     private LocalVariable locals;
     private ArrayList<Primitive> values;
 
@@ -45,6 +43,8 @@ public class Interpreter {
     public void interpret() {
         ByteCodeCompiler bcc = new ByteCodeCompiler(this.sourceCode);
         this.instructions = bcc.compileByteCode();
+
+        this.globals = bcc.getGlobals();
         this.locals = bcc.getLocals();
 
         this.errors = bcc.getErrors();
@@ -82,10 +82,27 @@ public class Interpreter {
                 case OP_CONSTANT -> push(this.values.get((int) instruction.getOperand()));
                 case OP_NULL -> push(new PNull());
 
-                // TODO Finish Interpreting Globals Once Added
-                case OP_NEW_GLOBAL -> {}
-                case OP_LOAD_GLOBAL -> {}
-                case OP_STORE_GLOBAL -> {}
+                case OP_NEW_GLOBAL -> {
+                    String variableName = instruction.getOperand().toString();
+                    if (this.globals.containsVariable(variableName)) {
+                        runtimeError("Global Variable '" + variableName + "' Already Exists");
+                    }
+
+                    Primitive primitive = pop();
+                    this.globals.addVariable(variableName, primitive, primitive.getPrimitiveType(), false);
+                }
+                case OP_LOAD_GLOBAL -> loadGlobal(instruction);
+                case OP_STORE_GLOBAL -> {
+                    Primitive value = pop();
+                    String variableName = instruction.getOperand().toString();
+
+                    if (!this.globals.containsVariable(variableName)) {
+                        runtimeError("There Is No Global Variable Named '" + variableName + "'");
+                    }
+
+                    this.globals.reassignVariable(variableName, value);
+                    push(value);
+                }
 
                 case OP_NEW_LOCAL -> {}
                 case OP_GET_LOCAL -> {
@@ -151,6 +168,15 @@ public class Interpreter {
         } else if (code == OP_JUMP_IF_FALSE && !value) {
             this.ip = (int) instruction.getOperand() - 1;
         }
+    }
+
+    private void loadGlobal(Instruction instruction) {
+        String variableName = instruction.getOperand().toString();
+        if (!this.globals.containsVariable(variableName)) {
+            runtimeError("Global Variable '" + variableName + "' Does Not Exist");
+        }
+
+        push(this.globals.getValue(variableName));
     }
 
     private void push(Primitive value) {

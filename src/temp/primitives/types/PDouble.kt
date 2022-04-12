@@ -1,8 +1,13 @@
 package temp.primitives.types
 
 import temp.primitives.Primitive
+import temp.primitives.PrimitiveType
 
 class PDouble(var value: Double) : Primitive() {
+    override fun getPrimitiveType(): PrimitiveType {
+        return PrimitiveType.PR_DOUBLE
+    }
+
     override fun getPrimitiveValue(): Any {
         return this.value
     }

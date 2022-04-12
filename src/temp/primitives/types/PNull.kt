@@ -1,8 +1,13 @@
 package temp.primitives.types
 
 import temp.primitives.Primitive
+import temp.primitives.PrimitiveType
 
 class PNull : Primitive() {
+    override fun getPrimitiveType(): PrimitiveType {
+        return PrimitiveType.PR_NULL
+    }
+
     override fun getPrimitiveValue(): Any {
         return PNull()
     }

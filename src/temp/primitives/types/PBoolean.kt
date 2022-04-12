@@ -1,8 +1,13 @@
 package temp.primitives.types
 
 import temp.primitives.Primitive
+import temp.primitives.PrimitiveType
 
 class PBoolean(var value: Boolean) : Primitive() {
+    override fun getPrimitiveType(): PrimitiveType {
+        return PrimitiveType.PR_BOOLEAN
+    }
+
     override fun getPrimitiveValue(): Any {
         return this.value
     }

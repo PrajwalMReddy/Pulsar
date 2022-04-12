@@ -1,8 +1,13 @@
 package temp.primitives.types
 
 import temp.primitives.Primitive
+import temp.primitives.PrimitiveType
 
 class PInteger(var value: Int) : Primitive() {
+    override fun getPrimitiveType(): PrimitiveType {
+        return PrimitiveType.PR_INTEGER
+    }
+
     override fun getPrimitiveValue(): Any {
         return this.value
     }
