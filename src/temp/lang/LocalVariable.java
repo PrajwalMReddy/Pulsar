@@ -15,8 +15,8 @@ public class LocalVariable {
         this.localCount = 0;
     }
 
-    public void newLocal(Token token, String name, PrimitiveType type, boolean isConstant) {
-        this.variables.add(this.localCount, new Local(token, name, type, isConstant, this.scopeDepth));
+    public void newLocal(Token token, String name, PrimitiveType type, boolean isInitialized, boolean isConstant) {
+        this.variables.add(this.localCount, new Local(token, name, type, isInitialized, isConstant, this.scopeDepth));
         this.localCount++;
     }
 
@@ -58,15 +58,17 @@ public class LocalVariable {
         private final String name;
         private final PrimitiveType type;
 
+        private boolean isInitialized;
         private final boolean isConstant;
         private final int depth;
 
-        public Local(Token token, String name, PrimitiveType type, boolean isConstant, int depth) {
+        public Local(Token token, String name, PrimitiveType type, boolean isInitialized, boolean isConstant, int depth) {
             this.token = token;
 
             this.name = name;
             this.type = type;
 
+            this.isInitialized = isInitialized;
             this.isConstant = isConstant;
             this.depth = depth;
         }
@@ -77,6 +79,14 @@ public class LocalVariable {
 
         public PrimitiveType getType() {
             return this.type;
+        }
+
+        public boolean isInitialized() {
+            return this.isInitialized;
+        }
+
+        public void setInitialized() {
+            this.isInitialized = true;
         }
 
         public boolean isConstant() {

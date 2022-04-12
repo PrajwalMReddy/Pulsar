@@ -12,14 +12,14 @@ public class GlobalVariable {
         this.variables = new HashMap<>();
     }
 
-    public void addVariable(String name, Primitive value, PrimitiveType type, boolean isConstant) {
-        this.variables.put(name, new Global(value, type, isConstant));
+    public void addVariable(String name, Primitive value, PrimitiveType type, boolean isInitialized, boolean isConstant) {
+        this.variables.put(name, new Global(value, type, isInitialized, isConstant));
     }
 
     public void reassignVariable(String name, Primitive value) {
         Global variable = this.variables.get(name);
 
-        this.variables.put(name, new Global(value, variable.getType(), variable.isConstant()));
+        this.variables.put(name, new Global(value, variable.getType(), true, variable.isConstant()));
     }
 
     public Primitive getValue(String name) {
@@ -39,11 +39,14 @@ public class GlobalVariable {
         private Primitive value;
         private PrimitiveType type;
 
+        private boolean isInitialized;
         private final boolean isConstant;
 
-        public Global(Primitive value, PrimitiveType type, boolean isConstant) {
+        public Global(Primitive value, PrimitiveType type, boolean isInitialized, boolean isConstant) {
             this.value = value;
             this.type = type;
+
+            this.isInitialized = isInitialized;
             this.isConstant = isConstant;
         }
 

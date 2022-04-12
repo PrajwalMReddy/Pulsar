@@ -89,7 +89,8 @@ public class Interpreter {
                     }
 
                     Primitive primitive = pop();
-                    this.globals.addVariable(variableName, primitive, primitive.getPrimitiveType(), false);
+                    // TODO Come Back To This Later While Improving Globals
+                    this.globals.addVariable(variableName, primitive, primitive.getPrimitiveType(), true, false);
                 }
                 case OP_LOAD_GLOBAL -> loadGlobal(instruction);
                 case OP_STORE_GLOBAL -> {

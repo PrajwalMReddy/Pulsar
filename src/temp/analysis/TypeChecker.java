@@ -47,6 +47,7 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
             newError("Variable Is Being Assigned To The Wrong Type", expression.getLine());
         }
 
+        local.setInitialized();
         return local.getType();
     }
 
@@ -122,6 +123,11 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
 
     public PrimitiveType visitVariableExpression(VariableAccess expression) {
         LocalVariable.Local local = this.locals.getLocal(expression.getName());
+
+        if (!local.isInitialized()) {
+            newError("Variable '" + expression.getName() + "' Has Not Been Initialized", expression.getLine());
+        }
+
         return local.getType();
     }
 
@@ -171,9 +177,7 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         PrimitiveType variableType = statement.getType();
         PrimitiveType initializerType = statement.getInitializer().accept(this);
 
-        if (initializerType == PR_NULL) {
-            newError("Variables May Not Be Initialized To Null", statement.getLine());
-        } else if ((variableType != initializerType) && (initializerType != PR_NULL)) {
+        if ((variableType != initializerType) && (initializerType != PR_NULL)) {
             newError("Variable Has Been Initialized With The Wrong Type", statement.getLine());
         }
 

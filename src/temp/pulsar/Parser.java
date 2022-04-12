@@ -78,9 +78,12 @@ public class Parser {
             return new NoneStatement();
         }
 
+        boolean isInitialized;
         if (matchAdvance(TK_EQUAL)) {
+            isInitialized = true;
             expression = expression();
         } else {
+            isInitialized = false;
             expression = new Literal(null, PR_NULL, peekLine());
         }
 
@@ -128,9 +131,12 @@ public class Parser {
             return new NoneStatement();
         }
 
+        boolean isInitialized;
         if (matchAdvance(TK_EQUAL)) {
+            isInitialized = true;
             expression = expression();
         } else {
+            isInitialized = false;
             expression = new Literal(null, PR_NULL, peekLine());
         }
 
@@ -148,15 +154,15 @@ public class Parser {
             }
         }
 
-        addLocal(localToken, accessType, checkType(type));
+        addLocal(localToken, accessType, checkType(type), isInitialized);
         return new Variable(localToken.getLiteral(), expression, checkType(type),false, localToken.getLine());
     }
 
-    private void addLocal(Token name, TokenType accessType, PrimitiveType variableType) {
+    private void addLocal(Token name, TokenType accessType, PrimitiveType variableType, boolean isInitialized) {
         if (accessType == TK_VAR) {
-            this.locals.newLocal(name, name.getLiteral(), variableType, false);
+            this.locals.newLocal(name, name.getLiteral(), variableType, isInitialized, false);
         } else if (accessType == TK_CONST) {
-            this.locals.newLocal(name, name.getLiteral(), variableType, true);
+            this.locals.newLocal(name, name.getLiteral(), variableType, isInitialized, true);
         }
     }
 
