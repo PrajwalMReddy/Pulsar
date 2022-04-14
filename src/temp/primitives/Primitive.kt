@@ -2,6 +2,7 @@ package temp.primitives
 
 abstract class Primitive {
     abstract fun getPrimitiveType(): PrimitiveType
+    abstract fun isPrimitiveType(primitiveType: PrimitiveType): Boolean
     abstract fun getPrimitiveValue(): Any
 
     abstract fun negate(): Primitive

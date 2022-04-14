@@ -8,6 +8,10 @@ class PInteger(var value: Int) : Primitive() {
         return PrimitiveType.PR_INTEGER
     }
 
+    override fun isPrimitiveType(primitiveType: PrimitiveType): Boolean {
+        return primitiveType == PrimitiveType.PR_INTEGER
+    }
+
     override fun getPrimitiveValue(): Any {
         return this.value
     }

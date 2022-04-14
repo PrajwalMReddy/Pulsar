@@ -8,6 +8,10 @@ class PBoolean(var value: Boolean) : Primitive() {
         return PrimitiveType.PR_BOOLEAN
     }
 
+    override fun isPrimitiveType(primitiveType: PrimitiveType): Boolean {
+        return primitiveType == PrimitiveType.PR_BOOLEAN
+    }
+
     override fun getPrimitiveValue(): Any {
         return this.value
     }

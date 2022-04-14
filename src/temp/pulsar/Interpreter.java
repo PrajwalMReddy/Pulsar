@@ -11,6 +11,7 @@ import temp.util.ErrorReporter;
 import java.util.ArrayList;
 
 import static temp.lang.ByteCode.*;
+import static temp.primitives.PrimitiveType.*;
 
 public class Interpreter {
     // Input Data
@@ -66,8 +67,8 @@ public class Interpreter {
             Instruction instruction = this.instructions.get(this.ip);
 
             switch (instruction.getOpcode()) {
-                case OP_NEGATE -> push(pop().negate());
-                case OP_NOT -> push(pop().not());
+                case OP_NEGATE -> unaryOperation(OP_NEGATE);
+                case OP_NOT -> unaryOperation(OP_NOT);
 
                 case OP_ADD -> binaryOperation(OP_ADD);
                 case OP_SUBTRACT -> binaryOperation(OP_SUBTRACT);
@@ -130,9 +131,27 @@ public class Interpreter {
         }
     }
 
+    private void unaryOperation(ByteCode code) {
+        Primitive a = pop();
+
+        if (a.isPrimitiveType(PR_NULL)) {
+            runtimeError("Cannot Use Unary Operations On Null Values");
+        }
+
+        if (code == OP_NEGATE) {
+            push(a.negate());
+        } else if (code == OP_NOT) {
+            push(a.not());
+        }
+    }
+
     private void binaryOperation(ByteCode code) {
         Primitive b = pop();
         Primitive a = pop();
+
+        if (a.isPrimitiveType(PR_NULL) || b.isPrimitiveType(PR_NULL)) {
+            runtimeError("Cannot Use Binary Operations On Null Values");
+        }
 
         if (code == OP_ADD) {
             push(a.plus(b));
@@ -153,6 +172,8 @@ public class Interpreter {
 
         if (code == OP_COMPARE_EQUAL) {
             push(new PBoolean(a.getPrimitiveValue() == b.getPrimitiveValue()));
+        } else if (a.isPrimitiveType(PR_NULL) || b.isPrimitiveType(PR_NULL)) {
+            runtimeError("Cannot Use Binary Operations On Null Values");
         } else if (code == OP_COMPARE_GREATER) {
             push(a.compareGreater(b));
         } else if (code == OP_COMPARE_LESSER) {
@@ -161,7 +182,15 @@ public class Interpreter {
     }
 
     private void conditionalJump(Instruction instruction, ByteCode code) {
-        boolean value = ((PBoolean) pop()).getValue();
+        Primitive condition = pop();
+        boolean value = false;
+
+        if (condition.isPrimitiveType(PR_NULL)) {
+            runtimeError("Cannot Use Null Values For Control Flow Conditions");
+        } else {
+            value = ((PBoolean) pop()).getValue();
+        }
+
         push(new PBoolean(value));
 
         if (code == OP_JUMP_IF_TRUE && value) {

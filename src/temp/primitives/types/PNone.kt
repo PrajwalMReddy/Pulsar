@@ -13,6 +13,11 @@ class PNone : Primitive() {
         return PrimitiveType.PR_ERROR
     }
 
+    // A Primitive Of Type PNone Cannot Be On The Stack
+    override fun isPrimitiveType(primitiveType: PrimitiveType): Boolean {
+        return primitiveType == PrimitiveType.PR_ERROR
+    }
+
     override fun getPrimitiveValue(): Any {
         return PNone()
     }

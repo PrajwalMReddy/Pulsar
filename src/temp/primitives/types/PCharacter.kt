@@ -8,6 +8,10 @@ class PCharacter(var value: Char) : Primitive() {
         return PrimitiveType.PR_CHARACTER
     }
 
+    override fun isPrimitiveType(primitiveType: PrimitiveType): Boolean {
+        return primitiveType == PrimitiveType.PR_CHARACTER
+    }
+
     override fun getPrimitiveValue(): Any {
         return this.value
     }

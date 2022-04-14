@@ -8,6 +8,10 @@ class PDouble(var value: Double) : Primitive() {
         return PrimitiveType.PR_DOUBLE
     }
 
+    override fun isPrimitiveType(primitiveType: PrimitiveType): Boolean {
+        return primitiveType == PrimitiveType.PR_DOUBLE
+    }
+
     override fun getPrimitiveValue(): Any {
         return this.value
     }

@@ -8,6 +8,10 @@ class PNull : Primitive() {
         return PrimitiveType.PR_NULL
     }
 
+    override fun isPrimitiveType(primitiveType: PrimitiveType): Boolean {
+        return primitiveType == PrimitiveType.PR_NULL
+    }
+
     override fun getPrimitiveValue(): Any {
         return PNull()
     }
