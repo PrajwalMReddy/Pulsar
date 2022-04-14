@@ -1,17 +1,33 @@
 package org.codepulsar.pulsar;
 
-import org.codepulsar.primitives.*;
+import org.codepulsar.lang.*;
+import org.codepulsar.lang.CompilerError.Error;
+import org.codepulsar.primitives.Primitive;
+import org.codepulsar.primitives.types.PBoolean;
+import org.codepulsar.primitives.types.PNull;
+import org.codepulsar.util.Disassembler;
+import org.codepulsar.util.ErrorReporter;
 
 import java.util.ArrayList;
 
-import static org.codepulsar.pulsar.ByteCode.*;
+import static org.codepulsar.lang.ByteCode.*;
+import static org.codepulsar.primitives.PrimitiveType.*;
 
 public class Interpreter {
+    // Input Data
     private final String sourceCode;
     private ArrayList<Instruction> instructions;
-    public GlobalVariable globals;
-    public LocalVariable locals;
 
+    // Data To Help In Interpreting
+    private GlobalVariable globals;
+    private LocalVariable locals;
+    private ArrayList<Primitive> values;
+
+    // Output Data
+    private CompilerError errors;
+    private CompilerError staticErrors;
+
+    // Other Necessary Data
     private final int STACK_MAX = 1024;
     private final Primitive[] stack;
     private int sp; // Stack Top
@@ -19,8 +35,6 @@ public class Interpreter {
 
     public Interpreter(String sourceCode) {
         this.sourceCode = sourceCode;
-        this.instructions = new ArrayList<>();
-        this.globals = new GlobalVariable();
 
         this.stack = new Primitive[STACK_MAX];
         this.sp = 0;
@@ -28,23 +42,24 @@ public class Interpreter {
     }
 
     public void interpret() {
-        Parser parser = new Parser(this.sourceCode);
-        this.instructions = parser.parse();
-        this.locals = parser.getLocals();
+        ByteCodeCompiler bcc = new ByteCodeCompiler(this.sourceCode);
+        this.instructions = bcc.compileByteCode();
 
-        if (CommandsKt.getDebug()) {
-            Disassembler.disassemble(this.instructions);
-            System.out.println();
-        }
+        this.globals = bcc.getGlobals();
+        this.locals = bcc.getLocals();
 
-        if (parser.hasErrors) {
-            System.out.println("-- Errors --");
-            for (Error error: parser.errors) {
-                System.out.println(reportError(error) + "\n");
-            }
-        } else {
-            execute();
-        }
+        this.errors = bcc.getErrors();
+        this.staticErrors = bcc.getStaticErrors();
+
+        this.values = bcc.getValues();
+
+        ErrorReporter.report(this.errors, this.sourceCode);
+        ErrorReporter.report(this.staticErrors, this.sourceCode);
+
+        Disassembler.disassemble(this.instructions, bcc);
+
+        System.out.println();
+        execute();
     }
 
     private void execute() {
@@ -65,250 +80,133 @@ public class Interpreter {
                 case OP_COMPARE_GREATER -> compareOperation(OP_COMPARE_GREATER);
                 case OP_COMPARE_LESSER -> compareOperation(OP_COMPARE_LESSER);
 
-                case OP_CONSTANT -> push(Parser.values.get((int) instruction.getOperand()));
+                case OP_CONSTANT -> push(this.values.get((int) instruction.getOperand()));
                 case OP_NULL -> push(new PNull());
 
                 case OP_NEW_GLOBAL -> {
-                    String varName = instruction.getOperand().toString();
-                    if (this.globals.containsKey(varName)) {
-                        runtimeError("Redefinition Of Global Variable Is Not Allowed - " + varName);
+                    String variableName = instruction.getOperand().toString();
+                    if (this.globals.containsVariable(variableName)) {
+                        runtimeError("Global Variable '" + variableName + "' Already Exists");
                     }
-                    this.globals.newVariable(varName, pop());
+
+                    Primitive primitive = pop();
+                    // TODO Come Back To This Later While Improving Globals
+                    this.globals.addVariable(variableName, primitive, primitive.getPrimitiveType(), true, false);
                 }
-
-                case OP_NEW_LOCAL -> {}
-
+                case OP_LOAD_GLOBAL -> loadGlobal(instruction);
                 case OP_STORE_GLOBAL -> {
                     Primitive value = pop();
-                    String varName = instruction.getOperand().toString();
-                    if (!this.globals.containsKey(varName)) {
-                        runtimeError("No Such Variable Named " + varName);
+                    String variableName = instruction.getOperand().toString();
+
+                    if (!this.globals.containsVariable(variableName)) {
+                        runtimeError("There Is No Global Variable Named '" + variableName + "'");
                     }
-                    this.globals.reassignVariable(varName, value);
+
+                    this.globals.reassignVariable(variableName, value);
                     push(value);
                 }
 
+                case OP_NEW_LOCAL -> {}
+                case OP_GET_LOCAL -> {
+                    int slot = (int) instruction.getOperand();
+                    push(this.stack[slot]);
+                }
                 case OP_SET_LOCAL -> {
                     int slot = (int) instruction.getOperand();
                     this.stack[slot] = this.stack[this.sp - 1];
                 }
 
-                case OP_LOAD_GLOBAL -> loadGlobal(instruction);
-
-                case OP_GET_LOCAL -> {
-                    int slot = (int) instruction.getOperand();
-                    push(this.stack[slot]);
-                }
-
-                case OP_JUMP -> this.ip = ((int) instruction.getOperand()) - 1;
+                case OP_JUMP -> this.ip = (int) instruction.getOperand() - 1;
                 case OP_JUMP_IF_TRUE -> conditionalJump(instruction, OP_JUMP_IF_TRUE);
                 case OP_JUMP_IF_FALSE -> conditionalJump(instruction, OP_JUMP_IF_FALSE);
 
                 case OP_PRINT -> System.out.println(pop());
                 case OP_POP -> pop();
 
-                default -> runtimeError("Unhandled ByteCode Instruction - " + instruction.getOpcode() +
-                        "\nThis Is Not Your Fault And It Will Be Fixed Soon"); // Supposed To Be Unreachable
+                // Supposed To Be Unreachable
+                default -> runtimeError("Unhandled ByteCode Instruction: " + instruction.getOpcode());
             }
 
             this.ip++;
         }
     }
 
-    private void unaryOperation(ByteCode opcode) {
-        if (opcode == OP_NOT) {
-            Primitive value = pop();
-            if (!(value instanceof PBoolean)) {
-                runtimeError("Invalid Type For Unary Not - " + value.getClass());
-            }
-            boolean val = ((PBoolean) value).isValue();
-            push(new PBoolean(!val));
-        } else if (opcode == OP_NEGATE) {
-            Primitive value = pop();
-            if (value instanceof PDouble) {
-                double val = ((PDouble) value).getValue();
-                push(new PDouble(-val));
-            } else if (value instanceof PInteger) {
-                int val = ((PInteger) value).getValue();
-                push(new PInteger(-val));
-            } else {
-                runtimeError("Invalid Type For Unary Negate - " + value.getClass());
-            }
+    private void unaryOperation(ByteCode code) {
+        Primitive a = pop();
+
+        if (a.isPrimitiveType(PR_NULL)) {
+            runtimeError("Cannot Use Unary Operations On Null Values");
+        }
+
+        if (code == OP_NEGATE) {
+            push(a.negate());
+        } else if (code == OP_NOT) {
+            push(a.not());
         }
     }
 
-    private void binaryOperation(ByteCode opcode) {
+    private void binaryOperation(ByteCode code) {
         Primitive b = pop();
         Primitive a = pop();
 
-        double newA = 0;
-        double newB = 0;
-
-        boolean isDouble = false;
-
-        if (a instanceof PInteger) {
-            newA = ((PInteger) a).getValue();
-        } else if (a instanceof PDouble) {
-            newA = ((PDouble) a).getValue();
-            isDouble = true;
-        } else {
-            runtimeError("Invalid Type For A Binary Operation");
+        if (a.isPrimitiveType(PR_NULL) || b.isPrimitiveType(PR_NULL)) {
+            runtimeError("Cannot Use Binary Operations On Null Values");
         }
 
-        if (b instanceof PInteger) {
-            newB = ((PInteger) b).getValue();
-        } else if (b instanceof PDouble) {
-            newB = ((PDouble) b).getValue();
-            isDouble = true;
-        } else {
-            runtimeError("Invalid Type For A Binary Operation");
-        }
-
-        if (opcode == OP_ADD) {
-            if (isDouble) {
-                push(new PDouble(newA + newB));
-            } else {
-                push(new PInteger((int) (newA + newB)));
-            }
-        } else if (opcode == OP_DIVIDE) {
-            if (newB == 0) {
-                runtimeError("Division By Zero Error");
-            }
-            push(new PDouble(newA / newB));
-        } else if (opcode == OP_MODULO) {
-            if (isDouble) {
-                push(new PDouble(newA % newB));
-            } else {
-                push(new PInteger((int) (newA % newB)));
-            }
-        } else if (opcode == OP_MULTIPLY) {
-            if (isDouble) {
-                push(new PDouble(newA * newB));
-            } else {
-                push(new PInteger((int) (newA * newB)));
-            }
-        } else if (opcode == OP_SUBTRACT) {
-            if (isDouble) {
-                push(new PDouble(newA - newB));
-            } else {
-                push(new PInteger((int) (newA - newB)));
-            }
+        if (code == OP_ADD) {
+            push(a.plus(b));
+        } else if (code == OP_SUBTRACT) {
+            push(a.minus(b));
+        } else if (code == OP_MULTIPLY) {
+            push(a.times(b));
+        } else if (code == OP_DIVIDE) {
+            push(a.div(b));
+        } else if (code == OP_MODULO) {
+            push(a.rem(b));
         }
     }
 
-    private void compareOperation(ByteCode opcode) {
+    private void compareOperation(ByteCode code) {
         Primitive b = pop();
         Primitive a = pop();
 
-        double newA = 0;
-        double newB = 0;
-
-        boolean boolA = false;
-        boolean boolB = false;
-
-        boolean isBool = false;
-
-        if (a instanceof PInteger) {
-            newA = ((PInteger) a).getValue();
-        } else if (a instanceof PDouble) {
-            newA = ((PDouble) a).getValue();
-        } else if (a instanceof PBoolean) {
-            boolA = ((PBoolean) a).isValue();
-            isBool = true;
-        } else {
-            runtimeError("Cannot Compare Null Values");
-        }
-
-        if (b instanceof PInteger) {
-            newB = ((PInteger) b).getValue();
-        } else if (b instanceof PDouble) {
-            newB = ((PDouble) b).getValue();
-        } else if (b instanceof PBoolean) {
-            boolB = ((PBoolean) b).isValue();
-            isBool = true;
-        } else {
-            runtimeError("Cannot Compare Null Values");
-        }
-
-        if (opcode == OP_COMPARE_EQUAL) {
-            if (a.getClass() != b.getClass()) {
-                push(new PBoolean(false));
-            } else if (isBool) {
-                push(new PBoolean(boolA == boolB));
-            } else {
-                push(new PBoolean(newA == newB));
-            }
-        } else if (opcode == OP_COMPARE_GREATER) {
-            if (isBool) {
-                runtimeError("Invalid Type For Inequality Comparison");
-            } else {
-                push(new PBoolean(newA > newB));
-            }
-        } else if (opcode == OP_COMPARE_LESSER) {
-            if (isBool) {
-                runtimeError("Invalid Type For Inequality Comparison");
-            } else {
-                push(new PBoolean(newA < newB));
-            }
+        if (code == OP_COMPARE_EQUAL) {
+            push(new PBoolean(a.getPrimitiveValue() == b.getPrimitiveValue()));
+        } else if (a.isPrimitiveType(PR_NULL) || b.isPrimitiveType(PR_NULL)) {
+            runtimeError("Cannot Use Binary Operations On Null Values");
+        } else if (code == OP_COMPARE_GREATER) {
+            push(a.compareGreater(b));
+        } else if (code == OP_COMPARE_LESSER) {
+            push(a.compareLesser(b));
         }
     }
 
-    private void conditionalJump(Instruction instruction, ByteCode opcode) {
-        Primitive value = pop();
-        push(value);
+    private void conditionalJump(Instruction instruction, ByteCode code) {
+        Primitive condition = pop();
+        boolean value = false;
 
-        if (!(value instanceof PBoolean)) {
-            runtimeError("Invalid Control Flow Condition");
+        if (condition.isPrimitiveType(PR_NULL)) {
+            runtimeError("Cannot Use Null Values For Control Flow Conditions");
+        } else {
+            value = ((PBoolean) pop()).getValue();
         }
 
-        PBoolean newValue = (PBoolean) value;
-        if (opcode == OP_JUMP_IF_TRUE) {
-            if (newValue.isValue()) {
-                this.ip = (int) instruction.getOperand() - 1;
-            }
-        } else if (opcode == OP_JUMP_IF_FALSE) {
-            if (!newValue.isValue()) {
-                this.ip = (int) instruction.getOperand() - 1;
-            }
+        push(new PBoolean(value));
+
+        if (code == OP_JUMP_IF_TRUE && value) {
+            this.ip = (int) instruction.getOperand() - 1;
+        } else if (code == OP_JUMP_IF_FALSE && !value) {
+            this.ip = (int) instruction.getOperand() - 1;
         }
     }
 
     private void loadGlobal(Instruction instruction) {
-        String varName = instruction.getOperand().toString();
-
-        if (!this.globals.containsKey(varName)) {
-            runtimeError("No Such Variable Named " + varName);
+        String variableName = instruction.getOperand().toString();
+        if (!this.globals.containsVariable(variableName)) {
+            runtimeError("Global Variable '" + variableName + "' Does Not Exist");
         }
 
-        Primitive value = this.globals.getValue(varName);
-
-        if (value instanceof PInteger) {
-            push(new PInteger(((PInteger) value).getValue()));
-            return;
-        } else if (value instanceof PDouble) {
-            push(new PDouble(((PDouble) value).getValue()));
-            return;
-        } else if (value instanceof PBoolean) {
-            push(new PBoolean(((PBoolean) value).isValue()));
-            return;
-        }
-
-        push(value);
-    }
-
-    private void runtimeError(String message) {
-        Error error = new Error("Runtime Error", message, null);
-        System.out.println(reportError(error));
-        System.exit(1);
-    }
-
-    private String reportError(Error error) {
-        String errorMessage = error.getErrorType();
-        errorMessage += " | " + error.getMessage();
-        if (error.getToken() != null) {
-            errorMessage += ";\nOn Line " + error.getToken().getLine();
-        }
-        return errorMessage;
+        push(this.globals.getValue(variableName));
     }
 
     private void push(Primitive value) {
@@ -325,11 +223,13 @@ public class Interpreter {
         return this.stack[this.sp];
     }
 
-    // Stack Debugger (Prints Out The Stack)
-    private void debugStack(int till) {
-        for (int i = 0; i < till; i++) {
-            System.out.print(this.stack[i] + "  |  ");
-        }
-        System.out.println();
+    private void runtimeError(String message) {
+        Error error = new Error("Runtime Error", message, -1);
+        StringBuilder errorMessage = new StringBuilder();
+
+        errorMessage.append("\n").append(error.getErrorType()).append(" | ").append(error.getMessage());
+        System.out.println(errorMessage);
+
+        System.exit(1);
     }
 }

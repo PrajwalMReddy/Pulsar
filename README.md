@@ -17,4 +17,4 @@ The following things are currently being worked upon:
 - User Defined Functions
 - Native Functions
 
-### Current Version: 0.0.5
+### Current Version: 0.0.6

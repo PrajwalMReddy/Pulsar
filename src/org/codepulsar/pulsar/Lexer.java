@@ -1,48 +1,48 @@
 package org.codepulsar.pulsar;
 
+import org.codepulsar.lang.CompilerError;
+import org.codepulsar.lang.Token;
+import org.codepulsar.lang.TokenType;
+
 import java.util.ArrayList;
-import static org.codepulsar.pulsar.TokenType.*;
+
+import static org.codepulsar.lang.TokenType.*;
 
 public class Lexer {
+    // Input Data
     private final String sourceCode;
+
+    // Data To Help In Lexing
     private int start;
     private int current;
     private int line;
 
-    private final ArrayList<Error> errors;
-    public boolean hasErrors;
+    // Output Data
+    private final ArrayList<Token> tokens;
+    private final CompilerError errors;
 
     public Lexer(String sourceCode) {
         this.sourceCode = sourceCode;
+        this.tokens = new ArrayList<>();
+
         this.start = 0;
         this.current = 0;
         this.line = 1;
 
-        this.errors = new ArrayList<>();
-        this.hasErrors = false;
+        this.errors = new CompilerError();
     }
 
     public ArrayList<Token> tokenize() {
-        ArrayList<Token> tokens = new ArrayList<>();
-
         while (true) {
             Token toAdd = scanToken();
-            tokens.add(toAdd);
+            this.tokens.add(toAdd);
 
             if (toAdd.getTokenType() == TK_EOF) {
                 break;
             }
         }
 
-        return tokens;
-    }
-
-    private boolean isAlpha(char c) {
-        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
-    }
-
-    private boolean isDigit(char c) {
-        return c >= '0' && c <= '9';
+        return this.tokens;
     }
 
     private Token scanToken() {
@@ -60,7 +60,11 @@ public class Lexer {
         } if (isDigit(now)) {
             return number();
         }
+        
+        return character(now);
+    }
 
+    private Token character(char now) {
         switch (now) {
             case '.':
                 return makeToken(TK_DOT);
@@ -85,8 +89,8 @@ public class Lexer {
                 return makeToken(TK_LBRACE);
             case '}':
                 return makeToken(TK_RBRACE);
-            case '"':
-                return string();
+            case '\'':
+                return charLiteral();
 
             case '!':
                 if (peek() == '=') {
@@ -163,15 +167,15 @@ public class Lexer {
                     advance();
                     return makeToken(TK_LOGICAL_AND);
                 } else {
-                    return errorToken("Invalid Character: '" + now + "'. Perhaps You Meant Logical AND: &&");
+                    return errorToken("Invalid Character: '" + now + "'. Perhaps You Meant Logical And: &&");
                 }
         }
 
         return errorToken("Invalid Character: " + now);
     }
 
-    private Token string() {
-        while (peek() != '"' && !isAtEnd()) {
+    private Token charLiteral() {
+        while (peek() != '\'' && !isAtEnd()) {
             if (peek() == '\n') {
                 this.line++;
             }
@@ -180,11 +184,16 @@ public class Lexer {
         }
 
         if (isAtEnd()) {
-            return errorToken("String Literal Not Closed");
+            return errorToken("Char Literal Not Closed");
         }
 
         advance();
-        return makeToken(TK_STRING);
+
+        if (currentLiteral().length() != 3) {
+            return errorToken("The Length Of A Char Can Only Be 1");
+        }
+
+        return makeToken(TK_CHARACTER);
     }
 
     private Token identifier() {
@@ -202,8 +211,13 @@ public class Lexer {
                 case 'w' -> checkKeyword("ait", TK_AWAIT, 2);
                 default -> TK_IDENTIFIER;
             };
-            case 'b' -> checkKeyword("reak", TK_BREAK, 1);
+            case 'b' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'r' -> checkKeyword("eak", TK_BREAK, 2);
+                case 'o' -> checkKeyword("olean", TK_DATA_TYPE, 2);
+                default -> TK_IDENTIFIER;
+            };
             case 'c' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'h' -> checkKeyword("ar", TK_DATA_TYPE, 2);
                 case 'l' -> checkKeyword("ass", TK_CLASS, 2);
                 case 'o' -> switch (this.sourceCode.charAt(this.start + 3)) {
                     case 's' -> checkKeyword("t", TK_CONST, 4);
@@ -212,6 +226,7 @@ public class Lexer {
                 };
                 default -> TK_IDENTIFIER;
             };
+            case 'd' -> checkKeyword("ouble", TK_DATA_TYPE, 1);
             case 'e' -> switch (this.sourceCode.charAt(this.start + 1)) {
                 case 'l' -> checkKeyword("se", TK_ELSE, 2);
                 case 'n' -> checkKeyword("um", TK_ENUM, 2);
@@ -226,6 +241,7 @@ public class Lexer {
             case 'i' -> switch (this.sourceCode.charAt(this.start + 1)) {
                 case 'f' -> checkKeyword("", TK_IF, 2);
                 case 'm' -> checkKeyword("port", TK_IMPORT, 2);
+                case 'n' -> checkKeyword("t", TK_DATA_TYPE, 2);
                 default -> TK_IDENTIFIER;
             };
             case 'l' -> checkKeyword("oop", TK_LOOP, 1);
@@ -270,36 +286,24 @@ public class Lexer {
 
     private Token number() {
         int dotCount = 0;
+
         while (isDigit(peek()) || peek() == '.') {
             if (peek() == '.') {
                 dotCount++;
             }
+
             advance();
         }
 
         if (dotCount == 1 && !currentLiteral().endsWith(".")) {
             return makeToken(TK_DOUBLE);
         } else if (dotCount > 1) {
-            return errorToken("Invalid Literal: " + currentLiteral());
+            return errorToken("Invalid Number Literal: " + currentLiteral());
         } else if (currentLiteral().endsWith(".")) {
-            return errorToken("Invalid Literal: " + currentLiteral());
+            return errorToken("Invalid Number Literal: " + currentLiteral());
         }
 
         return makeToken(TK_INTEGER);
-    }
-
-    private Token makeToken(TokenType tokenType) {
-        return new Token(tokenType, currentLiteral(), this.line);
-    }
-
-    private Token errorToken(String message) {
-        this.hasErrors = true;
-
-        Token errorToken = new Token(TK_ERROR, message, this.line);
-        Error error = new Error("Tokenizing Error", message, errorToken);
-
-        this.errors.add(error);
-        return errorToken;
     }
 
     private void skipWhitespace() {
@@ -307,15 +311,14 @@ public class Lexer {
             char next = peek();
 
             switch (next) {
-                case ' ', '\r', '\t':
-                    advance();
-                    break;
-                case '\n':
+                case ' ', '\r', '\t' -> advance();
+
+                case '\n' -> {
                     this.line++;
                     advance();
-                    break;
+                }
 
-                case '/':
+                case '/' -> {
                     if (peek(1) == '/') {
                         while (peek() != '\n' && !isAtEnd()) {
                             advance();
@@ -323,24 +326,35 @@ public class Lexer {
                     } else {
                         return;
                     }
-                    break;
+                }
 
-                default:
+                default -> {
                     return;
+                }
             }
         }
     }
 
-    public ArrayList<Error> getErrors() {
-        return this.errors;
+    private boolean isAlpha(char c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+    }
+
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    private Token makeToken(TokenType tokenType) {
+        return new Token(tokenType, currentLiteral(), this.line);
+    }
+
+    private Token errorToken(String message) {
+        Token errorToken = new Token(TK_ERROR, message, this.line);
+        this.errors.addError("Tokenizing Error", message, errorToken.getLine());
+        return errorToken;
     }
 
     private String currentLiteral() {
         return this.sourceCode.substring(this.start, this.current);
-    }
-
-    private boolean isAtEnd() {
-        return this.current >= this.sourceCode.length() - 1;
     }
 
     private char peek() {
@@ -360,5 +374,13 @@ public class Lexer {
     private char advance() {
         this.current++;
         return this.sourceCode.charAt(this.current - 1);
+    }
+
+    private boolean isAtEnd() {
+        return this.current >= this.sourceCode.length();
+    }
+
+    public CompilerError getErrors() {
+        return this.errors;
     }
 }

@@ -1,5 +1,8 @@
 package org.codepulsar.pulsar;
 
+import org.codepulsar.lang.CommandsKt;
+import org.codepulsar.lang.SetUp;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -7,18 +10,17 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 
 public class Pulsar {
-    // TODO Consider Encapsulating All Set Up Details In Their Own Class
-    public static String fileIn; // The Name Of The Input File
+    public static SetUp conditions = new SetUp("", false, "0.0.6");
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            repl(); // TODO Implement REPL
+            repl();
         } else if (args.length == 1) {
             CommandsKt.parseCommands(args[0].trim());
         } else if (args.length == 2) {
             CommandsKt.parseCommands(args[0].trim(), args[1].trim());
         } else {
-            CommandsKt.error("Invalid Parameters Given; Only 1 or 2 Parameters Allowed");
+            CommandsKt.error("Invalid Commands Given: Only 1 Or 2 Parameters Are Allowed But " + args.length + " Parameters Were Given");
         }
     }
 
@@ -42,7 +44,7 @@ public class Pulsar {
             stringFile = new String(fileBytes, Charset.defaultCharset());
             return stringFile;
         } catch (NoSuchFileException fileException) {
-            CommandsKt.error("The File Path That Was Provided Was Not Found");
+            CommandsKt.error("The File Path '" + file + "' Was Not Found");
             return null;
         }
     }

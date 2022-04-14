@@ -1,49 +1,56 @@
 package org.codepulsar.pulsar;
 
+import org.codepulsar.lang.CompilerError;
+import org.codepulsar.lang.Instruction;
+import org.codepulsar.lang.LocalVariable;
+import org.codepulsar.primitives.Primitive;
+import org.codepulsar.util.Disassembler;
+import org.codepulsar.util.ErrorReporter;
+
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class Compiler {
+    // Input Data
     private final String sourceCode;
     private ArrayList<Instruction> instructions;
+
+    // Data To Help In Compiling To Assembly
     private LocalVariable locals;
+    private ArrayList<Primitive> values;
 
-    public Compiler(String sourceCode) {
+    // Output Data
+    private final PrintWriter pw;
+    private CompilerError errors;
+    private CompilerError staticErrors;
+
+    public Compiler(String sourceCode) throws FileNotFoundException {
         this.sourceCode = sourceCode;
-        this.instructions = new ArrayList<>();
+
+        this.pw = new PrintWriter(Pulsar.conditions.getFileIn() + ".asm");
     }
 
-    public void init() throws FileNotFoundException {
-        Parser parser = new Parser(this.sourceCode);
-        this.instructions = parser.parse();
-        this.locals = parser.getLocals();
+    public void init() {
+        ByteCodeCompiler bcc = new ByteCodeCompiler(this.sourceCode);
+        this.instructions = bcc.compileByteCode();
+        this.locals = bcc.getLocals();
 
-        if (CommandsKt.getDebug()) {
-            Disassembler.disassemble(this.instructions);
-            System.out.println();
-        }
+        this.errors = bcc.getErrors();
+        this.staticErrors = bcc.getStaticErrors();
 
-        if (parser.hasErrors) {
-            System.out.println("-- Errors --");
-            for (Error error: parser.errors) {
-                System.out.println(reportError(error) + "\n");
-            }
-        } else {
-            compile();
-        }
+        this.values = bcc.getValues();
+
+        ErrorReporter.report(this.errors, this.sourceCode);
+        ErrorReporter.report(this.staticErrors, this.sourceCode);
+
+        Disassembler.disassemble(this.instructions, bcc);
+
+        compile();
+        this.pw.close();
     }
 
-    private void compile() throws FileNotFoundException {
-        PrintWriter pw = new PrintWriter(Pulsar.fileIn + ".asm");
-        pw.println("");
-        pw.close();
-    }
-
-    private String reportError(Error error) {
-        String errorMessage = error.getErrorType();
-        errorMessage += " | " + error.getMessage();
-        errorMessage += ";\nOn Line " + error.getToken().getLine();
-        return errorMessage;
+    private void compile() {
+        this.pw.println("");
     }
 }

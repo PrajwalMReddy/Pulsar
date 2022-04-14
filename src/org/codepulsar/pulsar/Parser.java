@@ -1,493 +1,451 @@
 package org.codepulsar.pulsar;
 
-import org.codepulsar.primitives.*;
+import org.codepulsar.ast.Expression;
+import org.codepulsar.ast.Statement;
+import org.codepulsar.ast.expression.*;
+import org.codepulsar.ast.statement.*;
+import org.codepulsar.lang.*;
+import org.codepulsar.primitives.PrimitiveType;
+import org.codepulsar.util.TokenDisassembler;
 
 import java.util.ArrayList;
 
-import static org.codepulsar.pulsar.TokenType.*;
-import static org.codepulsar.pulsar.ByteCode.*;
+import static org.codepulsar.lang.TokenType.*;
+import static org.codepulsar.primitives.PrimitiveType.*;
 
 public class Parser {
-    private final String sourceCode; // Original Source Code From User
-    private ArrayList<Token> tokens; // Fully Tokenized Output From Lexer
+    // Input Data
+    private final String sourceCode;
+    private ArrayList<Token> tokens;
 
-    private final ArrayList<Instruction> instructions; // Instructions Produced From Parser
-    public static ArrayList<Primitive> values; // Constant Values To Be Stored
+    // Data To Help In Generating An AST
     private int current; // Next Token To Be Used
+    private int depth;
 
-    private int depth; // The Total Depth Of The Current Scope
+    private final GlobalVariable globals;
+    private final LocalVariable locals;
 
-    public ArrayList<Error> errors; // Full List Of Errors To Be Reported
-    boolean hasErrors; // Flag To Indicate If The Code Has Any Errors
-
-    private final LocalVariable locals; // Used To Track Locals
+    // Output Data
+    private Statement program;
+    private CompilerError errors;
 
     public Parser(String sourceCode) {
         this.sourceCode = sourceCode;
-        this.tokens = new ArrayList<>();
 
-        this.instructions = new ArrayList<>();
-        values = new ArrayList<>();
         this.current = 0;
+        this.depth = 1;
 
-        this.depth = 1; // TODO Change Back To 0 When Functions Are Implemented
-
-        this.hasErrors = false;
-
+        this.globals = new GlobalVariable();
         this.locals = new LocalVariable();
     }
 
-    public ArrayList<Instruction> parse() {
-        Lexer lexer = new Lexer(this.sourceCode + "\n");
-
+    public Statement parse() {
+        Lexer lexer = new Lexer(this.sourceCode);
         this.tokens = lexer.tokenize();
         this.errors = lexer.getErrors();
 
-        if (CommandsKt.getDebug()) {
-            Disassembler.tokens(this.tokens);
-        } if (lexer.hasErrors) {
-            this.hasErrors = true;
-            return this.instructions;
-        }
+        if (this.errors.hasError()) return this.program;
+        TokenDisassembler.display(this.tokens);
 
-        start();
-
-        return this.instructions;
-    }
-
-    private void start() {
+        // TODO Temporary Code To Allow More Than One Statement At A Time
+        int line = peekLine();
+        ArrayList<Statement> statements = new ArrayList<>();
         while (!match(TK_EOF)) {
-            statement(); // TODO When Functions Are Implemented, Change This Back To 'declaration();'
+            statements.add(statement());
         }
+
+        this.program = new Block(statements, line);
+        return this.program;
     }
 
-    private void declaration() {
-        if (matchAdvance(TK_VAR, TK_CONST)) {
-            globalVariableDeclaration();
-        } else if (matchAdvance(TK_FUN)) {
-            functionDeclaration();
-        } else {
-            setErrors("Invalid Top Level Code", "Only Function And Global Variable Declarations Are " +
-                    "Allowed At The Top Level", peek());
-            synchronizeTopLevel();
+    private Statement globalVariableDeclaration(TokenType accessType) {
+        Token name = advance();
+
+        if (name.getTokenType() != TK_IDENTIFIER) {
+            error("Invalid Identifier Name", peekLine());
+            synchronize();
+            return new NoneStatement();
         }
-    }
 
-    private void globalVariableDeclaration() {
-        String name = peekLiteral();
-        advance();
+        Expression expression;
 
+        look(TK_COLON, "A Colon Was Expected After The Variable Name");
+        Token type = advance();
+
+        if (checkType(type) == PR_ERROR) {
+            error("Invalid Type For Variable", peekLine());
+            synchronize();
+            return new NoneStatement();
+        }
+
+        boolean isInitialized;
         if (matchAdvance(TK_EQUAL)) {
-            expression();
+            isInitialized = true;
+            expression = expression();
         } else {
-            makeOpCode(OP_NULL, peekLine());
+            isInitialized = false;
+            expression = new Literal(null, PR_NULL, peekLine());
         }
 
-        makeOpCode(OP_NEW_GLOBAL, name, peekLine());
-        look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration", "Missing Character");
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
+        return new Variable(name.getLiteral(), expression, checkType(type), true, name.getLine());
     }
 
-    private void functionDeclaration() {
-        // TODO Finish Function Declarations
-    }
-
-    private void block() {
-        startScope();
-        look(TK_LBRACE, "An Opening Brace Was Expected Before The Block", "Missing Character");
-        while (!match(TK_RBRACE) && !match(TK_EOF)) {
-            statement();
+    private Statement statement() {
+        while (!match(TK_EOF)) {
+            if (matchAdvance(TK_IF)) {
+                return ifStatement();
+            } else if (matchAdvance(TK_WHILE)) {
+                return whileStatement();
+            } else if (matchAdvance(TK_VAR)) {
+                return localVariableDeclaration(TK_VAR);
+            } else if (matchAdvance(TK_CONST)) {
+                return localVariableDeclaration(TK_CONST);
+            } else if (matchAdvance(TK_PRINT)) {
+                return printStatement();
+            } else {
+                return expressionStatement();
+            }
         }
-        look(TK_RBRACE, "A Closing Brace Was Expected Before The Block", "Missing Character");
-        endScope();
+
+        return null;
+    }
+
+    private Statement localVariableDeclaration(TokenType accessType) {
+        Token localToken = advance();
+
+        if (localToken.getTokenType() != TK_IDENTIFIER) {
+            error("Invalid Identifier Name", peekLine());
+            synchronize();
+            return new NoneStatement();
+        }
+
+        Expression expression;
+
+        look(TK_COLON, "A Colon Was Expected After The Variable Name");
+        Token type = advance();
+
+        if (checkType(type) == PR_ERROR) {
+            error("Invalid Type For Variable", peekLine());
+            synchronize();
+            return new NoneStatement();
+        }
+
+        boolean isInitialized;
+        if (matchAdvance(TK_EQUAL)) {
+            isInitialized = true;
+            expression = expression();
+        } else {
+            isInitialized = false;
+            expression = new Literal(null, PR_NULL, peekLine());
+        }
+
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
+
+        for (int i = this.locals.getLocalCount() - 1; i >= 0; i--) {
+            LocalVariable.Local local = this.locals.getLocal(i);
+
+            if (local.getDepth() < this.depth) {
+                break;
+            }
+
+            if (local.getName().equals(localToken.getLiteral())) {
+                error("Local Variable '" + localToken.getLiteral() + "' Already Exists", localToken.getLine());
+            }
+        }
+
+        addLocal(localToken, accessType, checkType(type), isInitialized);
+        return new Variable(localToken.getLiteral(), expression, checkType(type),false, localToken.getLine());
+    }
+
+    private void addLocal(Token name, TokenType accessType, PrimitiveType variableType, boolean isInitialized) {
+        if (accessType == TK_VAR) {
+            this.locals.newLocal(name, name.getLiteral(), variableType, isInitialized, false);
+        } else if (accessType == TK_CONST) {
+            this.locals.newLocal(name, name.getLiteral(), variableType, isInitialized, true);
+        }
+    }
+
+    private PrimitiveType checkType(Token type) {
+        return switch (type.getLiteral()) {
+            case "boolean" -> PR_BOOLEAN;
+            case "char" -> PR_CHARACTER;
+            case "double" -> PR_DOUBLE;
+            case "int" -> PR_INTEGER;
+            default -> PR_ERROR;
+        };
     }
 
     private void startScope() {
         this.depth++;
-        this.locals.scopeDepth++;
+        this.locals.incrementDepth();
     }
 
-    private void endScope() {
+    private Block block() {
+        ArrayList<Statement> statements = new ArrayList<>();
+        startScope();
+        look(TK_LBRACE, "An Opening Brace Was Expected Before The Block");
+
+        while (!match(TK_RBRACE) && !match(TK_EOF)) {
+            statements.add(statement());
+        }
+
+        look(TK_RBRACE, "A Closing Brace Was Expected After The Block");
+        statements.add(endScope());
+        return new Block(statements, peekLine());
+    }
+
+    private Statement endScope() {
         this.depth--;
-        this.locals.scopeDepth--;
+        this.locals.decrementDepth();
+        int localsToDelete = 0;
 
-        while (this.locals.localCount > 0 &&
-                (this.locals.getLocal(this.locals.localCount - 1).depth > this.depth)) {
-            makeOpCode(OP_POP, peekLine());
-            this.locals.localCount--;
+
+        while (this.locals.getLocalCount() > 0 &&
+                (this.locals.getLocal(this.locals.getLocalCount() - 1).getDepth() > this.depth)) {
+            localsToDelete++;
+            this.locals.decrementLocalCount();
         }
+
+        return new EndScope(localsToDelete, this.peekLine());
     }
 
-    private void statement() {
-        if (matchAdvance(TK_IF)) {
-            ifStatement();
-        } else if (matchAdvance(TK_WHILE)) {
-            whileStatement();
-        } else if (matchAdvance(TK_PRINT)) {
-            printStatement();
-        } else if (matchAdvance(TK_VAR)) {
-            localVariableDeclaration(TK_VAR);
-        } else if (matchAdvance(TK_CONST)) {
-            localVariableDeclaration(TK_CONST);
-        } else {
-            expressionStatement();
-        }
+    private Statement whileStatement() {
+        int line = peekLine();
+        Expression expression = expression();
+        Block statements = block();
+
+        return new While(expression, statements, line);
     }
 
-    private void ifStatement() {
-        expression();
-        int ifOffset = makeJump(OP_JUMP_IF_FALSE);
-        makeOpCode(OP_POP, peekLine());
-        block();
-
-        int elseOffset = makeJump(OP_JUMP);
-        fixJump(ifOffset, OP_JUMP_IF_FALSE);
-        makeOpCode(OP_POP, peekLine());
+    private Statement ifStatement() {
+        int line = peekLine();
+        Expression expression = expression();
+        Block thenBranch = block();
+        Statement elseBranch = null;
 
         if (matchAdvance(TK_ELSE)) {
             if (matchAdvance(TK_IF)) {
-                ifStatement();
+                elseBranch = ifStatement();
             } else {
-                block();
+                elseBranch = block();
             }
         }
 
-        fixJump(elseOffset, OP_JUMP);
+        return new If(expression, thenBranch, elseBranch, line);
     }
 
-    private void whileStatement() {
-        int start = this.instructions.size();
-        expression();
-
-        int offset = makeJump(OP_JUMP_IF_FALSE);
-        makeOpCode(OP_POP, peekLine());
-
-        block();
-        makeOpCode(OP_JUMP, start, peekLine());
-
-        fixJump(offset, OP_JUMP_IF_FALSE);
-        makeOpCode(OP_POP, peekLine());
+    private Statement printStatement() {
+        Print statement = new Print(expression(), peekLine());
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Print Statement");
+        return statement;
     }
 
-    private void printStatement() {
-        expression();
-        makeOpCode(OP_PRINT, peekLine());
-        look(TK_SEMICOLON, "A Semicolon Was Expected After The Print Statement", "Missing Character");
+    private ExpressionStmt expressionStatement() {
+        ExpressionStmt expression = new ExpressionStmt(expression(), peekLine());
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression");
+        return expression;
     }
 
-    private void localVariableDeclaration(TokenType varType) {
-        Token localToken = peek();
+    private Expression expression() {
+        return assignment();
+    }
 
-        for (int i = this.locals.localCount - 1; i >= 0; i--) {
-            LocalVariable.Local local = this.locals.getLocal(i);
-
-            if (local.depth < this.depth) {
-                break;
+    private Expression assignment() {
+        if (peekType() == TK_IDENTIFIER) {
+            Token variable = peek();
+            if (this.locals.getLocal(variable.getLiteral()) == null) {
+                error("Local Variable '" + variable.getLiteral() + "' Is Used But Never Defined", peekLine());
+                synchronize();
+                return new NoneExpression();
             }
 
-            if (local.name.getLiteral().equals(localToken.getLiteral())) {
-                setErrors("Variable Error",
-                        "A Local Variable With This Name Already Exists - " + localToken.getLiteral(), peek());
-            }
-        }
+            switch (peekNext().getTokenType()) {
+                case TK_EQUAL -> {
+                    if (this.locals.getLocal(variable.getLiteral()).isConstant()) {
+                        error("Local Variable '" + this.locals.getLocal(variable.getLiteral()).getName()
+                                + "' Is A Constant And Cannot Be Reassigned", peekLine());
 
-        addLocal(localToken, varType);
+                        synchronize();
+                        return new NoneExpression();
+                    }
 
-        advance();
+                    Token next = peek();
 
-        if (matchAdvance(TK_EQUAL)) {
-            expression();
-        } else {
-            makeOpCode(OP_NULL, peekLine());
-        }
+                    advance();
+                    advance();
 
-        makeOpCode(OP_NEW_LOCAL, localToken.getLiteral(), peekLine());
-        look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration", "Missing Character");
-    }
-
-    private void addLocal(Token name, TokenType type) {
-        if (type == TK_VAR) {
-            this.locals.newLocal(name, false);
-        } else if (type == TK_CONST) {
-            this.locals.newLocal(name, true);
-        }
-
-        this.locals.localCount++;
-    }
-
-    private void expressionStatement() {
-        expression();
-        makeOpCode(OP_POP, peekLine());
-        look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression", "Missing Character");
-    }
-
-    private void expression() {
-        assignment();
-    }
-
-    private void assignment() {
-        if (peekType() == TK_IDENTIFIER && peekNext().getLiteral().contains("=")
-                && peekNext().getTokenType() != TK_EQUAL_EQUAL
-                && peekNext().getTokenType() != TK_NOT_EQUAL
-                && peekNext().getTokenType() != TK_LT_EQUAL
-                && peekNext().getTokenType() != TK_GT_EQUAL) {
-            Token next = peekNext();
-            Token localToken = peek();
-
-            String name = peekLiteral();
-            advance();
-            advance();
-            expression();
-
-            if (next.getLiteral().indexOf("=") > 0) {
-                if (inGlobalScope()) {
-                    makeOpCode(OP_LOAD_GLOBAL, name, peekLine());
-                } else {
-                    makeOpCode(OP_GET_LOCAL, resolveLocal(localToken), peekLine());
+                    Expression expression = expression();
+                    return new Assignment(next.getLiteral(), inGlobalScope(), resolveLocal(variable), expression, next.getLine());
                 }
-                if (next.getTokenType() == TK_PLUS_EQUAL) {
-                    makeOpCode(OP_ADD, next.getLine());
-                } else if (next.getTokenType() == TK_MINUS_EQUAL) {
-                    makeOpCode(OP_SUBTRACT, next.getLine());
-                } else if (next.getTokenType() == TK_MUL_EQUAL) {
-                    makeOpCode(OP_MULTIPLY, next.getLine());
-                } else if (next.getTokenType() == TK_DIV_EQUAL) {
-                    makeOpCode(OP_DIVIDE, next.getLine());
-                } else if (next.getTokenType() == TK_MOD_EQUAL) {
-                    makeOpCode(OP_MODULO, next.getLine());
+
+                case TK_PLUS_EQUAL, TK_MINUS_EQUAL, TK_MUL_EQUAL, TK_DIV_EQUAL, TK_MOD_EQUAL -> {
+                    if (this.locals.getLocal(variable.getLiteral()).isConstant()) {
+                        error("Local Variable '" + this.locals.getLocal(variable.getLiteral()).getName()
+                                + "' Is A Constant And Cannot Be Reassigned", peekLine());
+
+                        synchronize();
+                        return new NoneExpression();
+                    }
+
+                    Token next = peek();
+                    String identifier = next.getLiteral();
+                    int line = next.getLine();
+
+                    advance();
+                    Token operator = peek();
+                    String operatorType = operator.getLiteral();
+                    advance();
+
+                    Expression expression = expression();
+
+                    // Expand An Operator Assignment Into A Normal Assignment
+                    return new Assignment(identifier, inGlobalScope(), resolveLocal(variable),
+                            new Binary(
+                                        new VariableAccess(identifier, inGlobalScope(), resolveLocal(variable), line
+                                    ), operatorType.substring(0, operatorType.length() - 1), expression, line
+                            ), line
+                    );
+                }
+
+                default -> {
+                    return logicalOr();
                 }
             }
-
-            if (inGlobalScope()) {
-                makeOpCode(OP_STORE_GLOBAL, name, peekLine());
-            } else {
-                if (isConstantVariable(localToken)) {
-                    setErrors("Variable Error",
-                            "Reassigning To Constants Is Not Allowed", peek());
-                }
-                makeOpCode(OP_SET_LOCAL, resolveLocal(localToken), peekLine());
-            }
-        } else {
-            logicalOr();
         }
+
+        else {
+            return logicalOr();
+        }
+    }
+
+    private Expression logicalOr() {
+        Expression expression = logicalAnd();
+
+        while (matchAdvance(TK_LOGICAL_OR)) {
+            Token operator = previous();
+            Expression right = logicalAnd();
+            expression = new Logical(expression, operator.getLiteral(), right, operator.getLine());
+        }
+
+        return expression;
+    }
+
+    private Expression logicalAnd() {
+        Expression expression = equality();
+
+        while (matchAdvance(TK_LOGICAL_AND)) {
+            Token operator = previous();
+            Expression right = equality();
+            expression = new Logical(expression, operator.getLiteral(), right, operator.getLine());
+        }
+
+        return expression;
+    }
+
+    private Expression equality() {
+        Expression expression = comparison();
+
+        while (matchAdvance(TK_EQUAL_EQUAL, TK_NOT_EQUAL)) {
+            Token operator = previous();
+            Expression right = comparison();
+            expression = new Binary(expression, operator.getLiteral(), right, operator.getLine());
+        }
+
+        return expression;
+    }
+
+    private Expression comparison() {
+        Expression expression = term();
+
+        while (matchAdvance(TK_GT, TK_GT_EQUAL, TK_LT, TK_LT_EQUAL)) {
+            Token operator = previous();
+            Expression right = term();
+            expression = new Binary(expression, operator.getLiteral(), right, operator.getLine());
+        }
+
+        return expression;
+    }
+
+    private Expression term() {
+        Expression expression = factor();
+
+        while (matchAdvance(TK_PLUS, TK_MINUS)) {
+            Token operator = previous();
+            Expression right = factor();
+            expression = new Binary(expression, operator.getLiteral(), right, operator.getLine());
+        }
+
+        return expression;
+    }
+
+    private Expression factor() {
+        Expression expression = unary();
+
+        while (matchAdvance(TK_MULTIPLICATION, TK_DIVISION, TK_MODULUS)) {
+            Token operator = previous();
+            Expression right = unary();
+            expression = new Binary(expression, operator.getLiteral(), right, operator.getLine());
+        }
+
+        return expression;
+    }
+
+    private Expression unary() {
+        if (matchAdvance(TK_NOT, TK_MINUS)) {
+            Token operator = previous();
+            Expression right = unary();
+            return new Unary(operator.getLiteral(), right, operator.getLine());
+        } else if (matchAdvance(TK_PLUS)) {
+            return unary();
+        }
+
+        return primary();
+    }
+
+    private Expression primary() {
+        if (matchAdvance(TK_TRUE)) {
+            return new Literal("true", PR_BOOLEAN, peekLine());
+        } else if (matchAdvance(TK_FALSE)) {
+            return new Literal("false", PR_BOOLEAN, peekLine());
+        } else if (matchAdvance(TK_NULL)) {
+            return new Literal("null", PR_NULL, peekLine());
+        }
+
+        if (matchAdvance(TK_INTEGER)) {
+            return new Literal(previous().getLiteral(), PR_INTEGER, peekLine());
+        } else if (matchAdvance(TK_DOUBLE)) {
+            return new Literal(previous().getLiteral(), PR_DOUBLE, peekLine());
+        } else if (matchAdvance(TK_CHARACTER)) {
+            return new Literal(previous().getLiteral(), PR_CHARACTER, peekLine());
+        }
+
+        if (match(TK_IDENTIFIER)) {
+            Token name = advance();
+            return new VariableAccess(previous().getLiteral(), inGlobalScope(), resolveLocal(name), peekLine());
+        }
+
+        if (matchAdvance(TK_LPAR)) {
+            Expression expression = expression();
+            look(TK_RPAR, "A Closing Parenthesis Was Expected");
+            return new Grouping(expression);
+        }
+
+        error("An Expression Was Expected But Nothing Was Given", peekLine());
+        return new NoneExpression();
     }
 
     private int resolveLocal(Token name) {
-        for (int i = this.locals.localCount - 1; i >= 0; i--) {
+        for (int i = this.locals.getLocalCount() - 1; i >= 0; i--) {
             LocalVariable.Local local = this.locals.getLocal(i);
-            if (local.name.getLiteral().equals(name.getLiteral())) {
+
+            if (local.getName().equals(name.getLiteral())) {
                 return i;
             }
         }
 
-        setErrors("Variable Error",
-                "Local Variable Used But Never Defined - " + name.getLiteral(), peek());
+        error("Local Variable '" + name.getLiteral() + "' Is Used But Never Defined", peekLine());
         return -1;
-    }
-
-    private boolean isConstantVariable(Token name) {
-        for (int i = this.locals.localCount - 1; i >= 0; i--) {
-            LocalVariable.Local local = this.locals.getLocal(i);
-            if (local.name.getLiteral().equals(name.getLiteral())) {
-                if (local.isConstant) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private void logicalOr() {
-        logicalAnd();
-        int offset;
-
-        while (match(TK_LOGICAL_OR)) {
-            if (peekType() == TK_LOGICAL_OR) {
-                int line = peekLine();
-                advance();
-                offset = makeJump(OP_JUMP_IF_TRUE);
-                makeOpCode(OP_POP, line);
-                logicalAnd();
-                fixJump(offset, OP_JUMP_IF_TRUE);
-            }
-        }
-    }
-
-    private void logicalAnd() {
-        equality();
-        int offset;
-
-        while (match(TK_LOGICAL_AND)) {
-            if (peekType() == TK_LOGICAL_AND) {
-                int line = peekLine();
-                advance();
-                offset = makeJump(OP_JUMP_IF_FALSE);
-                makeOpCode(OP_POP, line);
-                equality();
-                fixJump(offset, OP_JUMP_IF_FALSE);
-            }
-        }
-    }
-
-    private void equality() {
-        comparison();
-
-        while (match(TK_EQUAL_EQUAL, TK_NOT_EQUAL)) {
-            if (peekType() == TK_EQUAL_EQUAL) {
-                advance();
-                comparison();
-                makeOpCode(OP_COMPARE_EQUAL, peekLine());
-            } else if (peekType() == TK_NOT_EQUAL) {
-                advance();
-                comparison();
-                makeOpCode(OP_COMPARE_EQUAL, peekLine());
-                makeOpCode(OP_NOT, peekLine());
-            }
-        }
-    }
-
-    private void comparison() {
-        term();
-
-        while (match(TK_GT, TK_GT_EQUAL, TK_LT, TK_LT_EQUAL)) {
-            if (peekType() == TK_GT) {
-                advance();
-                term();
-                makeOpCode(OP_COMPARE_GREATER, peekLine());
-            } else if (peekType() == TK_LT) {
-                advance();
-                term();
-                makeOpCode(OP_COMPARE_LESSER, peekLine());
-            } else if (peekType() == TK_GT_EQUAL) {
-                advance();
-                term();
-                makeOpCode(OP_COMPARE_LESSER, peekLine());
-                makeOpCode(OP_NOT, peekLine());
-            } else if (peekType() == TK_LT_EQUAL) {
-                advance();
-                term();
-                makeOpCode(OP_COMPARE_GREATER, peekLine());
-                makeOpCode(OP_NOT, peekLine());
-            }
-        }
-    }
-
-    private void term() {
-        factor();
-
-        while (match(TK_PLUS, TK_MINUS)) {
-            if (peekType() == TK_PLUS) {
-                advance();
-                factor();
-                makeOpCode(OP_ADD, peekLine());
-            } else if (peekType() == TK_MINUS) {
-                advance();
-                factor();
-                makeOpCode(OP_SUBTRACT, peekLine());
-            }
-        }
-    }
-
-    private void factor() {
-        unary();
-
-        while (match(TK_MULTIPLICATION, TK_DIVISION, TK_MODULUS)) {
-            if (peekType() == TK_MULTIPLICATION) {
-                advance();
-                unary();
-                makeOpCode(OP_MULTIPLY, peekLine());
-            } else if (peekType() == TK_DIVISION) {
-                advance();
-                unary();
-                makeOpCode(OP_DIVIDE, peekLine());
-            } else if (peekType() == TK_MODULUS) {
-                advance();
-                unary();
-                makeOpCode(OP_MODULO, peekLine());
-            }
-        }
-    }
-
-    private void unary() {
-        if (matchAdvance(TK_NOT)) {
-            unary();
-            makeOpCode(OP_NOT, peekLine());
-        } else if (matchAdvance(TK_MINUS)) {
-            unary();
-            makeOpCode(OP_NEGATE, peekLine());
-        } else if (matchAdvance(TK_PLUS)) {
-            unary();
-        } else {
-            primary();
-        }
-    }
-
-    private void primary() {
-        if (match(TK_INTEGER, TK_DOUBLE, TK_TRUE, TK_FALSE, TK_NULL)) {
-            makeOpCode(OP_CONSTANT, peekLine());
-            advance();
-        } else if (match(TK_IDENTIFIER)) {
-            if (inGlobalScope()) {
-                makeOpCode(OP_LOAD_GLOBAL, peekLiteral(), peekLine());
-            } else {
-                makeOpCode(OP_GET_LOCAL, resolveLocal(peek()), peekLine());
-            }
-            advance();
-        } else if (matchAdvance(TK_LPAR)) {
-            expression();
-            look(TK_RPAR, "A Closing Parenthesis Was Expected Before The Block",
-                    "Missing Character");
-        } else {
-            setErrors("Missing Expression",
-                    "An Expression Was Expected But Nothing Was Given", peek());
-        }
-    }
-
-    private Instruction makeOpCode(ByteCode opcode, int line) {
-        if (opcode == OP_CONSTANT) {
-            Primitive primitiveLiteral = null;
-            switch (peekType()) {
-                case TK_INTEGER -> primitiveLiteral = new PInteger(Integer.parseInt(peekLiteral()));
-                case TK_DOUBLE -> primitiveLiteral = new PDouble(Double.parseDouble(peekLiteral()));
-                case TK_TRUE -> primitiveLiteral = new PBoolean(true);
-                case TK_FALSE -> primitiveLiteral = new PBoolean(false);
-                case TK_NULL -> primitiveLiteral = new PNull();
-            }
-            values.add(primitiveLiteral);
-            Instruction instruction = new Instruction(OP_CONSTANT, values.size() - 1, line);
-            this.instructions.add(instruction);
-            return instruction;
-        } else {
-            Instruction instruction = new Instruction(opcode, null, line);
-            this.instructions.add(instruction);
-            return instruction;
-        }
-    }
-
-    private Instruction makeOpCode(ByteCode opcode, Object operand, int line) {
-        Instruction instruction = new Instruction(opcode, operand, line);
-        this.instructions.add(instruction);
-        return instruction;
-    }
-
-    private Instruction makeOpCode(Instruction instruction) {
-        this.instructions.add(instruction);
-        return instruction;
-    }
-
-    private int makeJump(ByteCode opcode) {
-        int size = this.instructions.size();
-
-        makeOpCode(opcode, peekLine());
-
-        return size;
-    }
-
-    private void fixJump(int offset, ByteCode opcode) {
-        Instruction oldJump = this.instructions.get(offset);
-        int line = oldJump.getLine();
-        Instruction jumpOpCode = new Instruction(opcode, this.instructions.size(), line);
-        this.instructions.set(offset, jumpOpCode);
     }
 
     private boolean match(TokenType... types) {
@@ -514,12 +472,15 @@ public class Parser {
         return this.tokens.get(this.current - 1);
     }
 
-    private void look(TokenType token, String message, String errorType) {
-        if (peek().getTokenType() != token) {
-            setErrors(errorType, message, peek());
+    // Returns true if there's been a look ahead error.
+    private boolean look(TokenType token, String message) {
+        if (peekType() != token) {
+            error(message, peekLine());
             synchronize();
+            return true;
         } else {
             advance();
+            return false;
         }
     }
 
@@ -531,35 +492,22 @@ public class Parser {
 
             switch (peekType()) {
                 case TK_VAR, TK_CONST,
-                        TK_IF, TK_WHILE, TK_PRINT -> { return; }
+                        TK_IF, TK_WHILE, TK_PRINT,
+                        TK_FUN -> {
+                    return;
+                }
             }
 
             advance();
         }
-    }
-
-    private void synchronizeTopLevel() {
-        while (peekType() != TK_EOF) {
-            if (peekType() == TK_FUN) {
-                return;
-            }
-
-            advance();
-        }
-    }
-
-    private void setErrors(String errorType, String message, Token token) {
-        this.hasErrors = true;
-        Error error = new Error(errorType, message, token);
-        this.errors.add(error);
-    }
-
-    public LocalVariable getLocals() {
-        return this.locals;
     }
 
     private boolean inGlobalScope() {
         return this.depth == 0;
+    }
+
+    private Token previous() {
+        return this.tokens.get(this.current - 1);
     }
 
     private Token peek() {
@@ -580,5 +528,21 @@ public class Parser {
 
     private String peekLiteral() {
         return this.tokens.get(this.current).getLiteral();
+    }
+
+    private void error(String message, int line) {
+        this.errors.addError("Parsing Error", message, line);
+    }
+
+    public GlobalVariable getGlobals() {
+        return this.globals;
+    }
+
+    public LocalVariable getLocals() {
+        return this.locals;
+    }
+
+    public CompilerError getErrors() {
+        return this.errors;
     }
 }

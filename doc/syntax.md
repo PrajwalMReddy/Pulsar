@@ -1,5 +1,5 @@
 # The Pulsar Syntax Guide
-This syntax guide shows the different syntactic features of the latest version of Pulsar (Version 0.0.5). This is a relatively simple guide that only highlights the syntax of the language. Specialized docs will hopefully be added soon.
+This syntax guide shows the different syntactic features of the latest version of Pulsar (Version 0.0.6). This is a relatively simple guide that only highlights the syntax of the language. Specialized docs will hopefully be added soon.
 
 ## Comments
 ```pulsar
