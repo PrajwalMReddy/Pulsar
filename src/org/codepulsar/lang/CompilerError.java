@@ -27,17 +27,7 @@ public class CompilerError {
         return this.errors;
     }
 
-    public static class Error {
-        private final String errorType;
-        private final String message;
-        private final int line;
-
-        public Error(String errorType, String message, int line) {
-            this.errorType = errorType;
-            this.message = message;
-            this.line = line;
-        }
-
+    public record Error(String errorType, String message, int line) {
         public String getErrorType() {
             return this.errorType;
         }

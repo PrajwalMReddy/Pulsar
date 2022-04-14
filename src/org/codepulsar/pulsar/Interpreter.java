@@ -188,7 +188,7 @@ public class Interpreter {
         if (condition.isPrimitiveType(PR_NULL)) {
             runtimeError("Cannot Use Null Values For Control Flow Conditions");
         } else {
-            value = ((PBoolean) pop()).getValue();
+            value = (boolean) condition.getPrimitiveValue();
         }
 
         push(new PBoolean(value));
@@ -225,11 +225,7 @@ public class Interpreter {
 
     private void runtimeError(String message) {
         Error error = new Error("Runtime Error", message, -1);
-        StringBuilder errorMessage = new StringBuilder();
-
-        errorMessage.append("\n").append(error.getErrorType()).append(" | ").append(error.getMessage());
-        System.out.println(errorMessage);
-
+        System.out.println("\n" + error.getErrorType() + " | " + error.getMessage());
         System.exit(1);
     }
 }

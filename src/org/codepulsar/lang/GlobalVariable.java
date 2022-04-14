@@ -31,35 +31,13 @@ public class GlobalVariable {
         return global != null;
     }
 
-    public int getGlobalCount() {
-        return this.variables.size();
-    }
-
-    static class Global {
-        private final Primitive value;
-        private final PrimitiveType type;
-
-        private final boolean isInitialized;
-        private final boolean isConstant;
-
-        public Global(Primitive value, PrimitiveType type, boolean isInitialized, boolean isConstant) {
-            this.value = value;
-            this.type = type;
-
-            this.isInitialized = isInitialized;
-            this.isConstant = isConstant;
-        }
-
+    record Global(Primitive value, PrimitiveType type, boolean isInitialized, boolean isConstant) {
         public Primitive getValue() {
             return this.value;
         }
 
         public PrimitiveType getType() {
             return this.type;
-        }
-
-        public boolean isConstant() {
-            return this.isConstant;
         }
     }
 }

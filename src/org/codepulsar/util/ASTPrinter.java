@@ -150,10 +150,6 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         return "\t".repeat(this.indentCount);
     }
 
-    public String giveTabs(int n) {
-        return "\t".repeat(n);
-    }
-
     public void incrementIndentCount() {
         this.indentCount++;
     }

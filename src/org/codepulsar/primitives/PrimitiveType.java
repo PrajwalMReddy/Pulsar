@@ -1,7 +1,8 @@
 package org.codepulsar.primitives;
 
 public enum PrimitiveType {
-    PR_BOOLEAN, PR_CHARACTER, PR_DOUBLE, PR_INTEGER,
+    PR_INTEGER, PR_DOUBLE,
+    PR_BOOLEAN, PR_CHARACTER,
 
     // Other Types
     PR_NULL, PR_ERROR,

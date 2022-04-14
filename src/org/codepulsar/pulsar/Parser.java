@@ -526,10 +526,6 @@ public class Parser {
         return this.tokens.get(this.current).getLine();
     }
 
-    private String peekLiteral() {
-        return this.tokens.get(this.current).getLiteral();
-    }
-
     private void error(String message, int line) {
         this.errors.addError("Parsing Error", message, line);
     }
