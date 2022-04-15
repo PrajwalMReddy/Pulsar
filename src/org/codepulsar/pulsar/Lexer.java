@@ -303,6 +303,12 @@ public class Lexer {
             return errorToken("Invalid Number Literal: " + currentLiteral());
         }
 
+        try {
+            Integer.parseInt(currentLiteral());
+        } catch (NumberFormatException error) {
+            errorToken("Invalid Value For Integer: " + currentLiteral());
+        }
+
         return makeToken(TK_INTEGER);
     }
 
