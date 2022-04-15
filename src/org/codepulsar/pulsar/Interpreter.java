@@ -171,7 +171,9 @@ public class Interpreter {
         Primitive a = pop();
 
         if (code == OP_COMPARE_EQUAL) {
-            push(new PBoolean(a.getPrimitiveValue() == b.getPrimitiveValue()));
+            push(new PBoolean(
+                    a.getPrimitiveValue().toString().equals(b.getPrimitiveValue().toString())
+            ));
         } else if (a.isPrimitiveType(PR_NULL) || b.isPrimitiveType(PR_NULL)) {
             runtimeError("Cannot Use Binary Operations On Null Values");
         } else if (code == OP_COMPARE_GREATER) {
