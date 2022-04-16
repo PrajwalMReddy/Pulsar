@@ -85,23 +85,13 @@ public class Interpreter {
 
                 case OP_NEW_GLOBAL -> {
                     String variableName = instruction.getOperand().toString();
-                    if (this.globals.containsVariable(variableName)) {
-                        runtimeError("Global Variable '" + variableName + "' Already Exists");
-                    }
-
-                    Primitive primitive = pop();
-                    // TODO Come Back To This Later While Improving Globals
-                    this.globals.addVariable(variableName, primitive, primitive.getPrimitiveType(), true, false);
+                    Primitive primitiveValue = pop();
+                    this.globals.reassignVariable(variableName, primitiveValue);
                 }
                 case OP_LOAD_GLOBAL -> loadGlobal(instruction);
                 case OP_STORE_GLOBAL -> {
                     Primitive value = pop();
                     String variableName = instruction.getOperand().toString();
-
-                    if (!this.globals.containsVariable(variableName)) {
-                        runtimeError("There Is No Global Variable Named '" + variableName + "'");
-                    }
-
                     this.globals.reassignVariable(variableName, value);
                     push(value);
                 }
@@ -204,10 +194,6 @@ public class Interpreter {
 
     private void loadGlobal(Instruction instruction) {
         String variableName = instruction.getOperand().toString();
-        if (!this.globals.containsVariable(variableName)) {
-            runtimeError("Global Variable '" + variableName + "' Does Not Exist");
-        }
-
         push(this.globals.getValue(variableName));
     }
 

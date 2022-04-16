@@ -26,6 +26,10 @@ public class GlobalVariable {
         return this.variables.get(name).getValue();
     }
 
+    public PrimitiveType getType(String name) {
+        return this.variables.get(name).getType();
+    }
+
     public boolean containsVariable(String name) {
         Global global = this.variables.get(name);
         return global != null;

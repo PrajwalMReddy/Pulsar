@@ -13,16 +13,19 @@ import org.codepulsar.ast.Statement;
 import org.codepulsar.ast.expression.*;
 import org.codepulsar.ast.statement.*;
 import org.codepulsar.lang.CompilerError;
+import org.codepulsar.lang.GlobalVariable;
 import org.codepulsar.lang.LocalVariable;
 
 public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Void> {
     private final Statement program;
+    private final GlobalVariable globals;
     private final LocalVariable locals;
 
     private final CompilerError errors;
 
-    public Validator(Statement program, LocalVariable locals) {
+    public Validator(Statement program, GlobalVariable globals, LocalVariable locals) {
         this.program = program;
+        this.globals = globals;
         this.locals = locals;
 
         this.errors = new CompilerError();
@@ -80,10 +83,16 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
     }
 
     public Void visitVariableExpression(VariableAccess expression) {
-        LocalVariable.Local local = this.locals.getLocal(expression.getName());
+        if (!expression.isGlobalVariable()) {
+            LocalVariable.Local local = this.locals.getLocal(expression.getName());
 
-        if (!local.isInitialized()) {
-            newError("Variable '" + expression.getName() + "' Has Not Been Initialized", expression.getLine());
+            if (!local.isInitialized()) {
+                newError("Local Variable '" + expression.getName() + "' Has Not Been Initialized", expression.getLine());
+            }
+        } else {
+            if (!this.globals.containsVariable(expression.getName())) {
+                newError("Global Variable '" + expression.getName() + "' Does Not Exist", expression.getLine());
+            }
         }
 
         return null;

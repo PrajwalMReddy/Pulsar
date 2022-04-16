@@ -33,7 +33,7 @@ public class Parser {
         this.sourceCode = sourceCode;
 
         this.current = 0;
-        this.depth = 1;
+        this.depth = 0; // TODO Change Back To 1 Later
 
         this.globals = new GlobalVariable();
         this.locals = new LocalVariable();
@@ -441,7 +441,6 @@ public class Parser {
             }
         }
 
-        error("Local Variable '" + name.getLiteral() + "' Is Used But Never Defined", peekLine());
         return -1;
     }
 

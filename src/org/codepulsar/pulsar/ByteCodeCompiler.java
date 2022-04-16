@@ -52,8 +52,8 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         ASTPrinter astPrinter = new ASTPrinter();
         astPrinter.print(this.program);
 
-        TypeChecker analyzer = new TypeChecker(this.program, this.locals);
-        Validator validator = new Validator(this.program, this.locals);
+        TypeChecker analyzer = new TypeChecker(this.program, this.globals, this.locals);
+        Validator validator = new Validator(this.program, this.globals, this.locals);
 
         analyzer.check();
         validator.validate();
@@ -164,11 +164,11 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
         if (expression.isGlobalAssignment()) {
             type = OP_STORE_GLOBAL;
+            return makeOpCode(type, expression.getIdentifier(), expression.getLine());
         } else {
             type = OP_SET_LOCAL;
+            return makeOpCode(type, expression.getNumber(), expression.getLine());
         }
-
-        return makeOpCode(type, expression.getNumber(), expression.getLine());
     }
 
     public Instruction visitBinaryExpression(Binary expression) {
@@ -226,11 +226,11 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
         if (expression.isGlobalVariable()) {
             type = OP_LOAD_GLOBAL;
+            return makeOpCode(type, expression.getName(), expression.getLine());
         } else {
             type = OP_GET_LOCAL;
+            return makeOpCode(type, expression.getNumber(), expression.getLine());
         }
-
-        return makeOpCode(type, expression.getNumber(), expression.getLine());
     }
 
     private Instruction makeConstant(String value, int line, PrimitiveType type) {

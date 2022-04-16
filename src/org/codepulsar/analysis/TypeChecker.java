@@ -14,6 +14,7 @@ import org.codepulsar.ast.Statement;
 import org.codepulsar.ast.expression.*;
 import org.codepulsar.ast.statement.*;
 import org.codepulsar.lang.CompilerError;
+import org.codepulsar.lang.GlobalVariable;
 import org.codepulsar.lang.LocalVariable;
 import org.codepulsar.primitives.PrimitiveType;
 
@@ -21,12 +22,14 @@ import static org.codepulsar.primitives.PrimitiveType.*;
 
 public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement.Visitor<Void> {
     private final Statement program;
+    private final GlobalVariable globals;
     private final LocalVariable locals;
 
     private final CompilerError errors;
 
-    public TypeChecker(Statement program, LocalVariable locals) {
+    public TypeChecker(Statement program, GlobalVariable globals, LocalVariable locals) {
         this.program = program;
+        this.globals = globals;
         this.locals = locals;
 
         this.errors = new CompilerError();
@@ -122,8 +125,12 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
     }
 
     public PrimitiveType visitVariableExpression(VariableAccess expression) {
-        LocalVariable.Local local = this.locals.getLocal(expression.getName());
-        return local.getType();
+        if (!expression.isGlobalVariable()) {
+            LocalVariable.Local local = this.locals.getLocal(expression.getName());
+            return local.getType();
+        } else {
+            return this.globals.getType(expression.getName());
+        }
     }
 
     public Void visitBlockStatement(Block statements) {
