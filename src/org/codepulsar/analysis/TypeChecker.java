@@ -123,11 +123,6 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
 
     public PrimitiveType visitVariableExpression(VariableAccess expression) {
         LocalVariable.Local local = this.locals.getLocal(expression.getName());
-
-        if (!local.isInitialized()) {
-            newError("Variable '" + expression.getName() + "' Has Not Been Initialized", expression.getLine());
-        }
-
         return local.getType();
     }
 
@@ -169,7 +164,6 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
 
     public Void visitPrintExpression(Print statement) {
         statement.getExpression().accept(this);
-
         return null;
     }
 
@@ -215,7 +209,7 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return false;
     }
 
-    public void newError(String message, int line) {
+    private void newError(String message, int line) {
         this.errors.addError("Type Error", message, line);
     }
 

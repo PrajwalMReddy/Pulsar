@@ -88,7 +88,16 @@ public class Parser {
         }
 
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
+        addGlobal(name, accessType, checkType(type), isInitialized);
         return new Variable(name.getLiteral(), expression, checkType(type), true, name.getLine());
+    }
+
+    private void addGlobal(Token name, TokenType accessType, PrimitiveType variableType, boolean isInitialized) {
+        if (accessType == TK_VAR) {
+            this.globals.addVariable(name.getLiteral(), null, variableType, isInitialized, false);
+        } else if (accessType == TK_CONST) {
+            this.globals.addVariable(name.getLiteral(), null, variableType, isInitialized, true);
+        }
     }
 
     private Statement statement() {
@@ -98,9 +107,9 @@ public class Parser {
             } else if (matchAdvance(TK_WHILE)) {
                 return whileStatement();
             } else if (matchAdvance(TK_VAR)) {
-                return localVariableDeclaration(TK_VAR);
+                return globalVariableDeclaration(TK_VAR);
             } else if (matchAdvance(TK_CONST)) {
-                return localVariableDeclaration(TK_CONST);
+                return globalVariableDeclaration(TK_CONST);
             } else if (matchAdvance(TK_PRINT)) {
                 return printStatement();
             } else {
@@ -254,22 +263,18 @@ public class Parser {
     private Expression assignment() {
         if (peekType() == TK_IDENTIFIER) {
             Token variable = peek();
-            if (this.locals.getLocal(variable.getLiteral()) == null) {
-                error("Local Variable '" + variable.getLiteral() + "' Is Used But Never Defined", peekLine());
-                synchronize();
-                return new NoneExpression();
+            String variableName = variable.getLiteral();
+
+            if (this.locals.getLocal(variableName) == null) {
+                if (!this.globals.containsVariable(variableName)) {
+                    error("Local Variable '" + variableName + "' Is Used But Never Defined", peekLine());
+                    synchronize();
+                    return new NoneExpression();
+                }
             }
 
             switch (peekNext().getTokenType()) {
                 case TK_EQUAL -> {
-                    if (this.locals.getLocal(variable.getLiteral()).isConstant()) {
-                        error("Local Variable '" + this.locals.getLocal(variable.getLiteral()).getName()
-                                + "' Is A Constant And Cannot Be Reassigned", peekLine());
-
-                        synchronize();
-                        return new NoneExpression();
-                    }
-
                     Token next = peek();
 
                     advance();
@@ -280,14 +285,6 @@ public class Parser {
                 }
 
                 case TK_PLUS_EQUAL, TK_MINUS_EQUAL, TK_MUL_EQUAL, TK_DIV_EQUAL, TK_MOD_EQUAL -> {
-                    if (this.locals.getLocal(variable.getLiteral()).isConstant()) {
-                        error("Local Variable '" + this.locals.getLocal(variable.getLiteral()).getName()
-                                + "' Is A Constant And Cannot Be Reassigned", peekLine());
-
-                        synchronize();
-                        return new NoneExpression();
-                    }
-
                     Token next = peek();
                     String identifier = next.getLiteral();
                     int line = next.getLine();

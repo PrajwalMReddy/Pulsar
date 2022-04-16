@@ -1,6 +1,7 @@
 package org.codepulsar.pulsar;
 
 import org.codepulsar.analysis.TypeChecker;
+import org.codepulsar.analysis.Validator;
 import org.codepulsar.ast.Expression;
 import org.codepulsar.ast.Statement;
 import org.codepulsar.ast.expression.*;
@@ -52,9 +53,14 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         astPrinter.print(this.program);
 
         TypeChecker analyzer = new TypeChecker(this.program, this.locals);
+        Validator validator = new Validator(this.program, this.locals);
+
         analyzer.check();
+        validator.validate();
 
         this.staticErrors = analyzer.getErrors();
+        if (this.staticErrors.hasError()) return instructions;
+        this.staticErrors = validator.getErrors();
         if (this.staticErrors.hasError()) return instructions;
 
         compile();

@@ -47,10 +47,10 @@ block:
 
 statement:
     | while_statement
-	| if_statement
-	| return_statement
-	| variable_declaration
-	| expression_statement
+    | if_statement
+    | return_statement
+    | variable_declaration
+    | expression_statement
 
 while_statement:
     | "while" expression block
@@ -69,7 +69,7 @@ expression:
 
 assignment:
     | IDENTIFIER ("=" | "+=" | "-=" | "*=" | "/=" | "%=") assignment
-	| logical_or
+    | logical_or
 
 logical_or:
     | logical_and ("||" logical_and)*
