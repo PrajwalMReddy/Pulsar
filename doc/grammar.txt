@@ -1,96 +1,93 @@
 ---------------------------------KEY---------------------------------
 
 Key:
-	| "?" : Zero Or One Times
-	| "*" : Zero Or More Times
-	| "+" : One Or More Times
+    | "?" : Zero Or One Times
+    | "*" : Zero Or More Times
+    | "+" : One Or More Times
 
 -------------------------------GRAMMAR-------------------------------
 
 file:
-	| program EOF
+    | program EOF
 
 program:
-	| package_declaration? import_statement* top_level
+    | package_declaration? import_statement* top_level
 
 package_declaration:
-	| "package" IDENTIFIER ("." IDENTIFIER)* ";"
+    | "package" IDENTIFIER ("." IDENTIFIER)* ";"
 
 import_statement:
-	| "import" IDENTIFIER ("." IDENTIFIER)* ";"
+    | "import" IDENTIFIER ("." IDENTIFIER)* ";"
 
 top_level:
-	| declaration*
+    | declaration*
 
 declaration:
     | heavy_declaration
     | light_declaration
 
 heavy_declaration:
-	| "class" IDENTIFIER "{" light_declaration* "}"
+    | "class" IDENTIFIER "{" light_declaration* "}"
 
 light_declaration:
     | function_declaration
-	| variable_declaration
+    | variable_declaration
 
 function_declaration:
-    | "fun" IDENTIFIER "(" parameter? ")" heavy_block
+    | "fun" IDENTIFIER "(" parameter? ")" block
+
+parameter:
+    | IDENTIFIER ":" DATATYPE ("," IDENTIFIER ":" DATATYPE)*
 
 variable_declaration:
     | ("var" | "const") IDENTIFIER ":" DATATYPE ("=" expression)? ";"
 
-parameter:
-	| IDENTIFIER ":" DATATYPE ("," IDENTIFIER ":" DATATYPE)*
-
-heavy_block:
-    | (block | "{" light_declaration "}")
-
 block:
-	| "{" statement* "}"
+    | "{" statement* "}"
 
 statement:
-	| while_statement
+    | while_statement
 	| if_statement
 	| return_statement
 	| variable_declaration
 	| expression_statement
 
 while_statement:
-	| "while" expression block
+    | "while" expression block
 
 if_statement:
-	| "if" expression block ("else" (if_statement | block))?
+    | "if" expression block ("else" (if_statement | block))?
 
 return_statement:
-	| "return" expression? ";"
+    | "return" expression? ";"
 
 expression_statement:
-	| expression ";"
+    | expression ";"
 
 expression:
-	| assignment
+    | assignment
 
 assignment:
-	| IDENTIFIER ("=" | "+=" | "-=" | "*=" | "/=" | "%=") assignment
+    | IDENTIFIER ("=" | "+=" | "-=" | "*=" | "/=" | "%=") assignment
 	| logical_or
 
 logical_or:
-	| logical_and ("||" logical_and)*
+    | logical_and ("||" logical_and)*
 
 logical_and:
-	| equality ("&&" equality)*
+    | equality ("&&" equality)*
 
 equality:
-	| comparison (("!=" | "==") comparison)*
+    | comparison (("!=" | "==") comparison)*
 
 comparison:
-	| term ((">" | ">=" | "<" | "<=") term)*
+    | term ((">" | ">=" | "<" | "<=") term)*
 
 term:
-	| factor (("-" | "+") factor)*
+    | factor (("-" | "+") factor)*
 
 factor:
-	| unary (("/" | "*" | "%") unary)*
+    | unary (("/" | "*" | "%") unary)*
 
 unary:
     | ("!" | "-" | "+") unary
