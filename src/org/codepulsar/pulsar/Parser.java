@@ -88,6 +88,11 @@ public class Parser {
         }
 
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
+
+        if (this.globals.containsVariable(name.getLiteral())) {
+            error("Global Variable '" + name.getLiteral() + "' Already Exists", name.getLine());
+        }
+
         addGlobal(name, accessType, checkType(type), isInitialized);
         return new Variable(name.getLiteral(), expression, checkType(type), true, name.getLine());
     }
