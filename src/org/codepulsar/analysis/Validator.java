@@ -91,15 +91,22 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
     }
 
     public Void visitVariableExpression(VariableAccess expression) {
-        if (!expression.isGlobalVariable()) {
-            LocalVariable.Local local = this.locals.getLocal(expression.getName());
+        String name = expression.getName();
+        int line = expression.getLine();
 
-            if (!local.isInitialized()) {
-                newError("Local Variable '" + expression.getName() + "' Has Not Been Initialized", expression.getLine());
+        if (!expression.isGlobalVariable()) {
+            LocalVariable.Local local = this.locals.getLocal(name);
+
+            if (this.locals.getLocal(name) == null) {
+                newError("Local Variable '" + name + "' Is Used But Never Defined", line);
+            } else if (!local.isInitialized()) {
+                newError("Local Variable '" + name + "' Has Not Been Initialized", line);
             }
         } else {
-            if (!this.globals.containsVariable(expression.getName())) {
-                newError("Global Variable '" + expression.getName() + "' Does Not Exist", expression.getLine());
+            if (!this.globals.containsVariable(name)) {
+                newError("Global Variable '" + name + "' Does Not Exist", line);
+            } else if (!this.globals.isInitialized(name)) {
+                newError("Global Variable '" + name + "' Has Not Been Initialized", line);
             }
         }
 

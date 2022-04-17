@@ -34,6 +34,10 @@ public class GlobalVariable {
         return this.variables.get(name).isConstant();
     }
 
+    public boolean isInitialized(String name) {
+        return this.variables.get(name).isInitialized();
+    }
+
     public void setInitialized(String name) {
         Global variable = this.variables.get(name);
         variable.setInitialized();
@@ -67,6 +71,10 @@ public class GlobalVariable {
 
         public PrimitiveType getType() {
             return this.type;
+        }
+
+        public boolean isInitialized() {
+            return this.isInitialized;
         }
 
         private void setInitialized() {

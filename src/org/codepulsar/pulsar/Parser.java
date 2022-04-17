@@ -263,15 +263,6 @@ public class Parser {
     private Expression assignment() {
         if (peekType() == TK_IDENTIFIER) {
             Token variable = peek();
-            String variableName = variable.getLiteral();
-
-            if (this.locals.getLocal(variableName) == null) {
-                if (!this.globals.containsVariable(variableName)) {
-                    error("Local Variable '" + variableName + "' Is Used But Never Defined", peekLine());
-                    synchronize();
-                    return new NoneExpression();
-                }
-            }
 
             switch (peekNext().getTokenType()) {
                 case TK_EQUAL -> {
