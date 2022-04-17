@@ -44,14 +44,25 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
     }
 
     public PrimitiveType visitAssignmentExpression(Assignment expression) {
-        LocalVariable.Local local = this.locals.getLocal(expression.getIdentifier());
+        if (!expression.isGlobalAssignment()) {
+            LocalVariable.Local local = this.locals.getLocal(expression.getIdentifier());
 
-        if (local.getType() != expression.getValue().accept(this)) {
-            newError("Variable Is Being Assigned To The Wrong Type", expression.getLine());
+            if (local.getType() != expression.getValue().accept(this)) {
+                newError("Local Variable Is Being Assigned To The Wrong Type", expression.getLine());
+            }
+
+            local.setInitialized();
+            return local.getType();
+        } else {
+            PrimitiveType type = this.globals.getType(expression.getIdentifier());
+
+            if (type != expression.getValue().accept(this)) {
+                newError("Global Variable Is Being Assigned To The Wrong Type", expression.getLine());
+            }
+
+            this.globals.setInitialized(expression.getIdentifier());
+            return this.globals.getType(expression.getIdentifier());
         }
-
-        local.setInitialized();
-        return local.getType();
     }
 
     public PrimitiveType visitBinaryExpression(Binary expression) {

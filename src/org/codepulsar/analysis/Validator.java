@@ -40,13 +40,21 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
     }
 
     public Void visitAssignmentExpression(Assignment expression) {
-        LocalVariable.Local local = this.locals.getLocal(expression.getIdentifier());
+        if (!expression.isGlobalAssignment()) {
+            LocalVariable.Local local = this.locals.getLocal(expression.getIdentifier());
 
-        if (local.isConstant()) {
-            newError("Local Variable '" + local.getName() + "' Is A Constant And Cannot Be Reassigned", expression.getLine());
+            if (local.isConstant()) {
+                newError("Local Variable '" + local.getName() + "' Is A Constant And Cannot Be Reassigned", expression.getLine());
+            }
+
+            expression.getValue().accept(this);
+        } else {
+            if (this.globals.isConstant(expression.getIdentifier())) {
+                newError("Global Variable '" + expression.getIdentifier() + "' Is A Constant And Cannot Be Reassigned", expression.getLine());
+            }
+
         }
 
-        expression.getValue().accept(this);
         return null;
     }
 

@@ -30,18 +30,47 @@ public class GlobalVariable {
         return this.variables.get(name).getType();
     }
 
+    public boolean isConstant(String name) {
+        return this.variables.get(name).isConstant();
+    }
+
+    public void setInitialized(String name) {
+        Global variable = this.variables.get(name);
+        variable.setInitialized();
+    }
+
     public boolean containsVariable(String name) {
         Global global = this.variables.get(name);
         return global != null;
     }
 
-    record Global(Primitive value, PrimitiveType type, boolean isInitialized, boolean isConstant) {
+    static class Global {
+        private Primitive value;
+        private PrimitiveType type;
+        private boolean isInitialized;
+        private boolean isConstant;
+
+        public Global(Primitive value, PrimitiveType type, boolean isInitialized, boolean isConstant) {
+            this.value = value;
+            this.type = type;
+            this.isInitialized = isInitialized;
+            this.isConstant = isConstant;
+        }
+
+        public boolean isConstant() {
+            return this.isConstant;
+        }
+
         public Primitive getValue() {
             return this.value;
         }
 
         public PrimitiveType getType() {
             return this.type;
+        }
+
+        private void setInitialized() {
+            this.isInitialized = true;
         }
     }
 }

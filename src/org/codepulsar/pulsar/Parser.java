@@ -33,7 +33,7 @@ public class Parser {
         this.sourceCode = sourceCode;
 
         this.current = 0;
-        this.depth = 0; // TODO Change Back To 1 Later
+        this.depth = 1;
 
         this.globals = new GlobalVariable();
         this.locals = new LocalVariable();
@@ -107,9 +107,9 @@ public class Parser {
             } else if (matchAdvance(TK_WHILE)) {
                 return whileStatement();
             } else if (matchAdvance(TK_VAR)) {
-                return globalVariableDeclaration(TK_VAR);
+                return localVariableDeclaration(TK_VAR);
             } else if (matchAdvance(TK_CONST)) {
-                return globalVariableDeclaration(TK_CONST);
+                return localVariableDeclaration(TK_CONST);
             } else if (matchAdvance(TK_PRINT)) {
                 return printStatement();
             } else {
@@ -281,7 +281,7 @@ public class Parser {
                     advance();
 
                     Expression expression = expression();
-                    return new Assignment(next.getLiteral(), inGlobalScope(), resolveLocal(variable), expression, next.getLine());
+                    return new Assignment(next.getLiteral(), (resolveLocal(next) == -1), resolveLocal(variable), expression, next.getLine());
                 }
 
                 case TK_PLUS_EQUAL, TK_MINUS_EQUAL, TK_MUL_EQUAL, TK_DIV_EQUAL, TK_MOD_EQUAL -> {
@@ -297,9 +297,9 @@ public class Parser {
                     Expression expression = expression();
 
                     // Expand An Operator Assignment Into A Normal Assignment
-                    return new Assignment(identifier, inGlobalScope(), resolveLocal(variable),
+                    return new Assignment(identifier, (resolveLocal(next) == -1), resolveLocal(variable),
                             new Binary(
-                                        new VariableAccess(identifier, inGlobalScope(), resolveLocal(variable), line
+                                        new VariableAccess(identifier, (resolveLocal(next) == -1), resolveLocal(variable), line
                                     ), operatorType.substring(0, operatorType.length() - 1), expression, line
                             ), line
                     );
@@ -419,7 +419,7 @@ public class Parser {
 
         if (match(TK_IDENTIFIER)) {
             Token name = advance();
-            return new VariableAccess(previous().getLiteral(), inGlobalScope(), resolveLocal(name), peekLine());
+            return new VariableAccess(previous().getLiteral(), (resolveLocal(name) == -1), resolveLocal(name), peekLine());
         }
 
         if (matchAdvance(TK_LPAR)) {
