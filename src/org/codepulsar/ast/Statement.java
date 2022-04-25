@@ -8,7 +8,8 @@ public abstract class Statement {
         R visitBlockStatement(Block statement);
         R visitEndScopeStatement(EndScope statement);
         R visitExpressionStatement(ExpressionStmt statement);
-        R visitIFStatement(If statement);
+        R visitFunctionStatement(Function statement);
+        R visitIfStatement(If statement);
         R visitNoneStatement(NoneStatement statement);
         R visitPrintExpression(Print statement);
         R visitVariableStatement(Variable statement);

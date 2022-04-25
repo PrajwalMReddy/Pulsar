@@ -6,9 +6,11 @@ import org.codepulsar.ast.expression.*;
 import org.codepulsar.ast.statement.*;
 import org.codepulsar.lang.*;
 import org.codepulsar.primitives.PrimitiveType;
+import org.codepulsar.util.ASTPrinter;
 import org.codepulsar.util.TokenDisassembler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.codepulsar.lang.TokenType.*;
 import static org.codepulsar.primitives.PrimitiveType.*;
@@ -47,15 +49,49 @@ public class Parser {
         if (this.errors.hasError()) return this.program;
         TokenDisassembler.display(this.tokens);
 
-        // TODO Temporary Code To Allow More Than One Statement At A Time
-        int line = peekLine();
-        ArrayList<Statement> statements = new ArrayList<>();
+        this.program = lightDeclaration();
+        return this.program;
+    }
+
+    private Statement lightDeclaration() {
+        Statement statement = null;
+
         while (!match(TK_EOF)) {
-            statements.add(statement());
+            if (matchAdvance(TK_FUN)) {
+                statement = functionDeclaration();
+            } else if (matchAdvance(TK_VAR)) {
+                statement = globalVariableDeclaration(TK_VAR);
+            } else if (matchAdvance(TK_CONST)) {
+                statement = globalVariableDeclaration(TK_CONST);
+            }
         }
 
-        this.program = new Block(statements, line);
-        return this.program;
+        return statement;
+    }
+
+    private Statement functionDeclaration() {
+        String name = advance().getLiteral();
+
+        look(TK_LPAR, "An Opening Parenthesis Was Expected Before The Parameter List");
+        HashMap<String, PrimitiveType> parameters = new HashMap<>();
+
+        if (peekType() != TK_RPAR) {
+            do {
+                String varName = advance().getLiteral();
+                look(TK_COLON, "A Colon Was Expected After The Variable Name");
+                PrimitiveType varType = checkType(advance());
+
+                parameters.put(varName, varType);
+            } while (match(TK_COMMA));
+        }
+
+        look(TK_RPAR, "A Closing Parenthesis Was Expected After The Parameter List");
+        look(TK_COLON, "A Colon Was Expected After The Function's Parameters");
+        PrimitiveType type = checkType(advance());
+
+
+        Block statements = block();
+        return new Function(name, type, parameters, statements, peekLine());
     }
 
     private Statement globalVariableDeclaration(TokenType accessType) {

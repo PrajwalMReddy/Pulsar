@@ -130,7 +130,12 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
         return null;
     }
 
-    public Void visitIFStatement(If statement) {
+    // TODO Validate Functions
+    public Void visitFunctionStatement(Function statement) {
+        return null;
+    }
+
+    public Void visitIfStatement(If statement) {
         statement.getCondition().accept(this);
         statement.getThenBranch().accept(this);
 

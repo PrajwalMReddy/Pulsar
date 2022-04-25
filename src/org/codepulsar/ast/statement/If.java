@@ -18,7 +18,7 @@ public class If extends Statement {
     }
 
     public <R> R accept(Visitor<R> visitor) {
-        return visitor.visitIFStatement(this);
+        return visitor.visitIfStatement(this);
     }
 
     public boolean hasElse() {

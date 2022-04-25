@@ -11,7 +11,7 @@ file:
     | program EOF
 
 program:
-    | package_declaration? import_statement* top_level
+    | package_declaration? import_statement* top_level*
 
 package_declaration:
     | "package" IDENTIFIER ("." IDENTIFIER)* ";"
@@ -20,9 +20,6 @@ import_statement:
     | "import" IDENTIFIER ("." IDENTIFIER)* ";"
 
 top_level:
-    | declaration*
-
-declaration:
     | heavy_declaration
     | light_declaration
 
@@ -34,7 +31,7 @@ light_declaration:
     | variable_declaration
 
 function_declaration:
-    | "fun" IDENTIFIER "(" parameter? ")" block
+    | "fun" IDENTIFIER "(" parameter? ")" ":" DATATYPE block
 
 parameter:
     | IDENTIFIER ":" DATATYPE ("," IDENTIFIER ":" DATATYPE)*

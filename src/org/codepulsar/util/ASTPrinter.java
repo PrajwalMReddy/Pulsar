@@ -4,7 +4,10 @@ import org.codepulsar.ast.Expression;
 import org.codepulsar.ast.Statement;
 import org.codepulsar.ast.expression.*;
 import org.codepulsar.ast.statement.*;
+import org.codepulsar.primitives.PrimitiveType;
 import org.codepulsar.pulsar.Pulsar;
+
+import java.util.HashMap;
 
 public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor<String> {
     private int indentCount;
@@ -105,7 +108,27 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         return "Expression(" + statement.getExpression().accept(this) + ")\n";
     }
 
-    public String visitIFStatement(If statement) {
+    // TODO Pretty Print Functions Properly
+    public String visitFunctionStatement(Function statement) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append(giveTabs() + "Function(" + parameters(statement.getParameters()) + ")(\n");
+        incrementIndentCount();
+        stringBuilder.append(statement.getStatements().accept(this));
+        decrementIndentCount();
+
+        stringBuilder.append("\n" + giveTabs() + ")");
+        return stringBuilder.toString();
+    }
+
+    // TODO Finish Properly
+    private String parameters(HashMap<String, PrimitiveType> parameters) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        return stringBuilder.toString();
+    }
+
+    public String visitIfStatement(If statement) {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("\n" + giveTabs() + "If(" + statement.getCondition().accept(this) + ") (\n");

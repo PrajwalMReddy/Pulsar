@@ -122,7 +122,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return null;
     }
 
-    public Void visitIFStatement(If statement) {
+    public Void visitIfStatement(If statement) {
         statement.getCondition().accept(this);
         int ifOffset = makeJump(OP_JUMP_IF_FALSE, statement.getLine());
         makeOpCode(OP_POP, statement.getLine());
@@ -155,6 +155,11 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         statement.getExpression().accept(this);
         makeOpCode(OP_POP, statement.getLine());
 
+        return null;
+    }
+
+    // TODO Generate ByteCode For Functions
+    public Void visitFunctionStatement(Function statement) {
         return null;
     }
 
