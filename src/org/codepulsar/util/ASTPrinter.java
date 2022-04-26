@@ -125,7 +125,12 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
     private String parameters(HashMap<String, PrimitiveType> parameters) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        return stringBuilder.toString();
+        for (String name: parameters.keySet()) {
+            stringBuilder.append(name + ",");
+        }
+
+        String newString = stringBuilder.toString();
+        return newString.substring(0, newString.length() - 1);
     }
 
     public String visitIfStatement(If statement) {

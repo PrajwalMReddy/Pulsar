@@ -54,19 +54,20 @@ public class Parser {
     }
 
     private Statement lightDeclaration() {
-        Statement statement = null;
-
         while (!match(TK_EOF)) {
             if (matchAdvance(TK_FUN)) {
-                statement = functionDeclaration();
+                return functionDeclaration();
             } else if (matchAdvance(TK_VAR)) {
-                statement = globalVariableDeclaration(TK_VAR);
+                return globalVariableDeclaration(TK_VAR);
             } else if (matchAdvance(TK_CONST)) {
-                statement = globalVariableDeclaration(TK_CONST);
+                return globalVariableDeclaration(TK_CONST);
+            } else {
+                error("Only Global Variables And Functions Are Allowed At The Top Level", peekLine());
+                advance();
             }
         }
 
-        return statement;
+        return null;
     }
 
     private Statement functionDeclaration() {
@@ -82,13 +83,23 @@ public class Parser {
                 PrimitiveType varType = checkType(advance());
 
                 parameters.put(varName, varType);
-            } while (match(TK_COMMA));
+            } while (matchAdvance(TK_COMMA));
         }
 
         look(TK_RPAR, "A Closing Parenthesis Was Expected After The Parameter List");
-        look(TK_COLON, "A Colon Was Expected After The Function's Parameters");
-        PrimitiveType type = checkType(advance());
 
+        PrimitiveType type;
+        if (matchAdvance(TK_COLON)) {
+            TokenType next = peek().getTokenType();
+            if (next != TK_DATA_TYPE || next != TK_VOID) {
+                error("A Return Datatype For The Function Was Expected", peekLine());
+                type = PR_ERROR;
+            } else {
+                type = checkType(advance());
+            }
+        } else {
+            type = PR_VOID;
+        }
 
         Block statements = block();
         return new Function(name, type, parameters, statements, peekLine());
@@ -108,10 +119,8 @@ public class Parser {
         look(TK_COLON, "A Colon Was Expected After The Variable Name");
         Token type = advance();
 
-        if (checkType(type) == PR_ERROR) {
+        if (checkType(type) == PR_ERROR || checkType(type) == PR_VOID) {
             error("Invalid Type For Variable", peekLine());
-            synchronize();
-            return new NoneStatement();
         }
 
         boolean isInitialized;
@@ -175,10 +184,8 @@ public class Parser {
         look(TK_COLON, "A Colon Was Expected After The Variable Name");
         Token type = advance();
 
-        if (checkType(type) == PR_ERROR) {
+        if (checkType(type) == PR_ERROR || checkType(type) == PR_VOID) {
             error("Invalid Type For Variable", peekLine());
-            synchronize();
-            return new NoneStatement();
         }
 
         boolean isInitialized;
@@ -222,6 +229,7 @@ public class Parser {
             case "char" -> PR_CHARACTER;
             case "double" -> PR_DOUBLE;
             case "int" -> PR_INTEGER;
+            case "void" -> PR_VOID;
             default -> PR_ERROR;
         };
     }

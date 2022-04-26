@@ -5,5 +5,5 @@ public enum PrimitiveType {
     PR_BOOLEAN, PR_CHARACTER,
 
     // Other Types
-    PR_NULL, PR_ERROR,
+    PR_NULL, PR_VOID, PR_ERROR,
 }

@@ -267,7 +267,11 @@ public class Lexer {
                 default -> TK_IDENTIFIER;
             };
             case 'u' -> checkKeyword("nsafe", TK_UNSAFE, 1);
-            case 'v' -> checkKeyword("ar", TK_VAR, 1);
+            case 'v' -> switch (this.sourceCode.charAt(this.start + 1)) {
+                case 'a' -> checkKeyword("r", TK_VAR, 2);
+                case 'o' -> checkKeyword("id", TK_VOID, 2);
+                default -> TK_IDENTIFIER;
+            };
             case 'w' -> checkKeyword("hile", TK_WHILE, 1);
             default -> TK_IDENTIFIER;
         };
