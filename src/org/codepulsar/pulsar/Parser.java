@@ -6,7 +6,6 @@ import org.codepulsar.ast.expression.*;
 import org.codepulsar.ast.statement.*;
 import org.codepulsar.lang.*;
 import org.codepulsar.primitives.PrimitiveType;
-import org.codepulsar.util.ASTPrinter;
 import org.codepulsar.util.TokenDisassembler;
 
 import java.util.ArrayList;
@@ -49,7 +48,16 @@ public class Parser {
         if (this.errors.hasError()) return this.program;
         TokenDisassembler.display(this.tokens);
 
-        this.program = lightDeclaration();
+        // TODO Temporary Code To Allow More Than One Top Level Declaration
+
+        int line = peekLine();
+        ArrayList<Statement> statements = new ArrayList<>();
+
+        while (!match(TK_EOF)) {
+            statements.add(lightDeclaration());
+        }
+
+        this.program = new Block(statements, line);
         return this.program;
     }
 
@@ -79,8 +87,14 @@ public class Parser {
         if (peekType() != TK_RPAR) {
             do {
                 String varName = advance().getLiteral();
-                look(TK_COLON, "A Colon Was Expected After The Variable Name");
-                PrimitiveType varType = checkType(advance());
+                PrimitiveType varType = PR_ERROR;
+
+                // TODO Validate That varType != PR_ERROR In The Validator
+                if (!match(TK_COLON)) {
+                    error("A Colon Was Expected After The Variable Name", peekLine());
+                } else {
+                    varType = checkType(advance());
+                }
 
                 parameters.put(varName, varType);
             } while (matchAdvance(TK_COMMA));
@@ -91,7 +105,7 @@ public class Parser {
         PrimitiveType type;
         if (matchAdvance(TK_COLON)) {
             TokenType next = peek().getTokenType();
-            if (next != TK_DATA_TYPE || next != TK_VOID) {
+            if (next != TK_DATA_TYPE && next != TK_VOID) {
                 error("A Return Datatype For The Function Was Expected", peekLine());
                 type = PR_ERROR;
             } else {
@@ -139,7 +153,7 @@ public class Parser {
         }
 
         addGlobal(name, accessType, checkType(type), isInitialized);
-        return new Variable(name.getLiteral(), expression, checkType(type), true, name.getLine());
+        return new Variable(name.getLiteral(), expression, checkType(type), true, isInitialized, name.getLine());
     }
 
     private void addGlobal(Token name, TokenType accessType, PrimitiveType variableType, boolean isInitialized) {
@@ -212,7 +226,7 @@ public class Parser {
         }
 
         addLocal(localToken, accessType, checkType(type), isInitialized);
-        return new Variable(localToken.getLiteral(), expression, checkType(type),false, localToken.getLine());
+        return new Variable(localToken.getLiteral(), expression, checkType(type),false, isInitialized, localToken.getLine());
     }
 
     private void addLocal(Token name, TokenType accessType, PrimitiveType variableType, boolean isInitialized) {

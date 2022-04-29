@@ -157,6 +157,20 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
 
     public Void visitVariableStatement(Variable statement) {
         statement.getInitializer().accept(this);
+        boolean isInitialized = statement.isInitiallyInitialized();
+
+        if (statement.isGlobal()) {
+            if (this.globals.isConstant(statement.getName()) && !isInitialized) {
+                newError("Global Constants Must Be Initialized While Being Declared", statement.getLine());
+            }
+        } else {
+            LocalVariable.Local local = this.locals.getLocal(statement.getName());
+
+            if (local.isConstant() && !isInitialized) {
+                newError("Local Constants Must Be Initialized While Being Declared", statement.getLine());
+            }
+        }
+
         return null;
     }
 

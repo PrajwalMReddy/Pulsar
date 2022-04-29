@@ -112,16 +112,13 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
     public String visitFunctionStatement(Function statement) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append(giveTabs() + "Function(" + parameters(statement.getParameters()) + ")(\n");
-        incrementIndentCount();
-        stringBuilder.append(statement.getStatements().accept(this));
-        decrementIndentCount();
+        stringBuilder.append("\n" + giveTabs() + "Function(" + parameters(statement.getParameters()) + ")(\n");
+        stringBuilder.append(blockStatement(statement.getStatements()));
 
         stringBuilder.append("\n" + giveTabs() + ")");
         return stringBuilder.toString();
     }
 
-    // TODO Finish Properly
     private String parameters(HashMap<String, PrimitiveType> parameters) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -136,7 +133,7 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
     public String visitIfStatement(If statement) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("\n" + giveTabs() + "If(" + statement.getCondition().accept(this) + ") (\n");
+        stringBuilder.append("\n" + giveTabs() + "If(" + statement.getCondition().accept(this) + ")(\n");
         stringBuilder.append(blockStatement(statement.getThenBranch()) + "\n" + giveTabs() + ")");
 
         if (statement.hasElse()) {
@@ -168,7 +165,7 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
     public String visitWhileStatement(While statement) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("\n" + giveTabs() + "While(" + statement.getCondition().accept(this) + ") (\n");
+        stringBuilder.append("\n" + giveTabs() + "While(" + statement.getCondition().accept(this) + ")(\n");
         stringBuilder.append(blockStatement(statement.getStatements()) + "\n" + giveTabs() + ")");
 
         return stringBuilder.toString();
