@@ -1,4 +1,4 @@
-package org.codepulsar.ast.statement;
+package org.codepulsar.ast.statements;
 
 import org.codepulsar.ast.Statement;
 

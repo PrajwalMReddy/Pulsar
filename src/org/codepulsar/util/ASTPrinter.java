@@ -2,11 +2,12 @@ package org.codepulsar.util;
 
 import org.codepulsar.ast.Expression;
 import org.codepulsar.ast.Statement;
-import org.codepulsar.ast.expression.*;
-import org.codepulsar.ast.statement.*;
+import org.codepulsar.ast.expressions.*;
+import org.codepulsar.ast.statements.*;
 import org.codepulsar.primitives.PrimitiveType;
 import org.codepulsar.pulsar.Pulsar;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor<String> {
@@ -108,7 +109,6 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         return "Expression(" + statement.getExpression().accept(this) + ")\n";
     }
 
-    // TODO Pretty Print Functions Properly
     public String visitFunctionStatement(Function statement) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -119,11 +119,13 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         return stringBuilder.toString();
     }
 
-    private String parameters(HashMap<String, PrimitiveType> parameters) {
+    private String parameters(ArrayList<Function.Parameter> parameters) {
+        if (parameters.size() == 0) { return ""; }
+
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (String name: parameters.keySet()) {
-            stringBuilder.append(name + ",");
+        for (Function.Parameter parameter: parameters) {
+            stringBuilder.append(parameter.getName() + ",");
         }
 
         String newString = stringBuilder.toString();

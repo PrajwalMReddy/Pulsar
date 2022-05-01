@@ -1,4 +1,4 @@
-package org.codepulsar.lang;
+package org.codepulsar.lang.variables;
 
 import org.codepulsar.primitives.Primitive;
 import org.codepulsar.primitives.PrimitiveType;

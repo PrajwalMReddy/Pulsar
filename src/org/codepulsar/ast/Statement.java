@@ -1,6 +1,6 @@
 package org.codepulsar.ast;
 
-import org.codepulsar.ast.statement.*;
+import org.codepulsar.ast.statements.*;
 
 public abstract class Statement {
     public interface Visitor<R> {

@@ -10,11 +10,11 @@ package org.codepulsar.analysis;
 
 import org.codepulsar.ast.Expression;
 import org.codepulsar.ast.Statement;
-import org.codepulsar.ast.expression.*;
-import org.codepulsar.ast.statement.*;
+import org.codepulsar.ast.expressions.*;
+import org.codepulsar.ast.statements.*;
 import org.codepulsar.lang.CompilerError;
-import org.codepulsar.lang.GlobalVariable;
-import org.codepulsar.lang.LocalVariable;
+import org.codepulsar.lang.variables.GlobalVariable;
+import org.codepulsar.lang.variables.LocalVariable;
 
 public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Void> {
     private final Statement program;

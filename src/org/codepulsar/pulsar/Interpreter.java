@@ -2,6 +2,8 @@ package org.codepulsar.pulsar;
 
 import org.codepulsar.lang.*;
 import org.codepulsar.lang.CompilerError.Error;
+import org.codepulsar.lang.variables.GlobalVariable;
+import org.codepulsar.lang.variables.LocalVariable;
 import org.codepulsar.primitives.Primitive;
 import org.codepulsar.primitives.types.PBoolean;
 import org.codepulsar.primitives.types.PNull;

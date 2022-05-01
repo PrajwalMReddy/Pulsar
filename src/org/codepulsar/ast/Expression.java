@@ -1,6 +1,6 @@
 package org.codepulsar.ast;
 
-import org.codepulsar.ast.expression.*;
+import org.codepulsar.ast.expressions.*;
 
 public abstract class Expression {
     public interface Visitor<R> {

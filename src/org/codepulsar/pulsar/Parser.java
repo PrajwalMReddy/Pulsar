@@ -2,14 +2,17 @@ package org.codepulsar.pulsar;
 
 import org.codepulsar.ast.Expression;
 import org.codepulsar.ast.Statement;
-import org.codepulsar.ast.expression.*;
-import org.codepulsar.ast.statement.*;
-import org.codepulsar.lang.*;
+import org.codepulsar.ast.expressions.*;
+import org.codepulsar.ast.statements.*;
+import org.codepulsar.lang.CompilerError;
+import org.codepulsar.lang.Token;
+import org.codepulsar.lang.TokenType;
+import org.codepulsar.lang.variables.GlobalVariable;
+import org.codepulsar.lang.variables.LocalVariable;
 import org.codepulsar.primitives.PrimitiveType;
 import org.codepulsar.util.TokenDisassembler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static org.codepulsar.lang.TokenType.*;
 import static org.codepulsar.primitives.PrimitiveType.*;
@@ -71,7 +74,7 @@ public class Parser {
                 return globalVariableDeclaration(TK_CONST);
             } else {
                 error("Only Global Variables And Functions Are Allowed At The Top Level", peekLine());
-                advance();
+                end();
             }
         }
 
@@ -82,21 +85,27 @@ public class Parser {
         String name = advance().getLiteral();
 
         look(TK_LPAR, "An Opening Parenthesis Was Expected Before The Parameter List");
-        HashMap<String, PrimitiveType> parameters = new HashMap<>();
+        ArrayList<Function.Parameter> parameters = new ArrayList<>();
 
+        int arity = 0;
         if (peekType() != TK_RPAR) {
             do {
                 String varName = advance().getLiteral();
                 PrimitiveType varType = PR_ERROR;
 
                 // TODO Validate That varType != PR_ERROR In The Validator
-                if (!match(TK_COLON)) {
+                if (!matchAdvance(TK_COLON)) {
                     error("A Colon Was Expected After The Variable Name", peekLine());
                 } else {
-                    varType = checkType(advance());
+                    if (!match(TK_DATA_TYPE)) {
+                        error("A Datatype Was Expected For The Function's Parameters", peekLine());
+                    } else {
+                        varType = checkType(advance());
+                    }
                 }
 
-                parameters.put(varName, varType);
+                parameters.add(new Function.Parameter(varName, varType));
+                arity++;
             } while (matchAdvance(TK_COMMA));
         }
 
@@ -116,7 +125,7 @@ public class Parser {
         }
 
         Block statements = block();
-        return new Function(name, type, parameters, statements, peekLine());
+        return new Function(name, type, parameters, arity, statements, peekLine());
     }
 
     private Statement globalVariableDeclaration(TokenType accessType) {
@@ -548,6 +557,12 @@ public class Parser {
                 }
             }
 
+            advance();
+        }
+    }
+
+    private void end() {
+        while (!match(TK_EOF)) {
             advance();
         }
     }

@@ -1,4 +1,4 @@
-package org.codepulsar.ast.expression;
+package org.codepulsar.ast.expressions;
 
 import org.codepulsar.ast.Expression;
 import org.codepulsar.primitives.PrimitiveType;

@@ -1,5 +1,6 @@
-package org.codepulsar.lang;
+package org.codepulsar.lang.variables;
 
+import org.codepulsar.lang.Token;
 import org.codepulsar.primitives.PrimitiveType;
 
 import java.util.ArrayList;

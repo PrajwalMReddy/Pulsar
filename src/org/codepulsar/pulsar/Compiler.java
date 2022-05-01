@@ -2,7 +2,7 @@ package org.codepulsar.pulsar;
 
 import org.codepulsar.lang.CompilerError;
 import org.codepulsar.lang.Instruction;
-import org.codepulsar.lang.LocalVariable;
+import org.codepulsar.lang.variables.LocalVariable;
 import org.codepulsar.primitives.Primitive;
 import org.codepulsar.util.Disassembler;
 import org.codepulsar.util.ErrorReporter;
