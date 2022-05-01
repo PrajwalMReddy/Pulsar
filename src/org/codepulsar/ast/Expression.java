@@ -7,6 +7,7 @@ public abstract class Expression {
         // Expression Visitor Methods
         R visitAssignmentExpression(Assignment expression);
         R visitBinaryExpression(Binary expression);
+        R visitCallExpression(Call expression);
         R visitGroupingExpression(Grouping expression);
         R visitLiteralExpression(Literal expression);
         R visitLogicalExpression(Logical expression);

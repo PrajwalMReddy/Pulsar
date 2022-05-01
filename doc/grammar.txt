@@ -88,7 +88,13 @@ factor:
 
 unary:
     | ("!" | "-" | "+") unary
-    | primary
+    | call
+
+call:
+    | primary "(" argument? ")"
+
+argument:
+    | expression ("," expression)*
 
 primary:
     | IDENTIFIER

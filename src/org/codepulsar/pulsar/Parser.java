@@ -460,7 +460,28 @@ public class Parser {
             return unary();
         }
 
-        return primary();
+        return call();
+    }
+
+    // TODO No 'Nested Calls' Allowed For Now
+    private Expression call() {
+        Token name = peek();
+        Expression expression = primary();
+
+        if (matchAdvance(TK_LPAR)) {
+            ArrayList<Expression> arguments = new ArrayList<>();
+
+            if (!match(TK_RPAR)) {
+                do {
+                    arguments.add(expression());
+                } while (matchAdvance(TK_COMMA));
+            }
+
+            look(TK_RPAR, "A Closing Parenthesis Is Required After A Call Expression");
+            return new Call(name, arguments);
+        }
+
+        return expression;
     }
 
     private Expression primary() {

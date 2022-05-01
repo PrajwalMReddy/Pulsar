@@ -190,6 +190,11 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return null;
     }
 
+    // TODO Generating ByteCode For Function Calls
+    public Instruction visitCallExpression(Call expression) {
+        return null;
+    }
+
     public Instruction visitGroupingExpression(Grouping expression) {
         return expression.getExpression().accept(this);
     }

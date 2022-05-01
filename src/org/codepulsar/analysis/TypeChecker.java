@@ -90,6 +90,11 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         }
     }
 
+    // TODO TypeCheck Function Calls
+    public PrimitiveType visitCallExpression(Call expression) {
+        return null;
+    }
+
     public PrimitiveType visitGroupingExpression(Grouping expression) {
         return expression.getExpression().accept(this);
     }

@@ -55,6 +55,19 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         return "Binary(" + expression.getLeft().accept(this) + " " + expression.getOperator() + " " + expression.getRight().accept(this);
     }
 
+    public String visitCallExpression(Call expression) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Call([" + expression.getName().getLiteral() + "] ");
+
+        for (Expression expression1: expression.getArguments()) {
+            stringBuilder.append(expression1.accept(this) + ",");
+        }
+
+        String newString = stringBuilder.toString();
+        newString = newString.substring(0, newString.length() - 1) + ")";
+        return newString;
+    }
+
     public String visitGroupingExpression(Grouping expression) {
         return "(" + expression.getExpression().accept(this) + ")";
     }
@@ -112,7 +125,7 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
     public String visitFunctionStatement(Function statement) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("\n" + giveTabs() + "Function(" + parameters(statement.getParameters()) + ")(\n");
+        stringBuilder.append("\n" + giveTabs() + "Function([" + statement.getName() + "] " + parameters(statement.getParameters()) + ")(\n");
         stringBuilder.append(blockStatement(statement.getStatements()));
 
         stringBuilder.append("\n" + giveTabs() + ")");

@@ -4,7 +4,6 @@ import org.codepulsar.ast.Statement;
 import org.codepulsar.primitives.PrimitiveType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Function extends Statement {
     private String name;
@@ -29,6 +28,10 @@ public class Function extends Statement {
 
     public <R> R accept(Visitor<R> visitor) {
         return visitor.visitFunctionStatement(this);
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public ArrayList<Parameter> getParameters() {
