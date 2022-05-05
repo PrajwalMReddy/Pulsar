@@ -57,7 +57,7 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
 
     public String visitCallExpression(Call expression) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Call([" + expression.getName().getLiteral() + "] ");
+        stringBuilder.append("Call:" + expression.getName().getLiteral() + "(");
 
         for (Expression expression1: expression.getArguments()) {
             stringBuilder.append(expression1.accept(this) + ",");
@@ -125,7 +125,7 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
     public String visitFunctionStatement(Function statement) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("\n" + giveTabs() + "Function([" + statement.getName() + "] " + parameters(statement.getParameters()) + ")(\n");
+        stringBuilder.append("\n" + giveTabs() + "Function:" + statement.getName() + "(" + parameters(statement.getParameters()) + ")(\n");
         stringBuilder.append(blockStatement(statement.getStatements()));
 
         stringBuilder.append("\n" + giveTabs() + ")");

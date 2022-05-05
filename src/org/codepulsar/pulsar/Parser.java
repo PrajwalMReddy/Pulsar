@@ -7,6 +7,7 @@ import org.codepulsar.ast.statements.*;
 import org.codepulsar.lang.CompilerError;
 import org.codepulsar.lang.Token;
 import org.codepulsar.lang.TokenType;
+import org.codepulsar.lang.variables.FunctionVariable;
 import org.codepulsar.lang.variables.GlobalVariable;
 import org.codepulsar.lang.variables.LocalVariable;
 import org.codepulsar.primitives.PrimitiveType;
@@ -26,6 +27,7 @@ public class Parser {
     private int current; // Next Token To Be Used
     private int depth;
 
+    private final FunctionVariable functions;
     private final GlobalVariable globals;
     private final LocalVariable locals;
 
@@ -39,6 +41,7 @@ public class Parser {
         this.current = 0;
         this.depth = 1;
 
+        this.functions = new FunctionVariable();
         this.globals = new GlobalVariable();
         this.locals = new LocalVariable();
     }
@@ -125,6 +128,8 @@ public class Parser {
         }
 
         Block statements = block();
+
+        this.functions.addFunction(name, parameters.size());
         return new Function(name, type, parameters, arity, statements, peekLine());
     }
 
@@ -614,6 +619,10 @@ public class Parser {
 
     private void error(String message, int line) {
         this.errors.addError("Parsing Error", message, line);
+    }
+
+    public FunctionVariable getFunctions() {
+        return this.functions;
     }
 
     public GlobalVariable getGlobals() {

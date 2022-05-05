@@ -168,6 +168,7 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
 
     // TODO TypeCheck Functions
     public Void visitFunctionStatement(Function statement) {
+        statement.getStatements().accept(this);
         return null;
     }
 

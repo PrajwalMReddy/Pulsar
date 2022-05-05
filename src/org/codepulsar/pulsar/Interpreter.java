@@ -1,7 +1,10 @@
 package org.codepulsar.pulsar;
 
-import org.codepulsar.lang.*;
+import org.codepulsar.lang.ByteCode;
+import org.codepulsar.lang.CompilerError;
 import org.codepulsar.lang.CompilerError.Error;
+import org.codepulsar.lang.Instruction;
+import org.codepulsar.lang.variables.FunctionVariable;
 import org.codepulsar.lang.variables.GlobalVariable;
 import org.codepulsar.lang.variables.LocalVariable;
 import org.codepulsar.primitives.Primitive;
@@ -13,7 +16,7 @@ import org.codepulsar.util.ErrorReporter;
 import java.util.ArrayList;
 
 import static org.codepulsar.lang.ByteCode.*;
-import static org.codepulsar.primitives.PrimitiveType.*;
+import static org.codepulsar.primitives.PrimitiveType.PR_NULL;
 
 public class Interpreter {
     // Input Data
@@ -21,6 +24,7 @@ public class Interpreter {
     private ArrayList<Instruction> instructions;
 
     // Data To Help In Interpreting
+    private FunctionVariable functions;
     private GlobalVariable globals;
     private LocalVariable locals;
     private ArrayList<Primitive> values;
@@ -45,8 +49,9 @@ public class Interpreter {
 
     public void interpret() {
         ByteCodeCompiler bcc = new ByteCodeCompiler(this.sourceCode);
-        this.instructions = bcc.compileByteCode();
+        bcc.compileByteCode();
 
+        this.functions = bcc.getFunctions();
         this.globals = bcc.getGlobals();
         this.locals = bcc.getLocals();
 
@@ -58,13 +63,15 @@ public class Interpreter {
         ErrorReporter.report(this.errors, this.sourceCode);
         ErrorReporter.report(this.staticErrors, this.sourceCode);
 
-        Disassembler.disassemble(this.instructions, bcc);
+        Disassembler.disassemble(this.functions, bcc);
 
         System.out.println();
         execute();
     }
 
     private void execute() {
+        this.instructions = this.functions.getVariables().get("main").getChunk();
+
         while (this.ip < this.instructions.size()) {
             Instruction instruction = this.instructions.get(this.ip);
 

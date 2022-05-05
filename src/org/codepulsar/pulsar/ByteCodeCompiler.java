@@ -7,6 +7,7 @@ import org.codepulsar.ast.Statement;
 import org.codepulsar.ast.expressions.*;
 import org.codepulsar.ast.statements.*;
 import org.codepulsar.lang.*;
+import org.codepulsar.lang.variables.FunctionVariable;
 import org.codepulsar.lang.variables.GlobalVariable;
 import org.codepulsar.lang.variables.LocalVariable;
 import org.codepulsar.primitives.Primitive;
@@ -24,12 +25,13 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     private Statement program;
 
     // Data To Help In Compiling To ByteCode
+    private FunctionVariable functions;
     private GlobalVariable globals;
     private LocalVariable locals;
     private final ArrayList<Primitive> values; // Constant Values To Be Stored
 
     // Output Data
-    private final ArrayList<Instruction> instructions;
+    private ArrayList<Instruction> currentChunk;
     private CompilerError errors;
     private CompilerError staticErrors;
 
@@ -38,18 +40,19 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
         this.values = new ArrayList<>();
 
-        this.instructions = new ArrayList<>();
+        this.currentChunk = new ArrayList<>();
     }
 
-    public ArrayList<Instruction> compileByteCode() {
+    public void compileByteCode() {
         Parser ast = new Parser(this.sourceCode);
         this.program = ast.parse();
 
+        this.functions = ast.getFunctions();
         this.globals = ast.getGlobals();
         this.locals = ast.getLocals();
 
         this.errors = ast.getErrors();
-        if (this.errors.hasError()) return instructions;
+        if (this.errors.hasError()) return;
 
         ASTPrinter astPrinter = new ASTPrinter();
         astPrinter.print(this.program);
@@ -61,13 +64,13 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         validator.validate();
 
         this.staticErrors = analyzer.getErrors();
-        if (this.staticErrors.hasError()) return instructions;
+        if (this.staticErrors.hasError()) return;
         this.staticErrors = validator.getErrors();
-        if (this.staticErrors.hasError()) return instructions;
+        if (this.staticErrors.hasError()) return;
 
         compile();
         
-        return this.instructions;
+        return;
     }
 
     private void compile() {
@@ -109,7 +112,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     }
 
     public Void visitWhileStatement(While statement) {
-        int start = this.instructions.size();
+        int start = this.currentChunk.size();
         statement.getCondition().accept(this);
 
         int offset = makeJump(OP_JUMP_IF_FALSE, statement.getLine());
@@ -160,8 +163,11 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return null;
     }
 
-    // TODO Generate ByteCode For Functions
     public Void visitFunctionStatement(Function statement) {
+        statement.getStatements().accept(this);
+        this.functions.setChunk(statement.getName(), this.currentChunk);
+
+        this.currentChunk = new ArrayList<>();
         return null;
     }
 
@@ -259,35 +265,34 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         this.values.add(primitiveLiteral);
 
         Instruction instruction = new Instruction(OP_CONSTANT, this.values.size() - 1, line);
-        this.instructions.add(instruction);
+        this.currentChunk.add(instruction);
         return instruction;
     }
 
     private Instruction makeOpCode(ByteCode opcode, int line) {
         Instruction instruction = new Instruction(opcode, null, line);
-        this.instructions.add(instruction);
+        this.currentChunk.add(instruction);
         return instruction;
     }
 
     private Instruction makeOpCode(ByteCode opcode, Object operand, int line) {
         Instruction instruction = new Instruction(opcode, operand, line);
-        this.instructions.add(instruction);
+        this.currentChunk.add(instruction);
         return instruction;
     }
 
     private int makeJump(ByteCode opcode, int line) {
-        int size = this.instructions.size();
-
+        int size = this.currentChunk.size();
         makeOpCode(opcode, line);
 
         return size;
     }
 
     private void fixJump(int offset, ByteCode opcode) {
-        Instruction oldJump = this.instructions.get(offset);
+        Instruction oldJump = this.currentChunk.get(offset);
         int line = oldJump.getLine();
-        Instruction jumpOpCode = new Instruction(opcode, this.instructions.size(), line);
-        this.instructions.set(offset, jumpOpCode);
+        Instruction jumpOpCode = new Instruction(opcode, this.currentChunk.size(), line);
+        this.currentChunk.set(offset, jumpOpCode);
     }
 
     private ByteCode identifyUnaryOperator(String operator) {
@@ -333,6 +338,10 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
     public ArrayList<Primitive> getValues() {
         return this.values;
+    }
+
+    public FunctionVariable getFunctions() {
+        return this.functions;
     }
 
     public GlobalVariable getGlobals() {

@@ -137,6 +137,7 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
 
     // TODO Validate Functions
     public Void visitFunctionStatement(Function statement) {
+        statement.getStatements().accept(this);
         return null;
     }
 

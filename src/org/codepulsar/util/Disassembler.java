@@ -1,34 +1,44 @@
 package org.codepulsar.util;
 
+import org.codepulsar.lang.variables.FunctionVariable;
 import org.codepulsar.pulsar.ByteCodeCompiler;
 import org.codepulsar.pulsar.Pulsar;
 import org.codepulsar.lang.ByteCode;
 import org.codepulsar.lang.Instruction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Disassembler {
-    public static void disassemble(ArrayList<Instruction> instructions, ByteCodeCompiler bcc) {
+    public static void disassemble(FunctionVariable functions, ByteCodeCompiler bcc) {
         if (Pulsar.conditions.getDebug()) {
             System.out.println("\n-- Disassembled Bytecode --");
-            displayInstructions(instructions, bcc);
+            displayInstructions(functions, bcc);
         }
     }
 
-    private static void displayInstructions(ArrayList<Instruction> instructions, ByteCodeCompiler bcc) {
-        int line = 0;
-        int count = 0;
+    private static void displayInstructions(FunctionVariable functions, ByteCodeCompiler bcc) {
 
-        for (Instruction instruction: instructions) {
-            if (instruction.getLine() == line) {
-                System.out.print("            " + count + "  | ");
-            } else {
-                line = instruction.getLine();
-                System.out.print("\n" + line + spaces(line) + count + "  | ");
+        for (Map.Entry<String, FunctionVariable.Function> entry: functions.getVariables().entrySet()) {
+            String name = entry.getKey();
+            ArrayList<Instruction> chunk = entry.getValue().getChunk();
+
+            int line = 0;
+            int count = 0;
+
+            System.out.println("\n\nDisassembly Of Function: " + name);
+            for (Instruction instruction: chunk) {
+                if (instruction.getLine() == line) {
+                    System.out.print("            " + count + "  | ");
+                } else {
+                    line = instruction.getLine();
+                    System.out.print("\n" + line + spaces(line) + count + "  | ");
+                }
+
+                decide(instruction, bcc);
+                count++;
             }
-
-            decide(instruction, bcc);
-            count++;
         }
     }
 
