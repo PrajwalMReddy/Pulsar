@@ -4,12 +4,13 @@ import org.codepulsar.lang.Instruction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class FunctionVariable {
-    private HashMap<String, Function> variables;
+    private LinkedHashMap<String, Function> variables;
 
     public FunctionVariable() {
-        this.variables = new HashMap<>();
+        this.variables = new LinkedHashMap<>();
     }
 
     public void addFunction(String name, int arity) {

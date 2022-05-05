@@ -128,7 +128,6 @@ public class Parser {
         }
 
         Block statements = block();
-
         this.functions.addFunction(name, parameters.size());
         return new Function(name, type, parameters, arity, statements, peekLine());
     }

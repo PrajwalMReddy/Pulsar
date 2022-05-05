@@ -12,7 +12,7 @@ public class LocalVariable {
 
     public LocalVariable() {
         this.variables = new ArrayList<>();
-        this.scopeDepth = 1;
+        this.scopeDepth = 0;
         this.localCount = 0;
     }
 
