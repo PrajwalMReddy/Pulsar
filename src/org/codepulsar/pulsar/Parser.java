@@ -85,6 +85,7 @@ public class Parser {
     }
 
     private Statement functionDeclaration() {
+        int line = peekLine();
         String name = advance().getLiteral();
 
         look(TK_LPAR, "An Opening Parenthesis Was Expected Before The Parameter List");
@@ -128,6 +129,11 @@ public class Parser {
         }
 
         Block statements = block();
+
+        if (this.functions.getVariables().get(name) != null) {
+            error("Function " + name + " Already Exists", line);
+        }
+
         this.functions.addFunction(name, parameters.size());
         return new Function(name, type, parameters, arity, statements, peekLine());
     }

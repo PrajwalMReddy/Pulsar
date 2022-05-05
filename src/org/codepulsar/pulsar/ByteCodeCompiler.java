@@ -60,16 +60,15 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         TypeChecker analyzer = new TypeChecker(this.program, this.globals, this.locals);
         Validator validator = new Validator(this.program, this.globals, this.locals);
 
-        analyzer.check();
         validator.validate();
-
-        this.staticErrors = analyzer.getErrors();
-        if (this.staticErrors.hasError()) return;
         this.staticErrors = validator.getErrors();
         if (this.staticErrors.hasError()) return;
 
+        analyzer.check();
+        this.staticErrors = analyzer.getErrors();
+        if (this.staticErrors.hasError()) return;
+
         compile();
-        
         return;
     }
 
