@@ -27,7 +27,7 @@ public class Disassembler {
             int line = 0;
             int count = 0;
 
-            System.out.println("\n\nDisassembly Of Function: " + name);
+            System.out.println("\n\nDisassembly Of Function " + name);
             for (Instruction instruction: chunk) {
                 if (instruction.getLine() == line) {
                     System.out.print("            " + count + "  | ");
@@ -47,7 +47,8 @@ public class Disassembler {
             // These Are OpCodes That Have Operands
             case OP_CONSTANT, OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,
                     OP_NEW_GLOBAL, OP_STORE_GLOBAL, OP_LOAD_GLOBAL,
-                    OP_SET_LOCAL, OP_GET_LOCAL, OP_NEW_LOCAL -> operand(instruction, bcc);
+                    OP_SET_LOCAL, OP_GET_LOCAL, OP_NEW_LOCAL,
+                    OP_LOAD_FUNCTION, OP_CALL -> operand(instruction, bcc);
 
             // These Are OpCodes That Don't Have Operands
             case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_MODULO, OP_NEGATE,

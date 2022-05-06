@@ -49,10 +49,10 @@ public class GlobalVariable {
     }
 
     static class Global {
-        private Primitive value;
-        private PrimitiveType type;
+        private final Primitive value;
+        private final PrimitiveType type;
         private boolean isInitialized;
-        private boolean isConstant;
+        private final boolean isConstant;
 
         public Global(Primitive value, PrimitiveType type, boolean isInitialized, boolean isConstant) {
             this.value = value;

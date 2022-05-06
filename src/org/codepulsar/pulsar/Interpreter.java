@@ -1,6 +1,7 @@
 package org.codepulsar.pulsar;
 
 import org.codepulsar.lang.ByteCode;
+import org.codepulsar.lang.CallFrame;
 import org.codepulsar.lang.CompilerError;
 import org.codepulsar.lang.CompilerError.Error;
 import org.codepulsar.lang.Instruction;
@@ -9,6 +10,7 @@ import org.codepulsar.lang.variables.GlobalVariable;
 import org.codepulsar.lang.variables.LocalVariable;
 import org.codepulsar.primitives.Primitive;
 import org.codepulsar.primitives.types.PBoolean;
+import org.codepulsar.primitives.types.PFunctionName;
 import org.codepulsar.primitives.types.PNull;
 import org.codepulsar.util.Disassembler;
 import org.codepulsar.util.ErrorReporter;
@@ -24,7 +26,13 @@ public class Interpreter {
     private ArrayList<Instruction> instructions;
 
     // Data To Help In Interpreting
+    private String currentFunction;
     private FunctionVariable functions;
+
+    private CallFrame currentFrame;
+    private CallFrame[] callFrames;
+    private int callFrameCount;
+
     private GlobalVariable globals;
     private LocalVariable locals;
     private ArrayList<Primitive> values;
@@ -34,13 +42,17 @@ public class Interpreter {
     private CompilerError staticErrors;
 
     // Other Necessary Data
-    private final int STACK_MAX = 1024;
+    private final int FRAMES_MAX = 64;
+    private final int STACK_MAX = 1024 * FRAMES_MAX;
     private final Primitive[] stack;
     private int sp; // Stack Top
     private int ip; // Instruction Pointer
 
     public Interpreter(String sourceCode) {
         this.sourceCode = sourceCode;
+
+        this.callFrames = new CallFrame[FRAMES_MAX];
+        this.callFrameCount = 0;
 
         this.stack = new Primitive[STACK_MAX];
         this.sp = 0;
@@ -118,6 +130,22 @@ public class Interpreter {
                 case OP_JUMP -> this.ip = (int) instruction.getOperand() - 1;
                 case OP_JUMP_IF_TRUE -> conditionalJump(instruction, OP_JUMP_IF_TRUE);
                 case OP_JUMP_IF_FALSE -> conditionalJump(instruction, OP_JUMP_IF_FALSE);
+
+                case OP_LOAD_FUNCTION -> push(new PFunctionName(instruction.getOperand().toString()));
+                case OP_CALL -> {
+                    int nameOffset = this.sp - (int) instruction.getOperand() - 1;
+                    String functionName = this.stack[nameOffset].getPrimitiveValue().toString();
+                    FunctionVariable.Function function = this.functions.getVariables().get(functionName);
+
+                    int stackOffset = this.sp - (int) instruction.getOperand() - 1;
+                    CallFrame frame = new CallFrame(this.currentFunction, this.ip, function, stackOffset);
+                    this.currentFrame = frame;
+                    this.callFrames[this.callFrameCount] = frame;
+
+                    this.currentFunction = functionName;
+                    this.instructions = function.getChunk();
+                    this.ip = -1;
+                }
 
                 case OP_PRINT -> System.out.println(pop());
                 case OP_POP -> pop();

@@ -6,14 +6,14 @@ import org.codepulsar.primitives.PrimitiveType;
 import java.util.ArrayList;
 
 public class Function extends Statement {
-    private String name;
-    private PrimitiveType type;
+    private final String name;
+    private final PrimitiveType type;
 
-    private ArrayList<Parameter> parameters;
+    private final ArrayList<Parameter> parameters;
     private final int arity;
-    private Block statements;
+    private final Block statements;
 
-    private int line;
+    private final int line;
 
     public Function(String name, PrimitiveType type, ArrayList<Parameter> parameters, int arity, Block statements, int line) {
         this.name = name;
@@ -47,8 +47,8 @@ public class Function extends Statement {
     }
 
     public static class Parameter {
-        private String name;
-        private PrimitiveType type;
+        private final String name;
+        private final PrimitiveType type;
 
         public Parameter(String name, PrimitiveType type) {
             this.name = name;

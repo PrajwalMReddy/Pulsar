@@ -94,7 +94,8 @@ public class Parser {
         int arity = 0;
         if (peekType() != TK_RPAR) {
             do {
-                String varName = advance().getLiteral();
+                Token varToken = advance();
+                String varName = varToken.getLiteral();
                 PrimitiveType varType = PR_ERROR;
 
                 // TODO Validate That varType != PR_ERROR In The Validator
@@ -108,6 +109,7 @@ public class Parser {
                     }
                 }
 
+                this.locals.newLocal(varToken, varName, varType, true, false);
                 parameters.add(new Function.Parameter(varName, varType));
                 arity++;
             } while (matchAdvance(TK_COMMA));
@@ -134,7 +136,7 @@ public class Parser {
             error("Function " + name + " Already Exists", line);
         }
 
-        this.functions.addFunction(name, parameters.size());
+        this.functions.addFunction(name, parameters.size(), type);
         return new Function(name, type, parameters, arity, statements, peekLine());
     }
 

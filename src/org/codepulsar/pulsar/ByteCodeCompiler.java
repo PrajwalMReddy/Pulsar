@@ -195,8 +195,13 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return null;
     }
 
-    // TODO Generating ByteCode For Function Calls
     public Instruction visitCallExpression(Call expression) {
+        makeOpCode(OP_LOAD_FUNCTION, expression.getName().getLiteral(), expression.getLine());
+        for (Expression expression1: expression.getArguments()) {
+            expression1.accept(this);
+        }
+
+        makeOpCode(OP_CALL, expression.getArguments().size(), expression.getLine());
         return null;
     }
 

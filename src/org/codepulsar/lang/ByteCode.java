@@ -14,6 +14,9 @@ public enum ByteCode {
     // Control Flow OpCodes
     OP_JUMP, OP_JUMP_IF_TRUE, OP_JUMP_IF_FALSE,
 
+    // Functions and Classes
+    OP_LOAD_FUNCTION, OP_CALL,
+
     // Special OpCodes
     OP_PRINT, OP_POP, // TODO OP_PRINT Is A Temporary Opcode
 }
