@@ -23,4 +23,8 @@ public class CallFrame {
     public int getReturnIP() {
         return this.returnIP;
     }
+
+    public int getStackOffset() {
+        return this.stackOffset;
+    }
 }

@@ -46,5 +46,9 @@ public class FunctionVariable {
         public void setChunk(ArrayList<Instruction> chunk) {
             this.chunk = chunk;
         }
+
+        public int getArity() {
+            return this.arity;
+        }
     }
 }

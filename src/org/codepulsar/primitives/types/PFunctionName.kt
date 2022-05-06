@@ -52,4 +52,7 @@ class PFunctionName(var name: String) : Primitive() {
         return PNone()
     }
 
+    override fun toString(): String {
+        return name
+    }
 }

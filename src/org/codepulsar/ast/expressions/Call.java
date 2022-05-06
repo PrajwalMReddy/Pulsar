@@ -30,6 +30,10 @@ public class Call extends Expression {
         return this.arguments;
     }
 
+    public int getArity() {
+        return this.arguments.size();
+    }
+
     public int getLine() {
         return this.line;
     }

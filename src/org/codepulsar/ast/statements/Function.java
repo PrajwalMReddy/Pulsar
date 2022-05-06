@@ -46,6 +46,10 @@ public class Function extends Statement {
         return this.statements;
     }
 
+    public int getLine() {
+        return this.line;
+    }
+
     public static class Parameter {
         private final String name;
         private final PrimitiveType type;

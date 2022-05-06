@@ -78,13 +78,21 @@ public class Interpreter {
         Disassembler.disassemble(this.functions, bcc);
 
         System.out.println();
+        setUp();
+    }
+
+    private void setUp() {
+        this.instructions = this.functions.getVariables().get("main").getChunk();
+        this.currentFunction = "main";
+
+        this.currentFrame = new CallFrame("main", 0, null, 0);
+        this.callFrames[callFrameCount] = this.currentFrame;
+        this.callFrameCount++;
+
         execute();
     }
 
     private void execute() {
-        this.instructions = this.functions.getVariables().get("main").getChunk();
-        this.currentFunction = "main";
-
         while (this.ip < this.instructions.size()) {
             Instruction instruction = this.instructions.get(this.ip);
 
@@ -120,11 +128,11 @@ public class Interpreter {
 
                 case OP_NEW_LOCAL -> {}
                 case OP_GET_LOCAL -> {
-                    int slot = (int) instruction.getOperand();
+                    int slot = (int) instruction.getOperand() + this.currentFrame.getStackOffset();
                     push(this.stack[slot]);
                 }
                 case OP_SET_LOCAL -> {
-                    int slot = (int) instruction.getOperand();
+                    int slot = (int) instruction.getOperand() + this.currentFrame.getStackOffset();
                     this.stack[slot] = this.stack[this.sp - 1];
                 }
 
@@ -133,32 +141,8 @@ public class Interpreter {
                 case OP_JUMP_IF_FALSE -> conditionalJump(instruction, OP_JUMP_IF_FALSE);
 
                 case OP_LOAD_FUNCTION -> push(new PFunctionName(instruction.getOperand().toString()));
-                case OP_CALL -> {
-                    int nameOffset = this.sp - (int) instruction.getOperand() - 1;
-                    String functionName = this.stack[nameOffset].getPrimitiveValue().toString();
-                    FunctionVariable.Function function = this.functions.getVariables().get(functionName);
-
-                    int stackOffset = this.sp - (int) instruction.getOperand() - 1;
-                    CallFrame frame = new CallFrame(this.currentFunction, this.ip, function, stackOffset);
-                    this.currentFrame = frame;
-                    this.callFrames[this.callFrameCount] = frame;
-                    this.callFrameCount++;
-
-                    this.currentFunction = functionName;
-                    this.instructions = function.getChunk();
-                    this.ip = -1;
-                }
-                case OP_RETURN -> {
-                    CallFrame current = this.currentFrame;
-                    String caller = current.getCaller();
-                    FunctionVariable.Function function = this.functions.getVariables().get(caller);
-
-                    this.currentFunction = caller;
-                    this.callFrameCount--;
-
-                    this.instructions = function.getChunk();
-                    this.ip = current.getReturnIP();
-                }
+                case OP_CALL -> callFunction(instruction);
+                case OP_RETURN -> returnFromFunction();
 
                 case OP_PRINT -> System.out.println(pop());
                 case OP_POP -> pop();
@@ -247,6 +231,34 @@ public class Interpreter {
         push(this.globals.getValue(variableName));
     }
 
+    private void callFunction(Instruction instruction) {
+        int nameOffset = this.sp - (int) instruction.getOperand() - 1;
+        String functionName = this.stack[nameOffset].getPrimitiveValue().toString();
+        FunctionVariable.Function function = this.functions.getVariables().get(functionName);
+
+        int stackOffset = this.sp - (int) instruction.getOperand();
+        CallFrame frame = new CallFrame(this.currentFunction, this.ip, function, stackOffset);
+        this.currentFrame = frame;
+        this.callFrames[this.callFrameCount] = frame;
+        this.callFrameCount++;
+
+        this.currentFunction = functionName;
+        this.instructions = function.getChunk();
+        this.ip = -1;
+    }
+
+    private void returnFromFunction() {
+        CallFrame current = this.currentFrame;
+        String caller = current.getCaller();
+        FunctionVariable.Function function = this.functions.getVariables().get(caller);
+
+        this.currentFunction = caller;
+        this.callFrameCount--;
+
+        this.instructions = function.getChunk();
+        this.ip = current.getReturnIP();
+    }
+
     private void push(Primitive value) {
         if (this.sp >= STACK_MAX) {
             runtimeError("A Stack Overflow Has Occurred");
@@ -259,6 +271,14 @@ public class Interpreter {
     private Primitive pop() {
         this.sp--;
         return this.stack[this.sp];
+    }
+
+    // Stack Debugger (Prints Out The Stack)
+    private void debugStack(int till) {
+        for (int i = 0; i < till; i++) {
+            System.out.print(this.stack[i] + "  |  ");
+        }
+        System.out.println();
     }
 
     private void runtimeError(String message) {

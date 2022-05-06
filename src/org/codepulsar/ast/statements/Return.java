@@ -7,11 +7,13 @@ public class Return extends Statement {
     private boolean hasExpression;
     private Expression expression;
 
+    private String function;
     private int line;
 
-    public Return(boolean hasExpression, Expression expression, int line) {
+    public Return(boolean hasExpression, Expression expression, String function, int line) {
         this.hasExpression = hasExpression;
         this.expression = expression;
+        this.function = function;
 
         this.line = line;
     }
@@ -26,6 +28,10 @@ public class Return extends Statement {
 
     public Expression getExpression() {
         return this.expression;
+    }
+
+    public String getFunction() {
+        return this.function;
     }
 
     public int getLine() {

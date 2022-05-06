@@ -13,18 +13,24 @@ import org.codepulsar.ast.Statement;
 import org.codepulsar.ast.expressions.*;
 import org.codepulsar.ast.statements.*;
 import org.codepulsar.lang.CompilerError;
+import org.codepulsar.lang.variables.FunctionVariable;
 import org.codepulsar.lang.variables.GlobalVariable;
 import org.codepulsar.lang.variables.LocalVariable;
+import org.codepulsar.primitives.PrimitiveType;
+
+import java.util.Map;
 
 public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Void> {
     private final Statement program;
+    private final FunctionVariable functions;
     private final GlobalVariable globals;
     private final LocalVariable locals;
 
     private final CompilerError errors;
 
-    public Validator(Statement program, GlobalVariable globals, LocalVariable locals) {
+    public Validator(Statement program, FunctionVariable functions, GlobalVariable globals, LocalVariable locals) {
         this.program = program;
+        this.functions = functions;
         this.globals = globals;
         this.locals = locals;
 
@@ -36,7 +42,17 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
             return;
         }
 
+        generalValidation();
         this.program.accept(this);
+    }
+
+    private void generalValidation() {
+        int line = 1;
+
+        FunctionVariable.Function function = this.functions.getVariables().get("main");
+        if (function == null) {
+            newError("The Main Function Was Not Found", line);
+        }
     }
 
     public Void visitAssignmentExpression(Assignment expression) {
@@ -65,8 +81,13 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
         return null;
     }
 
-    // TODO Validate Function Calls
     public Void visitCallExpression(Call expression) {
+        FunctionVariable.Function function = this.functions.getVariables().get(expression.getName().getLiteral());
+        if (function.getArity() != expression.getArity()) {
+            newError("Function '" + expression.getName().getLiteral() + "' Takes " + function.getArity() + " Argument(s); "
+                    + expression.getArity() + " Argument(s) Was/Were Received", expression.getLine());
+        }
+
         return null;
     }
 
@@ -135,9 +156,15 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
         return null;
     }
 
-    // TODO Validate Functions
     public Void visitFunctionStatement(Function statement) {
         statement.getStatements().accept(this);
+
+        for (Function.Parameter parameter: statement.getParameters()) {
+            if (parameter.getType() == PrimitiveType.PR_ERROR) {
+                newError("Invalid Function Parameter(s) For Function " + statement.getName(), statement.getLine());
+            }
+        }
+
         return null;
     }
 
@@ -161,8 +188,11 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
         return null;
     }
 
-    // TODO Validate Return Statements
     public Void visitReturnStatement(Return statement) {
+        if (statement.hasExpression()) {
+            statement.getExpression().accept(this);
+        }
+
         return null;
     }
 
@@ -193,7 +223,6 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
     }
 
     private void newError(String message, int line) {
-        // TODO Need Better Error Type Than 'Code Error'
         this.errors.addError("Code Error", message, line);
     }
 

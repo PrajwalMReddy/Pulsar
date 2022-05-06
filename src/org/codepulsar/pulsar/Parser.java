@@ -11,7 +11,6 @@ import org.codepulsar.lang.variables.FunctionVariable;
 import org.codepulsar.lang.variables.GlobalVariable;
 import org.codepulsar.lang.variables.LocalVariable;
 import org.codepulsar.primitives.PrimitiveType;
-import org.codepulsar.primitives.types.PNull;
 import org.codepulsar.util.TokenDisassembler;
 
 import java.util.ArrayList;
@@ -32,6 +31,8 @@ public class Parser {
     private final GlobalVariable globals;
     private final LocalVariable locals;
 
+    private String currentFunction;
+
     // Output Data
     private Statement program;
     private CompilerError errors;
@@ -45,6 +46,8 @@ public class Parser {
         this.functions = new FunctionVariable();
         this.globals = new GlobalVariable();
         this.locals = new LocalVariable();
+
+        this.currentFunction = "";
     }
 
     public Statement parse() {
@@ -88,6 +91,7 @@ public class Parser {
     private Statement functionDeclaration() {
         int line = peekLine();
         String name = advance().getLiteral();
+        this.currentFunction = name;
 
         look(TK_LPAR, "An Opening Parenthesis Was Expected Before The Parameter List");
         ArrayList<Function.Parameter> parameters = new ArrayList<>();
@@ -105,6 +109,7 @@ public class Parser {
                 } else {
                     if (!match(TK_DATA_TYPE)) {
                         error("A Datatype Was Expected For The Function's Parameters", peekLine());
+                        while (!match(TK_RPAR)) advance();
                     } else {
                         varType = checkType(advance());
                     }
@@ -341,9 +346,9 @@ public class Parser {
         Return statement;
         if (match(TK_SEMICOLON)) {
             // TODO Remove Null Later
-            statement = new Return(true, new Literal("null", PR_NULL, peekLine()), peekLine());
+            statement = new Return(true, new Literal("null", PR_NULL, peekLine()), this.currentFunction, peekLine());
         } else {
-            statement = new Return(true, expression(), peekLine());
+            statement = new Return(true, expression(), this.currentFunction, peekLine());
         }
 
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Return Statement");
