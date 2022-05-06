@@ -3,11 +3,11 @@ package org.codepulsar.lang;
 import org.codepulsar.lang.variables.FunctionVariable;
 
 public class CallFrame {
-    private String caller;
-    private int returnIP;
+    private final String caller;
+    private final int returnIP;
 
-    private FunctionVariable.Function function;
-    private int stackOffset;
+    private final FunctionVariable.Function function;
+    private final int stackOffset;
 
     public CallFrame(String caller, int returnIP, FunctionVariable.Function function, int stackOffset) {
         this.caller = caller;

@@ -57,7 +57,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         ASTPrinter astPrinter = new ASTPrinter();
         astPrinter.print(this.program);
 
-        TypeChecker analyzer = new TypeChecker(this.program, this.globals, this.locals);
+        TypeChecker analyzer = new TypeChecker(this.program, this.functions, this.globals, this.locals);
         Validator validator = new Validator(this.program, this.functions, this.globals, this.locals);
 
         validator.validate();

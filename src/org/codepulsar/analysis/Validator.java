@@ -18,8 +18,6 @@ import org.codepulsar.lang.variables.GlobalVariable;
 import org.codepulsar.lang.variables.LocalVariable;
 import org.codepulsar.primitives.PrimitiveType;
 
-import java.util.Map;
-
 public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Void> {
     private final Statement program;
     private final FunctionVariable functions;

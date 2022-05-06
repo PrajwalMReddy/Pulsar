@@ -4,11 +4,11 @@ import org.codepulsar.ast.Expression;
 import org.codepulsar.ast.Statement;
 
 public class Return extends Statement {
-    private boolean hasExpression;
-    private Expression expression;
+    private final boolean hasExpression;
+    private final Expression expression;
 
-    private String function;
-    private int line;
+    private final String function;
+    private final int line;
 
     public Return(boolean hasExpression, Expression expression, String function, int line) {
         this.hasExpression = hasExpression;

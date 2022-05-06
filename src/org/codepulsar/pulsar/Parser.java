@@ -103,7 +103,6 @@ public class Parser {
                 String varName = varToken.getLiteral();
                 PrimitiveType varType = PR_ERROR;
 
-                // TODO Validate That varType != PR_ERROR In The Validator
                 if (!matchAdvance(TK_COLON)) {
                     error("A Colon Was Expected After The Variable Name", peekLine());
                 } else {
@@ -142,8 +141,9 @@ public class Parser {
             error("Function " + name + " Already Exists", line);
         }
 
-        this.functions.addFunction(name, parameters.size(), type);
-        return new Function(name, type, parameters, arity, statements, peekLine());
+        Function functionNode = new Function(name, type, parameters, arity, statements, peekLine());
+        this.functions.addFunction(name, functionNode, parameters.size(), type);
+        return functionNode;
     }
 
     private Statement globalVariableDeclaration(TokenType accessType) {
@@ -345,8 +345,7 @@ public class Parser {
     private Statement returnStatement() {
         Return statement;
         if (match(TK_SEMICOLON)) {
-            // TODO Remove Null Later
-            statement = new Return(true, new Literal("null", PR_NULL, peekLine()), this.currentFunction, peekLine());
+            statement = new Return(false, null, this.currentFunction, peekLine());
         } else {
             statement = new Return(true, expression(), this.currentFunction, peekLine());
         }

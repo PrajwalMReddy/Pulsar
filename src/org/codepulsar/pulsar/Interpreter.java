@@ -30,7 +30,7 @@ public class Interpreter {
     private FunctionVariable functions;
 
     private CallFrame currentFrame;
-    private CallFrame[] callFrames;
+    private final CallFrame[] callFrames;
     private int callFrameCount;
 
     private GlobalVariable globals;

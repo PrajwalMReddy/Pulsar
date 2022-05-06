@@ -14,21 +14,26 @@ import org.codepulsar.ast.Statement;
 import org.codepulsar.ast.expressions.*;
 import org.codepulsar.ast.statements.*;
 import org.codepulsar.lang.CompilerError;
+import org.codepulsar.lang.variables.FunctionVariable;
 import org.codepulsar.lang.variables.GlobalVariable;
 import org.codepulsar.lang.variables.LocalVariable;
 import org.codepulsar.primitives.PrimitiveType;
+
+import java.util.ArrayList;
 
 import static org.codepulsar.primitives.PrimitiveType.*;
 
 public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement.Visitor<Void> {
     private final Statement program;
+    private final FunctionVariable functions;
     private final GlobalVariable globals;
     private final LocalVariable locals;
 
     private final CompilerError errors;
 
-    public TypeChecker(Statement program, GlobalVariable globals, LocalVariable locals) {
+    public TypeChecker(Statement program, FunctionVariable functions, GlobalVariable globals, LocalVariable locals) {
         this.program = program;
+        this.functions = functions;
         this.globals = globals;
         this.locals = locals;
 
@@ -90,9 +95,20 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         }
     }
 
-    // TODO TypeCheck Function Calls
     public PrimitiveType visitCallExpression(Call expression) {
-        return null;
+        FunctionVariable.Function function = this.functions.getVariables().get(expression.getName().getLiteral());
+        ArrayList<Function.Parameter> parameters = function.getFunctionNode().getParameters();
+
+        for (int i = 0; i < expression.getArguments().size(); i++) {
+            PrimitiveType expressionType = expression.getArguments().get(i).accept(this);
+            PrimitiveType parameterType = parameters.get(i).getType();
+
+            if (expressionType != parameterType) {
+                newError("Invalid Argument Type Passed To Function " + expression.getName().getLiteral(), expression.getLine());
+            }
+        }
+
+        return function.getReturnType();
     }
 
     public PrimitiveType visitGroupingExpression(Grouping expression) {
@@ -166,7 +182,6 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return null;
     }
 
-    // TODO TypeCheck Functions
     public Void visitFunctionStatement(Function statement) {
         statement.getStatements().accept(this);
         return null;
@@ -196,8 +211,18 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return null;
     }
 
-    // TODO TypeCheck Return Statements
     public Void visitReturnStatement(Return statement) {
+        FunctionVariable.Function function = this.functions.getVariables().get(statement.getFunction());
+
+        if (statement.hasExpression()) {
+            PrimitiveType returnType = statement.getExpression().accept(this);
+            if (function.getReturnType() != returnType) {
+                newError("Invalid Return Type Found", statement.getLine());
+            }
+        } else if (function.getReturnType() != PR_VOID) {
+            newError("A Return Value Was Expected But None Given", statement.getLine());
+        }
+
         return null;
     }
 

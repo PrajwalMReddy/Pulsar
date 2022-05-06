@@ -14,8 +14,8 @@ public class FunctionVariable {
         this.variables = new LinkedHashMap<>();
     }
 
-    public void addFunction(String name, int arity, PrimitiveType returnType) {
-        this.variables.put(name, new Function(arity, returnType));
+    public void addFunction(String name, org.codepulsar.ast.statements.Function functionNode, int arity, PrimitiveType returnType) {
+        this.variables.put(name, new Function(functionNode, arity, returnType));
     }
 
     public void setChunk(String name, ArrayList<Instruction> chunk) {
@@ -28,12 +28,14 @@ public class FunctionVariable {
 
     public static class Function {
         private ArrayList<Instruction> chunk;
+        private final org.codepulsar.ast.statements.Function functionNode;
 
         private final int arity;
         private final PrimitiveType returnType;
 
-        public Function(int arity, PrimitiveType returnType) {
+        public Function(org.codepulsar.ast.statements.Function functionNode, int arity, PrimitiveType returnType) {
             this.chunk = null;
+            this.functionNode = functionNode;
 
             this.arity = arity;
             this.returnType = returnType;
@@ -47,8 +49,16 @@ public class FunctionVariable {
             this.chunk = chunk;
         }
 
+        public org.codepulsar.ast.statements.Function getFunctionNode() {
+            return this.functionNode;
+        }
+
         public int getArity() {
             return this.arity;
+        }
+
+        public PrimitiveType getReturnType() {
+            return this.returnType;
         }
     }
 }
