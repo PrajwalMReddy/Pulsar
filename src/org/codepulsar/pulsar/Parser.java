@@ -11,6 +11,7 @@ import org.codepulsar.lang.variables.FunctionVariable;
 import org.codepulsar.lang.variables.GlobalVariable;
 import org.codepulsar.lang.variables.LocalVariable;
 import org.codepulsar.primitives.PrimitiveType;
+import org.codepulsar.primitives.types.PNull;
 import org.codepulsar.util.TokenDisassembler;
 
 import java.util.ArrayList;
@@ -164,7 +165,7 @@ public class Parser {
             expression = expression();
         } else {
             isInitialized = false;
-            expression = new Literal(null, PR_NULL, peekLine());
+            expression = new Literal("null", PR_NULL, peekLine());
         }
 
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
@@ -197,6 +198,8 @@ public class Parser {
                 return localVariableDeclaration(TK_CONST);
             } else if (matchAdvance(TK_PRINT)) {
                 return printStatement();
+            } else if (matchAdvance(TK_RETURN)) {
+                return returnStatement();
             } else {
                 return expressionStatement();
             }
@@ -229,7 +232,7 @@ public class Parser {
             expression = expression();
         } else {
             isInitialized = false;
-            expression = new Literal(null, PR_NULL, peekLine());
+            expression = new Literal("null", PR_NULL, peekLine());
         }
 
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
@@ -331,6 +334,19 @@ public class Parser {
     private Statement printStatement() {
         Print statement = new Print(expression(), peekLine());
         look(TK_SEMICOLON, "A Semicolon Was Expected After The Print Statement");
+        return statement;
+    }
+
+    private Statement returnStatement() {
+        Return statement;
+        if (match(TK_SEMICOLON)) {
+            // TODO Remove Null Later
+            statement = new Return(true, new Literal("null", PR_NULL, peekLine()), peekLine());
+        } else {
+            statement = new Return(true, expression(), peekLine());
+        }
+
+        look(TK_SEMICOLON, "A Semicolon Was Expected After The Return Statement");
         return statement;
     }
 

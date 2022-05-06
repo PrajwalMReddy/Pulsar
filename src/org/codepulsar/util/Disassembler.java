@@ -53,7 +53,8 @@ public class Disassembler {
             // These Are OpCodes That Don't Have Operands
             case OP_ADD, OP_SUBTRACT, OP_MULTIPLY, OP_DIVIDE, OP_MODULO, OP_NEGATE,
                     OP_NOT, OP_COMPARE_EQUAL, OP_COMPARE_GREATER, OP_COMPARE_LESSER,
-                    OP_POP, OP_NULL, OP_PRINT -> opcode(instruction);
+                    OP_POP, OP_NULL, OP_PRINT,
+                    OP_RETURN -> opcode(instruction);
         }
     }
 

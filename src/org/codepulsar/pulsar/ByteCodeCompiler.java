@@ -155,6 +155,13 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         return null;
     }
 
+    public Void visitReturnStatement(Return statement) {
+        statement.getExpression().accept(this);
+        makeOpCode(OP_RETURN, statement.getLine());
+
+        return null;
+    }
+
     public Void visitExpressionStatement(ExpressionStmt statement) {
         statement.getExpression().accept(this);
         makeOpCode(OP_POP, statement.getLine());

@@ -83,6 +83,7 @@ public class Interpreter {
 
     private void execute() {
         this.instructions = this.functions.getVariables().get("main").getChunk();
+        this.currentFunction = "main";
 
         while (this.ip < this.instructions.size()) {
             Instruction instruction = this.instructions.get(this.ip);
@@ -141,10 +142,22 @@ public class Interpreter {
                     CallFrame frame = new CallFrame(this.currentFunction, this.ip, function, stackOffset);
                     this.currentFrame = frame;
                     this.callFrames[this.callFrameCount] = frame;
+                    this.callFrameCount++;
 
                     this.currentFunction = functionName;
                     this.instructions = function.getChunk();
                     this.ip = -1;
+                }
+                case OP_RETURN -> {
+                    CallFrame current = this.currentFrame;
+                    String caller = current.getCaller();
+                    FunctionVariable.Function function = this.functions.getVariables().get(caller);
+
+                    this.currentFunction = caller;
+                    this.callFrameCount--;
+
+                    this.instructions = function.getChunk();
+                    this.ip = current.getReturnIP();
                 }
 
                 case OP_PRINT -> System.out.println(pop());

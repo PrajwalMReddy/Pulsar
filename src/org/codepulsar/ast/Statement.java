@@ -12,6 +12,7 @@ public abstract class Statement {
         R visitIfStatement(If statement);
         R visitNoneStatement(NoneStatement statement);
         R visitPrintExpression(Print statement);
+        R visitReturnStatement(Return statement);
         R visitVariableStatement(Variable statement);
         R visitWhileStatement(While statement);
     }

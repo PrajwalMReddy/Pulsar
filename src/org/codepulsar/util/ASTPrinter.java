@@ -173,6 +173,10 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
         return "Print(" + statement.getExpression().accept(this) + ")\n";
     }
 
+    public String visitReturnStatement(Return statement) {
+        return "Return(" + statement.getExpression().accept(this) + ")\n";
+    }
+
     public String visitVariableStatement(Variable statement) {
         return "Variable(" + (statement.isGlobal() ? "Global:" : "Local:") + statement.getName() + " = " + statement.getInitializer().accept(this) + ")\n";
     }

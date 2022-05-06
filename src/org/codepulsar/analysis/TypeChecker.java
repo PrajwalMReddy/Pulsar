@@ -196,6 +196,11 @@ public class TypeChecker implements Expression.Visitor<PrimitiveType>, Statement
         return null;
     }
 
+    // TODO TypeCheck Return Statements
+    public Void visitReturnStatement(Return statement) {
+        return null;
+    }
+
     public Void visitVariableStatement(Variable statement) {
         PrimitiveType variableType = statement.getType();
         PrimitiveType initializerType = statement.getInitializer().accept(this);

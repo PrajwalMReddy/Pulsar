@@ -161,6 +161,11 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
         return null;
     }
 
+    // TODO Validate Return Statements
+    public Void visitReturnStatement(Return statement) {
+        return null;
+    }
+
     public Void visitVariableStatement(Variable statement) {
         statement.getInitializer().accept(this);
         boolean isInitialized = statement.isInitiallyInitialized();

@@ -15,4 +15,12 @@ public class CallFrame {
         this.function = function;
         this.stackOffset = stackOffset;
     }
+
+    public String getCaller() {
+        return this.caller;
+    }
+
+    public int getReturnIP() {
+        return this.returnIP;
+    }
 }
