@@ -30,8 +30,11 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     private LocalVariable locals;
     private final ArrayList<Primitive> values; // Constant Values To Be Stored
 
+    private boolean inFunction;
+
     // Output Data
     private ArrayList<Instruction> currentChunk;
+    private ArrayList<Instruction> globalChunk;
     private CompilerError errors;
     private CompilerError staticErrors;
 
@@ -41,9 +44,12 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         this.values = new ArrayList<>();
 
         this.currentChunk = new ArrayList<>();
+        this.globalChunk = new ArrayList<>();
+
+        this.inFunction = false;
     }
 
-    public void compileByteCode() {
+    public ArrayList<Instruction> compileByteCode() {
         Parser ast = new Parser(this.sourceCode);
         this.program = ast.parse();
 
@@ -52,7 +58,7 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
         this.locals = ast.getLocals();
 
         this.errors = ast.getErrors();
-        if (this.errors.hasError()) return;
+        if (this.errors.hasError()) return this.globalChunk;
 
         ASTPrinter astPrinter = new ASTPrinter();
         astPrinter.print(this.program);
@@ -62,14 +68,14 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
         validator.validate();
         this.staticErrors = validator.getErrors();
-        if (this.staticErrors.hasError()) return;
+        if (this.staticErrors.hasError()) return this.globalChunk;
 
         analyzer.check();
         this.staticErrors = analyzer.getErrors();
-        if (this.staticErrors.hasError()) return;
+        if (this.staticErrors.hasError()) return this.globalChunk;
 
         compile();
-        return;
+        return this.globalChunk;
     }
 
     private void compile() {
@@ -156,9 +162,11 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     }
 
     public Void visitReturnStatement(Return statement) {
-        statement.getExpression().accept(this);
-        makeOpCode(OP_RETURN, statement.getLine());
+        if (statement.hasExpression()) {
+            statement.getExpression().accept(this);
+        }
 
+        makeOpCode(OP_RETURN, statement.getLine());
         return null;
     }
 
@@ -170,10 +178,14 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
     }
 
     public Void visitFunctionStatement(Function statement) {
+        this.inFunction = true;
+
         statement.getStatements().accept(this);
         this.functions.setChunk(statement.getName(), this.currentChunk);
 
         this.currentChunk = new ArrayList<>();
+
+        this.inFunction = false;
         return null;
     }
 
@@ -275,20 +287,22 @@ public class ByteCodeCompiler implements Expression.Visitor<Instruction>, Statem
 
         this.values.add(primitiveLiteral);
 
-        Instruction instruction = new Instruction(OP_CONSTANT, this.values.size() - 1, line);
-        this.currentChunk.add(instruction);
-        return instruction;
+        return makeOpCode(OP_CONSTANT, this.values.size() - 1, line);
     }
 
     private Instruction makeOpCode(ByteCode opcode, int line) {
-        Instruction instruction = new Instruction(opcode, null, line);
-        this.currentChunk.add(instruction);
-        return instruction;
+        return makeOpCode(opcode, null, line);
     }
 
     private Instruction makeOpCode(ByteCode opcode, Object operand, int line) {
         Instruction instruction = new Instruction(opcode, operand, line);
-        this.currentChunk.add(instruction);
+
+        if (this.inFunction) {
+            this.currentChunk.add(instruction);
+        } else {
+            this.globalChunk.add(instruction);
+        }
+
         return instruction;
     }
 

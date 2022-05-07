@@ -17,6 +17,7 @@ public class Compiler {
     // Input Data
     private final String sourceCode;
     private ArrayList<Instruction> instructions;
+    private ArrayList<Instruction> globalChunk;
 
     // Data To Help In Compiling To Assembly Code
     private FunctionVariable functions;
@@ -37,6 +38,7 @@ public class Compiler {
 
     public void init() {
         ByteCodeCompiler bcc = new ByteCodeCompiler(this.sourceCode);
+        this.globalChunk = bcc.compileByteCode();
 
         this.functions = bcc.getFunctions();
         this.globals = bcc.getGlobals();
@@ -50,7 +52,7 @@ public class Compiler {
         ErrorReporter.report(this.errors, this.sourceCode);
         ErrorReporter.report(this.staticErrors, this.sourceCode);
 
-        Disassembler.disassemble(this.functions, bcc);
+        Disassembler.disassemble(this.globalChunk, this.functions, bcc);
 
         compile();
         this.pw.close();

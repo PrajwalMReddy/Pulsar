@@ -1,25 +1,42 @@
 package org.codepulsar.util;
 
+import org.codepulsar.lang.ByteCode;
+import org.codepulsar.lang.Instruction;
 import org.codepulsar.lang.variables.FunctionVariable;
 import org.codepulsar.pulsar.ByteCodeCompiler;
 import org.codepulsar.pulsar.Pulsar;
-import org.codepulsar.lang.ByteCode;
-import org.codepulsar.lang.Instruction;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Disassembler {
-    public static void disassemble(FunctionVariable functions, ByteCodeCompiler bcc) {
+    public static void disassemble(ArrayList<Instruction> globalChunk, FunctionVariable functions, ByteCodeCompiler bcc) {
         if (Pulsar.conditions.getDebug()) {
             System.out.println("\n-- Disassembled Bytecode --");
+            displayGlobals(globalChunk, bcc);
             displayInstructions(functions, bcc);
         }
     }
 
-    private static void displayInstructions(FunctionVariable functions, ByteCodeCompiler bcc) {
+    private static void displayGlobals(ArrayList<Instruction> globalChunk, ByteCodeCompiler bcc) {
+        int line = 0;
+        int count = 0;
 
+        System.out.println("\n\nDisassembly Of Globals");
+        for (Instruction instruction : globalChunk) {
+            if (instruction.getLine() == line) {
+                System.out.print("            " + count + "  | ");
+            } else {
+                line = instruction.getLine();
+                System.out.print("\n" + line + spaces(line) + count + "  | ");
+            }
+
+            decide(instruction, bcc);
+            count++;
+        }
+    }
+
+    private static void displayInstructions(FunctionVariable functions, ByteCodeCompiler bcc) {
         for (Map.Entry<String, FunctionVariable.Function> entry: functions.getVariables().entrySet()) {
             String name = entry.getKey();
             ArrayList<Instruction> chunk = entry.getValue().getChunk();

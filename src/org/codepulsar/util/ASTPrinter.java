@@ -174,7 +174,11 @@ public class ASTPrinter implements Expression.Visitor<String>, Statement.Visitor
     }
 
     public String visitReturnStatement(Return statement) {
-        return "Return(" + statement.getExpression().accept(this) + ")\n";
+        if (statement.hasExpression()) {
+            return "Return(" + statement.getExpression().accept(this) + ")\n";
+        } else {
+            return "Return()\n";
+        }
     }
 
     public String visitVariableStatement(Variable statement) {

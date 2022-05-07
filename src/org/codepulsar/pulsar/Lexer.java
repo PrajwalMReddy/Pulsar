@@ -278,8 +278,12 @@ public class Lexer {
     }
 
     private TokenType checkKeyword(String remaining, TokenType tokenType, int starter) {
+        if (this.current - this.start <= 1) {
+            return TK_IDENTIFIER;
+        }
+
         int length = remaining.length() + starter;
-        String word = this.sourceCode.substring(start + starter, start + length);
+        String word = this.sourceCode.substring(this.start + starter, this.start + length);
 
         if (((this.current - this.start) == length) && (word.equals(remaining))) {
             return tokenType;

@@ -81,7 +81,10 @@ public class Validator implements Expression.Visitor<Void>, Statement.Visitor<Vo
 
     public Void visitCallExpression(Call expression) {
         FunctionVariable.Function function = this.functions.getVariables().get(expression.getName().getLiteral());
-        if (function.getArity() != expression.getArity()) {
+
+        if (function == null) {
+            newError("Function " + expression.getName().getLiteral() + " Was Not Found", expression.getLine());
+        } else if (function.getArity() != expression.getArity()) {
             newError("Function '" + expression.getName().getLiteral() + "' Takes " + function.getArity() + " Argument(s); "
                     + expression.getArity() + " Argument(s) Was/Were Received", expression.getLine());
         }

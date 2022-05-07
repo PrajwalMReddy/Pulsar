@@ -24,6 +24,7 @@ public class Interpreter {
     // Input Data
     private final String sourceCode;
     private ArrayList<Instruction> instructions;
+    private ArrayList<Instruction> globalChunk;
 
     // Data To Help In Interpreting
     private String currentFunction;
@@ -61,7 +62,7 @@ public class Interpreter {
 
     public void interpret() {
         ByteCodeCompiler bcc = new ByteCodeCompiler(this.sourceCode);
-        bcc.compileByteCode();
+        this.globalChunk = bcc.compileByteCode();
 
         this.functions = bcc.getFunctions();
         this.globals = bcc.getGlobals();
@@ -75,21 +76,32 @@ public class Interpreter {
         ErrorReporter.report(this.errors, this.sourceCode);
         ErrorReporter.report(this.staticErrors, this.sourceCode);
 
-        Disassembler.disassemble(this.functions, bcc);
+        Disassembler.disassemble(this.globalChunk, this.functions, bcc);
 
         System.out.println();
         setUp();
     }
 
     private void setUp() {
+        setUpGlobals();
+
         this.instructions = this.functions.getVariables().get("main").getChunk();
         this.currentFunction = "main";
 
-        this.currentFrame = new CallFrame("main", 0, null, 0);
+        this.currentFrame = new CallFrame("main", 0, null, 1);
         this.callFrames[callFrameCount] = this.currentFrame;
         this.callFrameCount++;
 
+        push(new PFunctionName("main"));
         execute();
+    }
+
+    private void setUpGlobals() {
+        this.instructions = this.globalChunk;
+        execute();
+
+        this.ip = 0;
+        this.sp = 0;
     }
 
     private void execute() {
@@ -239,6 +251,11 @@ public class Interpreter {
         int stackOffset = this.sp - (int) instruction.getOperand();
         CallFrame frame = new CallFrame(this.currentFunction, this.ip, function, stackOffset);
         this.currentFrame = frame;
+
+        if (this.callFrameCount == FRAMES_MAX) {
+            runtimeError("A Stack Overflow Has Occurred");
+        }
+
         this.callFrames[this.callFrameCount] = frame;
         this.callFrameCount++;
 
@@ -248,6 +265,7 @@ public class Interpreter {
     }
 
     private void returnFromFunction() {
+        Primitive returnValue = pop();
         CallFrame current = this.currentFrame;
         String caller = current.getCaller();
         FunctionVariable.Function function = this.functions.getVariables().get(caller);
@@ -255,8 +273,12 @@ public class Interpreter {
         this.currentFunction = caller;
         this.callFrameCount--;
 
+        this.currentFrame = this.callFrames[this.callFrameCount];
         this.instructions = function.getChunk();
+
         this.ip = current.getReturnIP();
+        this.sp -= (current.getStackOffset() - 1);
+        push(returnValue);
     }
 
     private void push(Primitive value) {
