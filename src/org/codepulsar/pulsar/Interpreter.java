@@ -1,5 +1,6 @@
 package org.codepulsar.pulsar;
 
+import org.codepulsar.ast.statements.Function;
 import org.codepulsar.lang.ByteCode;
 import org.codepulsar.lang.CallFrame;
 import org.codepulsar.lang.CompilerError;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 
 import static org.codepulsar.lang.ByteCode.*;
 import static org.codepulsar.primitives.PrimitiveType.PR_NULL;
+import static org.codepulsar.primitives.PrimitiveType.PR_VOID;
 
 public class Interpreter {
     // Input Data
@@ -83,6 +85,21 @@ public class Interpreter {
     }
 
     private void setUp() {
+        this.instructions = this.globalChunk;
+        this.currentFunction = "";
+
+        this.functions.addFunction("", null, 0, PR_VOID);
+        this.currentFrame = new CallFrame("", 0, this.functions.getVariables().get(""), 1);
+        this.callFrames[this.callFrameCount] = this.currentFrame;
+        push(new PFunctionName(""));
+        execute();
+
+        pop();
+        this.ip = 0;
+        this.sp = 0;
+
+        /* ---------------------------------------------------------------------------------- */
+
         this.instructions = this.functions.getVariables().get("main").getChunk();
         this.currentFunction = "main";
 
@@ -91,17 +108,7 @@ public class Interpreter {
         this.callFrameCount++;
 
         push(new PFunctionName("main"));
-        mergeGlobals();
         execute();
-    }
-
-    private void mergeGlobals() {
-        ArrayList<Instruction> mainChunk = this.globalChunk;
-        for (int i = 0; i < this.instructions.size(); i++) {
-            mainChunk.add(this.instructions.get(i));
-        }
-
-        this.instructions = mainChunk;
     }
 
     private void execute() {
@@ -274,7 +281,12 @@ public class Interpreter {
         this.callFrameCount--;
 
         this.currentFrame = this.callFrames[this.callFrameCount];
-        this.instructions = function.getChunk();
+
+        if (this.currentFunction.equals("")) {
+            this.instructions = this.globalChunk;
+        } else {
+            this.instructions = function.getChunk();
+        }
 
         this.ip = current.getReturnIP();
         this.sp -= (current.getStackOffset() - 1);
