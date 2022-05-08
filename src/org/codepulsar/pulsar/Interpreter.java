@@ -83,8 +83,6 @@ public class Interpreter {
     }
 
     private void setUp() {
-        setUpGlobals();
-
         this.instructions = this.functions.getVariables().get("main").getChunk();
         this.currentFunction = "main";
 
@@ -93,15 +91,17 @@ public class Interpreter {
         this.callFrameCount++;
 
         push(new PFunctionName("main"));
+        mergeGlobals();
         execute();
     }
 
-    private void setUpGlobals() {
-        this.instructions = this.globalChunk;
-        execute();
+    private void mergeGlobals() {
+        ArrayList<Instruction> mainChunk = this.globalChunk;
+        for (int i = 0; i < this.instructions.size(); i++) {
+            mainChunk.add(this.instructions.get(i));
+        }
 
-        this.ip = 0;
-        this.sp = 0;
+        this.instructions = mainChunk;
     }
 
     private void execute() {
