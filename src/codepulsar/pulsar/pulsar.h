@@ -1,7 +1,7 @@
 #ifndef CODEPULSAR_PULSAR_H
 #define CODEPULSAR_PULSAR_H
 
-#include "commands.h"
+#include "../lang/commands.h"
 
 using namespace std;
 

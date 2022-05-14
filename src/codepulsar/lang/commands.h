@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "pulsar.h"
+#include "../pulsar/pulsar.h"
 
 using namespace std;
 
