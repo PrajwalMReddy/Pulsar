@@ -1,6 +1,5 @@
 package org.codepulsar.pulsar;
 
-import org.codepulsar.ast.statements.Function;
 import org.codepulsar.lang.ByteCode;
 import org.codepulsar.lang.CallFrame;
 import org.codepulsar.lang.CompilerError;
@@ -104,7 +103,7 @@ public class Interpreter {
         this.currentFunction = "main";
 
         this.currentFrame = new CallFrame("main", 0, null, 1);
-        this.callFrames[callFrameCount] = this.currentFrame;
+        this.callFrames[this.callFrameCount] = this.currentFrame;
         this.callFrameCount++;
 
         push(new PFunctionName("main"));
