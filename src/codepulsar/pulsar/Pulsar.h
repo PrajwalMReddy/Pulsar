@@ -1,7 +1,9 @@
 #ifndef CODEPULSAR_PULSAR_H
 #define CODEPULSAR_PULSAR_H
 
-#include "../lang/commands.h"
+#include <fstream>
+
+#include "../lang/Commands.h"
 
 using namespace std;
 
@@ -12,10 +14,12 @@ struct SetUp {
     string version;
 };
 
-extern SetUp setUpStruct;
+extern SetUp setUpConditions;
 
 void repl();
 void interpretFile(string file);
 void compileFile(string file);
+
+string openFile(string file);
 
 #endif

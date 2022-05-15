@@ -3,9 +3,10 @@
 
 #include <iostream>
 
-#include "../pulsar/pulsar.h"
+#include "../pulsar/Pulsar.h"
 
 using namespace std;
+
 
 void help();
 void error(string message);

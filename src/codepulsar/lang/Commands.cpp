@@ -1,4 +1,4 @@
-#include "commands.h"
+#include "Commands.h"
 
 void help() {
     cout << "Usage: pulsar [command] [file]" << endl;
@@ -8,14 +8,12 @@ void help() {
     cout << "    -i     : Interprets The Given File" << endl;
     cout << "    -c     : Compiles The Given File" << endl;
     cout << "    -d     : Displays Debug Information\n"
-         << "             And Interprets The File\n";
-
-    cout << endl;
+         << "             And Interprets The File\n" << endl;
 }
 
 void error(string message) {
     help();
-    cerr << "Set Up Error | " << message << endl;
+    cout << "Set Up Error | " << message << endl;
     exit(1);
 }
 
@@ -26,7 +24,7 @@ void parseCommands(string command) {
 }
 
 void parseCommands(string command, string file) {
-    setUp(file);
+    setUpConditions(file);
 
     if (command == "-h") help();
     else if (command == "-i") interpretFile(file);
@@ -41,13 +39,13 @@ void parseCommands(string command, string file) {
 }
 
 void debug() {
-    setUpStruct.debug = true;
+    setUpConditions.debug = true;
 }
 
 void version() {
-    cout << "Version: " << setUpStruct.version << endl;
+    cout << "Version: " << setUpConditions.version << endl;
 }
 
 void setUp(string name) {
-    setUpStruct.fileIn = name.substr(0, name.find_last_of('.'));
+    setUpConditions.fileIn = name.substr(0, name.find_last_of('.'));
 }
