@@ -24,7 +24,7 @@ void parseCommands(string command) {
 }
 
 void parseCommands(string command, string file) {
-    setUpConditions(file);
+    setUp(file);
 
     if (command == "-h") help();
     else if (command == "-i") interpretFile(file);
