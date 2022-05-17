@@ -61,7 +61,6 @@ TokenType Lexer::identifyIdentifier() {
     if (currentLiteral() == "loop") return TK_LOOP;
     if (currentLiteral() == "mod") return TK_MOD;
     if (currentLiteral() == "match") return TK_MATCH;
-    if (currentLiteral() == "null") return TK_NULL;
     if (currentLiteral() == "native") return TK_NATIVE;
     if (currentLiteral() == "operator") return TK_OPERATOR;
     if (currentLiteral() == "package") return TK_PACKAGE;

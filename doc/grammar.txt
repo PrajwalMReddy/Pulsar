@@ -11,7 +11,7 @@ file:
     | program EOF
 
 program:
-    | package_declaration? import_statement* top_level*
+    | package_declaration? import_statement* declaration*
 
 package_declaration:
     | "package" IDENTIFIER ("." IDENTIFIER)* ";"
@@ -19,16 +19,13 @@ package_declaration:
 import_statement:
     | "import" IDENTIFIER ("." IDENTIFIER)* ";"
 
-top_level:
-    | heavy_declaration
-    | light_declaration
-
-heavy_declaration:
-    | "class" IDENTIFIER "{" light_declaration* "}"
-
-light_declaration:
+declaration:
+    | class_declaration
     | function_declaration
     | variable_declaration
+
+class_declaration:
+    | "class" IDENTIFIER "{" declaration* "}"
 
 function_declaration:
     | "fun" IDENTIFIER "(" parameter? ")" ":" DATATYPE block
@@ -43,10 +40,10 @@ block:
     | "{" statement* "}"
 
 statement:
+    | declaration
     | while_statement
     | if_statement
     | return_statement
-    | variable_declaration
     | expression_statement
 
 while_statement:
