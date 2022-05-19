@@ -114,7 +114,7 @@ Token Lexer::character(char now) {
                 advance();
                 return makeToken(TK_DOUBLE_COLON);
             } else {
-                makeToken(TK_COLON);
+                return makeToken(TK_COLON);
             }
         case ';':
             return makeToken(TK_SEMICOLON);
@@ -263,7 +263,7 @@ void Lexer::skipWhitespace() {
 }
 
 string Lexer::currentLiteral() {
-    return this->sourceCode.substr(this->start, this->current);
+    return this->sourceCode.substr(this->start, this->current - this->start);
 }
 
 bool Lexer::isAlpha(char c) {

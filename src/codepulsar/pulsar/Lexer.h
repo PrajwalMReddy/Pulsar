@@ -14,6 +14,7 @@ class Lexer {
     public:
         explicit Lexer(string sourceCode);
         vector<Token> tokenize();
+        CompilerError* getErrors();
 
     private:
         // Input Data
@@ -52,8 +53,6 @@ class Lexer {
         char peek(int skip);
         char advance();
         bool isAtEnd();
-
-        CompilerError* getErrors();
 };
 
 
