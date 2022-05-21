@@ -12,7 +12,7 @@ void TokenDisassembler::displayTokens(vector<Token> tokens) {
     int line = 0;
 
     for (Token token: tokens) {
-        string tokenName = checkToken(token.tokenType);
+        string tokenName = tokenToString(token.tokenType);
         if (token.line == line) {
             cout << "            ";
         } else {
@@ -28,8 +28,7 @@ void TokenDisassembler::displayTokens(vector<Token> tokens) {
     }
 }
 
-// TODO Add Reserved Keywords; Make More Elegant
-string TokenDisassembler::checkToken(TokenType type) {
+string TokenDisassembler::tokenToString(TokenType type) {
     switch (type) {
         case TK_NOT: return "TK_NOT";
         case TK_MINUS: return "TK_MINUS";
@@ -81,6 +80,15 @@ string TokenDisassembler::checkToken(TokenType type) {
         case TK_STATIC: return "TK_STATIC";
         case TK_RETURN: return "TK_RETURN";
 
+        case TK_MATCH: return "TK_MATCH";
+        case TK_LOOP: return "TK_LOOP";
+        case TK_ASYNC: return "TK_ASYNC";
+        case TK_AWAIT: return "TK_AWAIT";
+        case TK_TRY: return "TK_TRY";
+        case TK_EXCEPT: return "TK_EXCEPT";
+        case TK_MOD: return "TK_MOD";
+        case TK_UNSAFE: return "TK_UNSAFE";
+
         case TK_IDENTIFIER: return "TK_IDENTIFIER";
         case TK_VOID: return "TK_VOID";
         case TK_INT_TYPE: return "TK_INT_TYPE";
@@ -116,7 +124,7 @@ string TokenDisassembler::space(int line) {
 }
 
 string TokenDisassembler::space(Token token) {
-    int length = to_string(token.tokenType).length();
+    int length = tokenToString(token.tokenType).length();
     return giveSpaces(length);
 }
 

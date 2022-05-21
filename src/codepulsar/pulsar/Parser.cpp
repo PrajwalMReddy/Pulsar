@@ -9,13 +9,13 @@ Parser::Parser(string sourceCode) {
     this->depth = 1;
 }
 
-Statement Parser::parse() {
+int Parser::parse() {
     Lexer* lexer = new Lexer(this->sourceCode);
     this->tokens = lexer->tokenize();
     this->errors = *lexer->getErrors();
 
-    TokenDisassembler::display(this->tokens);
     if (this->errors.hasError()) return this->program;
+    TokenDisassembler::display(this->tokens);
 
     return this->program;
 }

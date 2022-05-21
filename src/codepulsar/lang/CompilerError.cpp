@@ -11,7 +11,7 @@ Error CompilerError::addError(string errorType, string message, int line) {
 }
 
 bool CompilerError::hasError() {
-    return errorCount() == 0;
+    return errorCount() != 0;
 }
 
 int CompilerError::errorCount() {

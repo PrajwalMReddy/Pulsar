@@ -6,7 +6,6 @@
 
 #include "../lang/Token.h"
 #include "../lang/CompilerError.h"
-#include "../ast/Statement.h"
 #include "../util/TokenDisassembler.h"
 
 using namespace std;
@@ -15,7 +14,7 @@ using namespace std;
 class Parser {
     public:
         Parser(string sourceCode);
-        Statement parse();
+        int parse();
 
     private:
         // Input Data
@@ -28,7 +27,7 @@ class Parser {
         int depth;
 
         // Output Data
-        Statement program;
+        int program;
 };
 
 

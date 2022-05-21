@@ -13,7 +13,7 @@ class TokenDisassembler {
 
     private:
         static void displayTokens(vector<Token> tokens);
-        static string checkToken(TokenType);
+        static string tokenToString(TokenType type);
 
         static bool isLiteralTokenType(TokenType type);
         static string space(int line);
