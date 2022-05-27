@@ -2,20 +2,22 @@
 #define CODEPULSAR_COMMANDS_H
 
 #include <iostream>
+#include <string>
 
 #include "../pulsar/Pulsar.h"
+#include "SetUp.h"
 
-using namespace std;
 
+namespace Pulsar {
+    void help();
+    void error(std::string message);
 
-void help();
-void error(string message);
+    void parseCommands(std::string command);
+    void parseCommands(std::string command, std::string file);
 
-void parseCommands(string command);
-void parseCommands(string command, string file);
-
-void debug();
-void version();
-void setUp(string name);
+    void debug();
+    void version();
+    void setUp(std::string name);
+}
 
 #endif

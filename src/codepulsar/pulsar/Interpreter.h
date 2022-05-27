@@ -1,19 +1,19 @@
 #ifndef CODEPULSAR_INTERPRETER_H
 #define CODEPULSAR_INTERPRETER_H
 
-#include <iostream>
-
-using namespace std;
+#include <string>
 
 
-class Interpreter {
-    public:
-        Interpreter(string sourceCode);
-        void interpret();
+namespace Pulsar {
+    class Interpreter {
+        public:
+            Interpreter(std::string sourceCode);
+            void interpret();
 
-    private:
-        string sourceCode;
-};
+        private:
+            std::string sourceCode;
+    };
+}
 
 
 #endif

@@ -1,23 +1,24 @@
 #include "CompilerError.h"
 
 
-CompilerError::CompilerError() {
+Pulsar::CompilerError::CompilerError() {
+    this->errors = new std::vector<Pulsar::Error>;
 }
 
-Error CompilerError::addError(string errorType, string message, int line) {
+Pulsar::Error Pulsar::CompilerError::addError(std::string errorType, std::string message, int line) {
     Error error = {errorType, message, line};
-    this->errors.push_back(error);
+    this->errors->push_back(error);
     return error;
 }
 
-bool CompilerError::hasError() {
-    return errorCount() != 0;
+bool Pulsar::CompilerError::hasError() {
+    return this->errors->size() != 0;
 }
 
-int CompilerError::errorCount() {
-    return this->errors.size();
+int Pulsar::CompilerError::errorCount() {
+    return this->errors->size();
 }
 
-vector<Error> CompilerError::getErrors() {
+std::vector<Pulsar::Error>* Pulsar::CompilerError::getErrors() {
     return this->errors;
 }

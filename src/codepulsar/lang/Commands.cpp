@@ -1,29 +1,30 @@
 #include "Commands.h"
 
-void help() {
-    cout << "Usage: pulsar [command] [file]" << endl;
-    cout << "Commands:" << endl;
-    cout << "    -h     : Shows This Help Menu" << endl;
-    cout << "    -v     : Displays The Current Version Number" << endl;
-    cout << "    -i     : Interprets The Given File" << endl;
-    cout << "    -c     : Compiles The Given File" << endl;
-    cout << "    -d     : Displays Debug Information\n"
-         << "             And Interprets The File\n" << endl;
+
+void Pulsar::help() {
+    std::cout << "Usage: pulsar [command] [file]" << std::endl;
+    std::cout << "Commands:" << std::endl;
+    std::cout << "    -h     : Shows This Help Menu" << std::endl;
+    std::cout << "    -v     : Displays The Current Version Number" << std::endl;
+    std::cout << "    -i     : Interprets The Given File" << std::endl;
+    std::cout << "    -c     : Compiles The Given File" << std::endl;
+    std::cout << "    -d     : Displays Debug Information\n"
+              << "             And Interprets The File\n" << std::endl;
 }
 
-void error(string message) {
+void Pulsar::error(std::string message) {
     help();
-    cout << "Set Up Error | " << message << endl;
+    std::cout << "Set Up Error | " << message << std::endl;
     exit(1);
 }
 
-void parseCommands(string command) {
+void Pulsar::parseCommands(std::string command) {
     if (command == "-h") help();
     else if (command == "-v") version();
     else error("Invalid One Argument Command: " + command);
 }
 
-void parseCommands(string command, string file) {
+void Pulsar::parseCommands(std::string command, std::string file) {
     setUp(file);
 
     if (command == "-h") help();
@@ -38,14 +39,14 @@ void parseCommands(string command, string file) {
     else error("Invalid Two Argument Command: " + command);
 }
 
-void debug() {
-    setUpConditions.debug = true;
+void Pulsar::debug() {
+    Pulsar::conditions.debug = true;
 }
 
-void version() {
-    cout << "Version: " << setUpConditions.version << endl;
+void Pulsar::version() {
+    std::cout << "Version: " << Pulsar::conditions.version << std::endl;
 }
 
-void setUp(string name) {
-    setUpConditions.fileIn = name.substr(0, name.find_last_of('.'));
+void Pulsar::setUp(std::string name) {
+    Pulsar::conditions.fileIn = name.substr(0, name.find_last_of('.'));
 }

@@ -1,41 +1,46 @@
 #ifndef CODEPULSAR_TOKENTYPE_H
 #define CODEPULSAR_TOKENTYPE_H
 
-enum TokenType {
-    // Operators
-    TK_NOT, // Unary
-    TK_MINUS, TK_PLUS, TK_MULTIPLICATION, TK_DIVISION, TK_MODULUS, // Binary
-    TK_NOT_EQUAL, TK_EQUAL_EQUAL, TK_GT, TK_GT_EQUAL, TK_LT, TK_LT_EQUAL, // Comparison
-    TK_EQUAL, TK_PLUS_EQUAL, TK_MINUS_EQUAL, TK_MUL_EQUAL, TK_DIV_EQUAL, TK_MOD_EQUAL, // Assignment
-    TK_LOGICAL_OR, TK_LOGICAL_AND, // Logical
 
-    // Other Character Tokens
-    TK_DOT, TK_COMMA, TK_COLON, TK_SEMICOLON, TK_DOUBLE_COLON, TK_QMARK,
-    TK_LPAR, TK_RPAR, TK_LBRACE, TK_RBRACE,
+namespace Pulsar {
+    enum TokenType {
+        // Operators
+        TK_NOT, // Unary
+        TK_MINUS, TK_PLUS, TK_MULTIPLICATION, TK_DIVISION, TK_MODULUS, // Binary
+        TK_NOT_EQUAL, TK_EQUAL_EQUAL, TK_GT, TK_GT_EQUAL, TK_LT, TK_LT_EQUAL, // Comparison
+        TK_EQUAL, TK_PLUS_EQUAL, TK_MINUS_EQUAL, TK_MUL_EQUAL, TK_DIV_EQUAL, TK_MOD_EQUAL, // Assignment
+        TK_LOGICAL_OR, TK_LOGICAL_AND, // Logical
 
-    // Keywords
-    TK_PACKAGE, TK_IMPORT,
-    TK_CLASS, TK_ENUM,
-    TK_VAR, TK_CONST,
-    TK_IF, TK_ELSE, TK_WHILE,
-    TK_CONTINUE, TK_BREAK,
-    TK_FUN, TK_NATIVE, TK_OPERATOR,
-    TK_PUBLIC, TK_PRIVATE, TK_STATIC, TK_RETURN,
+        // Other Character Tokens
+        TK_DOT, TK_COMMA, TK_SEMICOLON,
+        TK_LPAR, TK_RPAR, TK_LBRACE, TK_RBRACE,
+        TK_COLON, TK_ARROW, TK_DOUBLE_COLON, TK_QMARK,
 
-    // Reserved Keywords (For Possible Future Use)
-    TK_MATCH, TK_LOOP,
-    TK_ASYNC, TK_AWAIT,
-    TK_TRY, TK_EXCEPT,
-    TK_MOD, TK_UNSAFE,
+        // Keywords
+        TK_PACKAGE, TK_IMPORT,
+        TK_CLASS, TK_ENUM,
+        TK_VAR, TK_CONST,
+        TK_IF, TK_ELSE, TK_WHILE,
+        TK_CONTINUE, TK_BREAK,
+        TK_FUN, TK_NATIVE, TK_OPERATOR,
+        TK_PUBLIC, TK_PRIVATE, TK_STATIC, TK_RETURN,
 
-    // Data Types and Variables
-    TK_IDENTIFIER, TK_VOID,
-    TK_INT_TYPE, TK_DOUBLE_TYPE, TK_BOOLEAN_TYPE, TK_CHAR_TYPE,
-    TK_TRUE, TK_FALSE, TK_CHARACTER, TK_INTEGER, TK_DOUBLE,
+        // Reserved Keywords (For Possible Future Use)
+        TK_MATCH, TK_LOOP,
+        TK_ASYNC, TK_AWAIT,
+        TK_TRY, TK_EXCEPT,
+        TK_MOD, TK_UNSAFE,
 
-    // Special Tokens
-    TK_PRINT,
-    TK_ERROR, TK_EOF,
-};
+        // Data Types and Variables
+        TK_IDENTIFIER, TK_VOID,
+        TK_INT_TYPE, TK_DOUBLE_TYPE, TK_BOOLEAN_TYPE, TK_CHAR_TYPE,
+        TK_TRUE, TK_FALSE, TK_CHARACTER, TK_INTEGER, TK_DOUBLE,
+
+        // Special Tokens
+        TK_PRINT,
+        TK_ERROR, TK_EOF,
+    };
+}
+
 
 #endif

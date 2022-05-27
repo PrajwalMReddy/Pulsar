@@ -1,34 +1,35 @@
 #include "TokenDisassembler.h"
 
 
-void TokenDisassembler::display(vector<Token> tokens) {
-    if (setUpConditions.debug) {
-        cout << "-- Tokens --" << endl;
+void Pulsar::TokenDisassembler::display(std::vector<Pulsar::Token> tokens) {
+    if (Pulsar::conditions.debug) {
+        std::cout << "-- Tokens --" << std::endl;
         displayTokens(tokens);
     }
 }
 
-void TokenDisassembler::displayTokens(vector<Token> tokens) {
+void Pulsar::TokenDisassembler::displayTokens(std::vector<Pulsar::Token> tokens) {
     int line = 0;
 
-    for (Token token: tokens) {
-        string tokenName = tokenToString(token.tokenType);
+    for (Pulsar::Token token: tokens) {
+        std::string tokenName = tokenToString(token.tokenType);
+
         if (token.line == line) {
-            cout << "            ";
+            std::cout << "            ";
         } else {
             line = token.line;
-            cout << endl << line << space(line);
+            std::cout << std::endl << line << space(line);
         }
 
         if (isLiteralTokenType(token.tokenType)) {
-            cout << tokenName << space(token) << "(" + token.literal << ")" << endl;
+            std::cout << tokenName << space(token) << "(" + token.literal << ")" << std::endl;
         } else {
-            cout << tokenName << endl;
+            std::cout << tokenName << std::endl;
         }
     }
 }
 
-string TokenDisassembler::tokenToString(TokenType type) {
+std::string Pulsar::TokenDisassembler::tokenToString(Pulsar::TokenType type) {
     switch (type) {
         case TK_NOT: return "TK_NOT";
         case TK_MINUS: return "TK_MINUS";
@@ -108,7 +109,7 @@ string TokenDisassembler::tokenToString(TokenType type) {
     }
 }
 
-bool TokenDisassembler::isLiteralTokenType(TokenType type) {
+bool Pulsar::TokenDisassembler::isLiteralTokenType(TokenType type) {
     switch (type) {
         case TK_CHARACTER: return true;
         case TK_INTEGER: return true;
@@ -118,16 +119,16 @@ bool TokenDisassembler::isLiteralTokenType(TokenType type) {
     }
 }
 
-string TokenDisassembler::space(int line) {
-    int length = to_string(line).length();
+std::string Pulsar::TokenDisassembler::space(int line) {
+    int length = std::to_string(line).length();
     return giveSpaces(length + 9);
 }
 
-string TokenDisassembler::space(Token token) {
+std::string Pulsar::TokenDisassembler::space(Token token) {
     int length = tokenToString(token.tokenType).length();
     return giveSpaces(length);
 }
 
-string TokenDisassembler::giveSpaces(int length) {
-    return string(" ", max(0, 20 - length + 1));
+std::string Pulsar::TokenDisassembler::giveSpaces(int length) {
+    return std::string(" ", std::max(0, 20 - length + 1));
 }

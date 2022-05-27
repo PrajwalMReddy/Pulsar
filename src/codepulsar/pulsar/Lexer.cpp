@@ -1,15 +1,17 @@
 #include "Lexer.h"
 
 
-Lexer::Lexer(string sourceCode) {
+Pulsar::Lexer::Lexer(std::string sourceCode) {
     this->sourceCode = sourceCode;
 
     this->start = 0;
     this->current = 0;
     this->line = 1;
+
+    this->errors = new CompilerError();
 }
 
-vector<Token> Lexer::tokenize() {
+std::vector<Pulsar::Token> Pulsar::Lexer::tokenize() {
     while (true) {
         Token toAdd = scanToken();
         this->tokens.push_back(toAdd);
@@ -20,19 +22,19 @@ vector<Token> Lexer::tokenize() {
     return this->tokens;
 }
 
-Token Lexer::scanToken() {
+Pulsar::Token Pulsar::Lexer::scanToken() {
     skipWhitespace();
     this->start = this->current;
 
     if (isAtEnd()) return makeToken(TK_EOF);
 
     char now = advance();
-    if (isAlpha(now)) { return identifier(); }
-    if (isDigit(now)) { return number(); }
-    return character(now);
+    if (isAlpha(now)) { return scanIdentifier(); }
+    if (isDigit(now)) { return scanNumber(); }
+    return scanCharacter(now);
 }
 
-Token Lexer::identifier() {
+Pulsar::Token Pulsar::Lexer::scanIdentifier() {
     while (isAlpha(peek()) || isDigit(peek())) {
         advance();
     }
@@ -40,7 +42,7 @@ Token Lexer::identifier() {
     return makeToken(identifyIdentifier());
 }
 
-TokenType Lexer::identifyIdentifier() {
+Pulsar::TokenType Pulsar::Lexer::identifyIdentifier() {
     if (currentLiteral() == "async") return TK_ASYNC;
     if (currentLiteral() == "await") return TK_AWAIT;
     if (currentLiteral() == "break") return TK_BREAK;
@@ -78,7 +80,7 @@ TokenType Lexer::identifyIdentifier() {
     else return TK_IDENTIFIER;
 }
 
-Token Lexer::number() {
+Pulsar::Token Pulsar::Lexer::scanNumber() {
     int dotCount = 0;
 
     while (isDigit(peek()) || peek() == '.') {
@@ -96,15 +98,15 @@ Token Lexer::number() {
 
     try {
         stoi(currentLiteral());
-    } catch (exception) {
+    } catch (std::exception) {
         errorToken("Invalid Value For Integer: " + currentLiteral());
     }
 
     return makeToken(TK_INTEGER);
 }
 
-Token Lexer::character(char now) {
-    switch (now) {
+Pulsar::Token Pulsar::Lexer::scanCharacter(char character) {
+    switch (character) {
         case '.':
             return makeToken(TK_DOT);
         case ',':
@@ -149,6 +151,9 @@ Token Lexer::character(char now) {
             if (peek() == '=') {
                 advance();
                 return makeToken(TK_MINUS_EQUAL);
+            } else if (peek() == '>') {
+                advance();
+                return makeToken(TK_ARROW);
             } else {
                 return makeToken(TK_MINUS);
             }
@@ -200,44 +205,44 @@ Token Lexer::character(char now) {
                 advance();
                 return makeToken(TK_LOGICAL_OR);
             } else {
-                return errorToken("Invalid Character: '" + to_string(now) + "'. Perhaps You Meant Logical Or: ||");
+                return errorToken("Invalid Character: '" + std::to_string(character) + "'. Perhaps You Meant Logical Or: ||");
             }
         case '&':
             if (peek() == '&') {
                 advance();
                 return makeToken(TK_LOGICAL_AND);
             } else {
-                return errorToken("Invalid Character: '" + to_string(now) + "'. Perhaps You Meant Logical And: &&");
+                return errorToken("Invalid Character: '" + std::to_string(character) + "'. Perhaps You Meant Logical And: &&");
             }
 
-        default: return errorToken("Invalid Character: " + to_string(now));
+        default: return errorToken("Invalid Character: " + std::to_string(character));
     }
 }
 
-Token Lexer::charLiteral() {
+Pulsar::Token Pulsar::Lexer::charLiteral() {
     while (peek() != '\'' && !isAtEnd()) {
         if (peek() == '\n') this->line++;
         advance();
     }
 
-    if (isAtEnd()) return errorToken("Char Literal Not Closed");
+    if (isAtEnd()) return errorToken("The Char Literal Has Not Been Closed");
     advance();
     if (currentLiteral().length() != 3) return errorToken("A Char May Only Contain 1 Character");
 
     return makeToken(TK_CHARACTER);
 }
 
-Token Lexer::makeToken(TokenType tokenType) {
-    return Token(tokenType, currentLiteral(), this->line);
+Pulsar::Token Pulsar::Lexer::makeToken(Pulsar::TokenType tokenType) {
+    return Pulsar::Token(tokenType, currentLiteral(), this->line);
 }
 
-Token Lexer::errorToken(string message) {
-    Token errorToken = Token(TK_ERROR, message, this->line);
+Pulsar::Token Pulsar::Lexer::errorToken(std::string message) {
+    Pulsar::Token errorToken = Token(TK_ERROR, message, this->line);
     this->errors->addError("Tokenizing Error", message, this->line);
     return errorToken;
 }
 
-void Lexer::skipWhitespace() {
+void Pulsar::Lexer::skipWhitespace() {
     while (true) {
         char next = peek();
 
@@ -262,37 +267,37 @@ void Lexer::skipWhitespace() {
     }
 }
 
-string Lexer::currentLiteral() {
+std::string Pulsar::Lexer::currentLiteral() {
     return this->sourceCode.substr(this->start, this->current - this->start);
 }
 
-bool Lexer::isAlpha(char c) {
+bool Pulsar::Lexer::isAlpha(char c) {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 
-bool Lexer::isDigit(char c) {
+bool Pulsar::Lexer::isDigit(char c) {
     return c >= '0' && c <= '9';
 }
 
-char Lexer::peek() {
+char Pulsar::Lexer::peek() {
     if (isAtEnd()) return '\0';
     return this->sourceCode[this->current];
 }
 
-char Lexer::peek(int skip) {
+char Pulsar::Lexer::peek(int skip) {
     if (isAtEnd()) return '\0';
     return this->sourceCode[this->current + skip];
 }
 
-char Lexer::advance() {
+char Pulsar::Lexer::advance() {
     this->current++;
     return this->sourceCode[this->current - 1];
 }
 
-bool Lexer::isAtEnd() {
+bool Pulsar::Lexer::isAtEnd() {
     return this->current >= this->sourceCode.length();
 }
 
-CompilerError* Lexer::getErrors() {
+Pulsar::CompilerError* Pulsar::Lexer::getErrors() {
     return this->errors;
 }

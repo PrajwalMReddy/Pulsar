@@ -1,19 +1,20 @@
 #ifndef CODEPULSAR_ERROR_H
 #define CODEPULSAR_ERROR_H
 
-#include <iostream>
-
-using namespace std;
+#include <string>
 
 
-struct Error {
-    string errorType;
-    string message;
-    int line;
+namespace Pulsar {
+    struct Error {
+        std::string errorType;
+        std::string message;
+        int line;
 
-    string getErrorType() { return this->errorType; }
-    string getMessage() { return this->message; }
-    int getLine() { return this->line; }
-};
+        std::string getErrorType() { return this->errorType; }
+        std::string getMessage() { return this->message; }
+        int getLine() { return this->line; }
+    };
+}
+
 
 #endif

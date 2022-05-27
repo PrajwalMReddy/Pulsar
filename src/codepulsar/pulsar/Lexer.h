@@ -1,59 +1,59 @@
 #ifndef CODEPULSAR_LEXER_H
 #define CODEPULSAR_LEXER_H
 
-#include <iostream>
+#include <string>
 #include <vector>
 
 #include "../lang/Token.h"
 #include "../lang/CompilerError.h"
 
-using namespace std;
 
+namespace Pulsar {
+    class Lexer {
+        public:
+            Lexer(std::string sourceCode);
+            std::vector<Pulsar::Token> tokenize();
+            Pulsar::CompilerError* getErrors();
 
-class Lexer {
-    public:
-        explicit Lexer(string sourceCode);
-        vector<Token> tokenize();
-        CompilerError* getErrors();
+        private:
+            // Input Data
+            std::string sourceCode;
 
-    private:
-        // Input Data
-        string sourceCode;
+            // Processing Data
+            int start;
+            int current;
+            int line;
 
-        // Processing Data
-        int start;
-        int current;
-        int line;
+            // Output Data
+            std::vector<Token> tokens;
+            Pulsar::CompilerError* errors;
 
-        // Output Data
-        vector<Token> tokens;
-        CompilerError* errors = new CompilerError();
+            // Core Functions
+            Pulsar::Token scanToken();
 
-        // Functions
-        Token scanToken();
+            Pulsar::Token scanIdentifier();
+            Pulsar::Token scanNumber();
+            Pulsar::Token scanCharacter(char character);
 
-        Token identifier();
-        Token number();
-        Token character(char now);
+            Pulsar::Token makeToken(Pulsar::TokenType tokenType);
+            Pulsar::Token errorToken(std::string message);
 
-        Token makeToken(TokenType tokenType);
-        Token errorToken(string message);
+            // Utility Functions
+            Pulsar::TokenType identifyIdentifier();
+            Pulsar::Token charLiteral();
 
-        // Utility Functions
-        TokenType identifyIdentifier();
-        Token charLiteral();
+            void skipWhitespace();
+            std::string currentLiteral();
 
-        void skipWhitespace();
-        string currentLiteral();
+            bool isAlpha(char c);
+            bool isDigit(char c);
 
-        bool isAlpha(char c);
-        bool isDigit(char c);
-
-        char peek();
-        char peek(int skip);
-        char advance();
-        bool isAtEnd();
-};
+            char peek();
+            char peek(int skip);
+            char advance();
+            bool isAtEnd();
+    };
+}
 
 
 #endif

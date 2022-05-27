@@ -1,17 +1,17 @@
 #ifndef CODEPULSAR_SETUP_H
 #define CODEPULSAR_SETUP_H
 
-#include <iostream>
-
-using namespace std;
+#include <string>
 
 
-struct SetUp {
-    string fileIn;
-    bool debug;
-    string version;
-};
+namespace Pulsar {
+    struct SetUp {
+        std::string fileIn;
+        bool debug;
+        std::string version;
+    };
 
-extern SetUp setUpConditions;
+    SetUp conditions = {"", false, "0.1.0"};
+}
 
 #endif

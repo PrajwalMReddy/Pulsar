@@ -1,19 +1,19 @@
 #ifndef CODEPULSAR_COMPILER_H
 #define CODEPULSAR_COMPILER_H
 
-#include <iostream>
-
-using namespace std;
+#include <string>
 
 
-class Compiler {
-    public:
-        Compiler(string sourceCode);
-        void init();
+namespace Pulsar {
+    class Compiler {
+        public:
+            Compiler(std::string sourceCode);
+            void init();
 
-    private:
-        string sourceCode;
-};
+        private:
+            std::string sourceCode;
+    };
+}
 
 
 #endif

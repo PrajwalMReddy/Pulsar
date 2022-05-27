@@ -2,23 +2,24 @@
 #define CODEPULSAR_COMPILERERROR_H
 
 #include <vector>
+#include <string>
 
 #include "Error.h"
 
-using namespace std;
 
+namespace Pulsar {
+    class CompilerError {
+        public:
+            CompilerError();
+            Pulsar::Error addError(std::string errorType, std::string message, int line);
+            bool hasError();
+            int errorCount();
+            std::vector<Pulsar::Error>* getErrors();
 
-class CompilerError {
-    public:
-        CompilerError();
-        Error addError(string errorType, string message, int line);
-        bool hasError();
-        int errorCount();
-        vector<Error> getErrors();
-
-    private:
-        vector<Error> errors;
-};
+        private:
+            std::vector<Pulsar::Error>* errors;
+    };
+}
 
 
 #endif
