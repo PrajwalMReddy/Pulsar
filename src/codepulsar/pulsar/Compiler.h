@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "ByteCodeCompiler.h"
+
 
 namespace Pulsar {
     class Compiler {
