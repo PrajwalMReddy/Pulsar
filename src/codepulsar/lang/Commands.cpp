@@ -40,13 +40,13 @@ void Pulsar::parseCommands(std::string command, std::string file) {
 }
 
 void Pulsar::debug() {
-    Pulsar::conditions.debug = true;
+    conditions.debug = true;
 }
 
 void Pulsar::version() {
-    std::cout << "Version: " << Pulsar::conditions.version << std::endl;
+    std::cout << "Version: " << conditions.version << std::endl;
 }
 
 void Pulsar::setUp(std::string name) {
-    Pulsar::conditions.fileIn = name.substr(0, name.find_last_of('.'));
+    conditions.fileIn = name.substr(0, name.find_last_of('.'));
 }

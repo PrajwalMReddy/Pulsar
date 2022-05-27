@@ -10,8 +10,9 @@ namespace Pulsar {
         bool debug;
         std::string version;
     };
-
-    SetUp conditions = {"", false, "0.1.0"};
 }
+
+extern Pulsar::SetUp conditions;
+
 
 #endif

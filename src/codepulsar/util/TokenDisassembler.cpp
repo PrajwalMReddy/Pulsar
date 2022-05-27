@@ -2,7 +2,7 @@
 
 
 void Pulsar::TokenDisassembler::display(std::vector<Pulsar::Token> tokens) {
-    if (Pulsar::conditions.debug) {
+    if (conditions.debug) {
         std::cout << "-- Tokens --" << std::endl;
         displayTokens(tokens);
     }
