@@ -75,19 +75,24 @@ std::string Pulsar::TokenDisassembler::tokenToString(Pulsar::TokenType type) {
         case TK_BREAK: return "TK_BREAK";
         case TK_FUN: return "TK_FUN";
         case TK_NATIVE: return "TK_NATIVE";
+        case TK_METHOD: return "TK_METHOD";
+        case TK_INIT: return "TK_INIT";
         case TK_OPERATOR: return "TK_OPERATOR";
+        case TK_STATIC: return "TK_STATIC";
+        case TK_OVERRIDE: return "TK_OVERRIDE";
         case TK_PUBLIC: return "TK_PUBLIC";
         case TK_PRIVATE: return "TK_PRIVATE";
-        case TK_STATIC: return "TK_STATIC";
         case TK_RETURN: return "TK_RETURN";
 
         case TK_MATCH: return "TK_MATCH";
         case TK_LOOP: return "TK_LOOP";
-        case TK_ASYNC: return "TK_ASYNC";
-        case TK_AWAIT: return "TK_AWAIT";
         case TK_TRY: return "TK_TRY";
         case TK_EXCEPT: return "TK_EXCEPT";
         case TK_MOD: return "TK_MOD";
+        case TK_USE: return "TK_USE";
+        case TK_INTERNAL: return "TK_INTERNAL";
+        case TK_ASYNC: return "TK_ASYNC";
+        case TK_AWAIT: return "TK_AWAIT";
         case TK_UNSAFE: return "TK_UNSAFE";
 
         case TK_IDENTIFIER: return "TK_IDENTIFIER";

@@ -25,10 +25,16 @@ declaration:
     | variable_declaration
 
 class_declaration:
-    | "class" IDENTIFIER "{" declaration* "}"
+    | access_modifier? "class" IDENTIFIER "{" declaration* "}"
+
+access_modifier:
+    | ("public" | "private")
 
 function_declaration:
-    | "fun" IDENTIFIER "(" parameter? ")" ":" DATATYPE block
+    | access_modifier? function_type IDENTIFIER "(" parameter? ")" "->" DATATYPE block
+
+function_type:
+    | ("fun" | "method" | "init" | "static" | "override" | "operator" | "native")
 
 parameter:
     | IDENTIFIER ":" DATATYPE ("," IDENTIFIER ":" DATATYPE)*

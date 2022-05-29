@@ -23,7 +23,7 @@ a % b; // Modulus
 ```
 ### Assignment Operations
 ```pulsar
-a = b; // Regular Assignment
+a = b; // Assignment
 a += b; // Addition Assignment
 a -= b; // Subtraction Assignment
 a *= b; // Multiplication Assignment
@@ -32,14 +32,14 @@ a %= b; // Modulus Assignment
 ```
 ### Comparison Operations
 ```pulsar
+a == b; // Equality Comparison
+a != b; // Not Equal Comparison
+
 a > b; // Greater Than
 a >= b; // Greater Than Equal To
 
 a < b; // Less Than
 a <= b; // Less Than Equal To
-
-a == b; // Equal Comparison
-a != b; // Not Equal Comparison
 ```
 ### Logical Operations
 ```pulsar
@@ -57,12 +57,12 @@ Pulsar has a temporary print statement used for debugging. This will be replaced
 ## Variables
 
 ```pulsar
-var a: int; // Declares and initializes a (of type int) and sets it to null.
+var a: int; // Defines a (of type int) and leaves it uninitialized.
 var b: boolean = true; // Declares and initializes b (of type boolean) and sets it to true.
 
 a = 10; // Assigns the value 10 to the variable a.
 ```
-The datatypes available for variables include boolean, char, double, and int.
+The datatypes available for variables include int, double, boolean, and char.
 
 ## If/Else Statements
 ```pulsar
@@ -72,7 +72,7 @@ if a == b {
   print 404;
 }
 ```
-The parentheses around if statements are optional.
+The parentheses around if statements are optional but the curly braces are not.
 
 ## While Loops
 ```pulsar
@@ -82,3 +82,16 @@ while i < 100 {
 }
 ```
 Once again, the parentheses around while loops are optional.
+
+## Functions
+```pulsar
+// Function test takes in two integer arguments and returns and int.
+fun test(a: int, b: int): int {
+    if a > b {
+        return a;
+    } else {
+        return b;
+    }
+}
+```
+The return type of the function is always written after the function parameter list.

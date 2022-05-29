@@ -59,12 +59,16 @@ Pulsar::TokenType Pulsar::Lexer::identifyIdentifier() {
     if (currentLiteral() == "false") return TK_FALSE;
     if (currentLiteral() == "if") return TK_IF;
     if (currentLiteral() == "import") return TK_IMPORT;
+    if (currentLiteral() == "init") return TK_INIT;
     if (currentLiteral() == "int") return TK_INT_TYPE;
+    if (currentLiteral() == "internal") return TK_INTERNAL;
     if (currentLiteral() == "loop") return TK_LOOP;
-    if (currentLiteral() == "mod") return TK_MOD;
     if (currentLiteral() == "match") return TK_MATCH;
+    if (currentLiteral() == "method") return TK_METHOD;
+    if (currentLiteral() == "mod") return TK_MOD;
     if (currentLiteral() == "native") return TK_NATIVE;
     if (currentLiteral() == "operator") return TK_OPERATOR;
+    if (currentLiteral() == "override") return TK_OVERRIDE;
     if (currentLiteral() == "package") return TK_PACKAGE;
     if (currentLiteral() == "print") return TK_PRINT;
     if (currentLiteral() == "private") return TK_PRIVATE;
@@ -74,6 +78,7 @@ Pulsar::TokenType Pulsar::Lexer::identifyIdentifier() {
     if (currentLiteral() == "true") return TK_TRUE;
     if (currentLiteral() == "try") return TK_TRY;
     if (currentLiteral() == "unsafe") return TK_UNSAFE;
+    if (currentLiteral() == "use") return TK_USE;
     if (currentLiteral() == "var") return TK_VAR;
     if (currentLiteral() == "void") return TK_VOID;
     if (currentLiteral() == "while") return TK_WHILE;

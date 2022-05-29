@@ -22,14 +22,16 @@ namespace Pulsar {
         TK_VAR, TK_CONST,
         TK_IF, TK_ELSE, TK_WHILE,
         TK_CONTINUE, TK_BREAK,
-        TK_FUN, TK_NATIVE, TK_OPERATOR,
-        TK_PUBLIC, TK_PRIVATE, TK_STATIC, TK_RETURN,
+        TK_FUN, TK_NATIVE, TK_METHOD, TK_INIT,
+        TK_OPERATOR, TK_STATIC, TK_OVERRIDE,
+        TK_PUBLIC, TK_PRIVATE, TK_RETURN,
 
         // Reserved Keywords (For Possible Future Use)
         TK_MATCH, TK_LOOP,
-        TK_ASYNC, TK_AWAIT,
         TK_TRY, TK_EXCEPT,
-        TK_MOD, TK_UNSAFE,
+        TK_MOD, TK_USE, TK_INTERNAL,
+        TK_ASYNC, TK_AWAIT,
+        TK_UNSAFE,
 
         // Data Types and Variables
         TK_IDENTIFIER, TK_VOID,
