@@ -1,4 +1,4 @@
----------------------------------KEY---------------------------------
+----------------------------META-GRAMMAR-----------------------------
 
 Key:
     | "?" : Zero Or One Times
@@ -21,14 +21,21 @@ import_statement:
 
 declaration:
     | class_declaration
+    | enum_declaration
     | function_declaration
     | variable_declaration
 
 class_declaration:
-    | access_modifier? "class" IDENTIFIER "{" declaration* "}"
+    | access_modifier? "class" IDENTIFIER ("<" IDENTIFIER)? "{" declaration* "}"
 
 access_modifier:
     | ("public" | "private")
+
+enum_declaration:
+    | access_modifier? "enum" IDENTIFIER? "{" enum_block? "}"
+
+enum_block:
+    | IDENTIFIER ("," IDENTIFIER)* ","?
 
 function_declaration:
     | access_modifier? function_type IDENTIFIER "(" parameter? ")" "->" DATATYPE block
@@ -40,7 +47,7 @@ parameter:
     | IDENTIFIER ":" DATATYPE ("," IDENTIFIER ":" DATATYPE)*
 
 variable_declaration:
-    | ("var" | "const") IDENTIFIER ":" DATATYPE ("=" expression)? ";"
+    | access_modifier? ("var" | "const") IDENTIFIER ":" DATATYPE ("=" expression)? ";"
 
 block:
     | "{" statement* "}"
