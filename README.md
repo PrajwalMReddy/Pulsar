@@ -1,5 +1,9 @@
 # Pulsar
-![Pulsar Logo](doc/pulsar-logo.png)
+
+<p align="center">
+  <img src="doc/pulsar-logo.png" height=250>
+  <hr>
+</p>
 
 Pulsar is a new programming language that I am currently working on to learn how compilers and interpreters work as well as for a personal challenge. This is the first implementation, written in Java with a bit of Kotlin. It features both a compiler, which will compile down to native code, and an interpreter, both of which are currently being developed.
 
