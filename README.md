@@ -1,7 +1,7 @@
 # Pulsar
 
 <p align="center">
-  <img src="doc/pulsar-logo.png" height=250>
+  <img src="doc/pulsar-logo.png" alt="Pulsar Logo" height=250>
   <hr>
 </p>
 

@@ -210,17 +210,17 @@ Pulsar::Token Pulsar::Lexer::scanCharacter(char character) {
                 advance();
                 return makeToken(TK_LOGICAL_OR);
             } else {
-                return errorToken("Invalid Character: '" + std::to_string(character) + "'. Perhaps You Meant Logical Or: ||");
+                return errorToken(std::string("Invalid Character: '") + character + std::string("'. Perhaps You Meant Logical Or: ||"));
             }
         case '&':
             if (peek() == '&') {
                 advance();
                 return makeToken(TK_LOGICAL_AND);
             } else {
-                return errorToken("Invalid Character: '" + std::to_string(character) + "'. Perhaps You Meant Logical And: &&");
+                return errorToken(std::string("Invalid Character: '") + character + std::string("'. Perhaps You Meant Logical And: &&"));
             }
 
-        default: return errorToken("Invalid Character: " + std::to_string(character));
+        default: return errorToken(std::string("Invalid Character: ") + character);
     }
 }
 

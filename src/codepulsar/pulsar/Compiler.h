@@ -4,6 +4,7 @@
 #include <string>
 
 #include "ByteCodeCompiler.h"
+#include "../util/ErrorReporter.h"
 
 
 namespace Pulsar {
@@ -13,7 +14,11 @@ namespace Pulsar {
             void init();
 
         private:
+            // Input Data
             std::string sourceCode;
+
+            // Output Data
+            CompilerError* errors;
     };
 }
 

@@ -5,21 +5,48 @@
 
 #include "Lexer.h"
 #include "../util/TokenDisassembler.h"
+#include "../ast/Expression.h"
+#include "../ast/expression/Literal.h"
 
 
 namespace Pulsar {
     class Parser {
         public:
             Parser(std::string sourceCode);
-            void parse();
+            Expression* parse();
+            CompilerError* getErrors();
 
         private:
             // Input Data
             std::string sourceCode;
             std::vector<Token> tokens;
 
+            // Processing Data
+            int current;
+
             // Output Data
-            Pulsar::CompilerError* errors;
+            Expression* program;
+            CompilerError* errors;
+
+            // AST Parsing Functions
+            Expression* primary();
+
+            // Helper Functions
+            bool match(TokenType type);
+            bool matchAdvance(TokenType type);
+
+            Token advance();
+            Token previous();
+
+            void newError(std::string message, int line);
+
+            // The Peek Family
+            Token peek();
+            Token peekNext();
+
+            TokenType peekType();
+            std::string peekLiteral();
+            int peekLine();
     };
 }
 
