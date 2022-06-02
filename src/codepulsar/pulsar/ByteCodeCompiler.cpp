@@ -7,10 +7,14 @@ Pulsar::ByteCodeCompiler::ByteCodeCompiler(std::string sourceCode) {
 
 void Pulsar::ByteCodeCompiler::compileByteCode() {
     Pulsar::Parser parser = Parser(this->sourceCode);
-    parser.parse();
-    this->errors = parser.getErrors();
+    this->program = parser.parse();
 
+    this->errors = parser.getErrors();
     if (this->errors->hasError()) return;
+
+    ASTPrinter astPrinter = ASTPrinter();
+    astPrinter.print(this->program);
+
     compile();
 }
 

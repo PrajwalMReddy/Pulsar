@@ -8,8 +8,7 @@ namespace Pulsar {
     class Grouping: public Expression {
         public:
             Grouping(Expression* expression, int line);
-            template<typename R>
-            R accept(ExprVisitor<R>& visitor);
+            void accept(ExprVisitor& visitor);
 
             Expression* getExpression();
             int getLine();

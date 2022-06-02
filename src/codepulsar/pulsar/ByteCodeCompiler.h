@@ -5,6 +5,7 @@
 
 #include "Parser.h"
 #include "../util/ErrorReporter.h"
+#include "../util/ASTPrinter.h"
 
 
 namespace Pulsar {
@@ -17,6 +18,7 @@ namespace Pulsar {
         private:
             // Input Data
             std::string sourceCode;
+            Expression* program;
 
             // Output Data
             CompilerError* errors;

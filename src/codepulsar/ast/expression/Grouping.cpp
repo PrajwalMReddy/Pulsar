@@ -6,8 +6,7 @@ Pulsar::Grouping::Grouping(Expression* expression, int line) {
     this->line = line;
 }
 
-template<typename R>
-R Pulsar::Grouping::accept(ExprVisitor<R>& visitor) {
+void Pulsar::Grouping::accept(ExprVisitor& visitor) {
     visitor.visitGroupingExpression(this);
 }
 

@@ -7,14 +7,14 @@
 
 
 namespace Pulsar {
-    class ASTPrinter: public ExprVisitor<std::string> {
+    class ASTPrinter: public ExprVisitor {
         public:
             ASTPrinter();
             void print(Expression* ast);
 
             // Expression AST Visitors
-            std::string visitGroupingExpression(Grouping* expression) override;
-            std::string visitLiteralExpression(Literal* expression) override;
+            void visitGroupingExpression(Grouping* expression) override;
+            void visitLiteralExpression(Literal* expression) override;
 
         private:
             int indentCount;

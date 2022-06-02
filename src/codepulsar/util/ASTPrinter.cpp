@@ -16,14 +16,14 @@ void Pulsar::ASTPrinter::constructTree(Pulsar::Expression* ast) {
     if (ast == nullptr) {
         std::cout << "No AST Has Been Generated" << std::endl;
     } else {
-        std::cout << ast->accept(*this) << std::endl;
+        ast->accept(*this); std::cout << std::endl;
     }
 }
 
-std::string Pulsar::ASTPrinter::visitGroupingExpression(Pulsar::Grouping* expression) {
-    return "(" + expression->getExpression()->accept(*this) + ")";
+void Pulsar::ASTPrinter::visitGroupingExpression(Pulsar::Grouping* expression) {
+    std::cout << "("; expression->getExpression()->accept(*this); std::cout << ")";
 }
 
-std::string Pulsar::ASTPrinter::visitLiteralExpression(Pulsar::Literal* expression) {
-    return "Literal(" + expression->getValue() + ")";
+void Pulsar::ASTPrinter::visitLiteralExpression(Pulsar::Literal* expression) {
+    std::cout << "Literal(" + expression->getValue() << ")";
 }
