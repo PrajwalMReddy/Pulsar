@@ -35,6 +35,13 @@ Pulsar::Expression* Pulsar::Parser::primary() {
         return new Literal(previous().literal, PR_CHARACTER, peekLine());
     }
 
+    if (matchAdvance(TK_LPAR)) {
+        // TODO Change Later to expression();
+        Expression* expression = primary();
+        look(TK_RPAR, "A Closing Parenthesis Was Expected");
+        return new Grouping(expression, peekLine());
+    }
+
     newError("An Expression Was Expected But Nothing Was Given", peekLine());
     return new Literal("", PR_ERROR, peekLine());
 }
@@ -56,6 +63,17 @@ bool Pulsar::Parser::matchAdvance(TokenType type) {
 Pulsar::Token Pulsar::Parser::advance() {
     this->current++;
     return this->tokens[this->current - 1];
+}
+
+bool Pulsar::Parser::look(TokenType token, std::string message) {
+    if (peekType() != token) {
+        newError(message, peekLine());
+        // TODO synchronize();
+        return true;
+    } else {
+        advance();
+        return false;
+    }
 }
 
 Pulsar::Token Pulsar::Parser::previous() {

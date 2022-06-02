@@ -11,6 +11,8 @@ namespace Pulsar {
     class Literal: public Expression {
         public:
             Literal(std::string value, PrimitiveType type, int line);
+            template<typename R>
+            R accept(ExprVisitor<R>& visitor);
 
             std::string getValue();
             PrimitiveType getType();

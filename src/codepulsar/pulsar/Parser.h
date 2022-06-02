@@ -5,8 +5,10 @@
 
 #include "Lexer.h"
 #include "../util/TokenDisassembler.h"
+
 #include "../ast/Expression.h"
 #include "../ast/expression/Literal.h"
+#include "../ast/expression/Grouping.h"
 
 
 namespace Pulsar {
@@ -38,6 +40,8 @@ namespace Pulsar {
             Token advance();
             Token previous();
 
+            // Error Handling Functions
+            bool look(TokenType token, std::string message);
             void newError(std::string message, int line);
 
             // The Peek Family
