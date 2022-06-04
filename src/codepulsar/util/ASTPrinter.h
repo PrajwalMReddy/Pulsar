@@ -13,8 +13,12 @@ namespace Pulsar {
             void print(Expression* ast);
 
             // Expression AST Visitors
+            void visitBinaryExpression(Binary* expression) override;
+            void visitCallExpression(Call* expression) override;
             void visitGroupingExpression(Grouping* expression) override;
             void visitLiteralExpression(Literal* expression) override;
+            void visitLogicalExpression(Logical* expression) override;
+            void visitUnaryExpression(Unary* expression) override;
 
         private:
             int indentCount;

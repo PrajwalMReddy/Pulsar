@@ -9,6 +9,10 @@
 #include "../ast/Expression.h"
 #include "../ast/expression/Literal.h"
 #include "../ast/expression/Grouping.h"
+#include "../ast/expression/Unary.h"
+#include "../ast/expression/Call.h"
+#include "../ast/expression/Binary.h"
+#include "../ast/expression/Logical.h"
 
 
 namespace Pulsar {
@@ -31,6 +35,16 @@ namespace Pulsar {
             CompilerError* errors;
 
             // AST Parsing Functions
+            Expression* expression();
+            Expression* assignment();
+            Expression* logicalOr();
+            Expression* logicalAnd();
+            Expression* equality();
+            Expression* comparison();
+            Expression* term();
+            Expression* factor();
+            Expression* unary();
+            Expression* call();
             Expression* primary();
 
             // Helper Functions

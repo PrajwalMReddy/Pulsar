@@ -15,11 +15,125 @@ Pulsar::Expression* Pulsar::Parser::parse() {
     if (this->errors->hasError()) return this->program;
     Pulsar::TokenDisassembler::display(this->tokens);
 
-    this->program = primary();
+    this->program = expression();
     return this->program;
 }
 
-// TODO Grouping and Variable Accessors
+Pulsar::Expression* Pulsar::Parser::expression() {
+    return assignment();
+}
+
+// TODO Finish assignment()
+Pulsar::Expression* Pulsar::Parser::assignment() {
+    logicalOr();
+}
+
+Pulsar::Expression* Pulsar::Parser::logicalOr() {
+    Expression* expression = logicalAnd();
+
+    while (matchAdvance(TK_LOGICAL_OR)) {
+        Token operatorType = previous();
+        Expression* right = logicalAnd();
+        expression = new Logical(expression, operatorType.literal, right, operatorType.line);
+    }
+
+    return expression;
+}
+
+Pulsar::Expression* Pulsar::Parser::logicalAnd() {
+    Expression* expression = equality();
+
+    while (matchAdvance(TK_LOGICAL_AND)) {
+        Token operatorType = previous();
+        Expression* right = equality();
+        expression = new Logical(expression, operatorType.literal, right, operatorType.line);
+    }
+
+    return expression;
+}
+
+Pulsar::Expression* Pulsar::Parser::equality() {
+    Expression* expression = comparison();
+
+    while (matchAdvance(TK_EQUAL_EQUAL) || matchAdvance(TK_NOT_EQUAL)) {
+        Token operatorType = previous();
+        Expression* right = comparison();
+        expression = new Binary(expression, operatorType.literal, right, operatorType.line);
+    }
+
+    return expression;
+}
+
+Pulsar::Expression* Pulsar::Parser::comparison() {
+    Expression* expression = term();
+
+    while (matchAdvance(TK_GT) || matchAdvance(TK_GT_EQUAL) || matchAdvance(TK_LT) || matchAdvance(TK_LT_EQUAL)) {
+        Token operatorType = previous();
+        Expression* right = term();
+        expression = new Binary(expression, operatorType.literal, right, operatorType.line);
+    }
+
+    return expression;
+}
+
+Pulsar::Expression* Pulsar::Parser::term() {
+    Expression* expression = factor();
+
+    while (matchAdvance(TK_PLUS) || matchAdvance(TK_MINUS)) {
+        Token operatorType = previous();
+        Expression* right = factor();
+        expression = new Binary(expression, operatorType.literal, right, operatorType.line);
+    }
+
+    return expression;
+}
+
+Pulsar::Expression* Pulsar::Parser::factor() {
+    Expression* expression = unary();
+
+    while (matchAdvance(TK_MULTIPLICATION) || matchAdvance(TK_DIVISION) || matchAdvance(TK_MODULUS)) {
+        Token operatorType = previous();
+        Expression* right = unary();
+        expression = new Binary(expression, operatorType.literal, right, operatorType.line);
+    }
+
+    return expression;
+}
+
+Pulsar::Expression* Pulsar::Parser::unary() {
+    if (matchAdvance(TK_NOT) || matchAdvance(TK_MINUS)) {
+        Token operatorType = previous();
+        Expression* right = unary();
+        return new Unary(operatorType.literal, right, operatorType.line);
+    } else if (matchAdvance(TK_PLUS)) {
+        return unary();
+    }
+
+    return call();
+}
+
+// TODO Disallow 'Nested' Calls For Now
+Pulsar::Expression* Pulsar::Parser::call() {
+    Token name = peek();
+    Expression* expr = primary();
+
+    if (matchAdvance(TK_LPAR)) {
+        auto* arguments = new std::vector<Expression*>;
+
+        if (!match(TK_RPAR)) {
+            do {
+                arguments->push_back(expression());
+            } while (matchAdvance(TK_COMMA));
+        }
+
+        look(TK_RPAR, "A Closing Parenthesis Is Required After A Call Expression");
+        return new Call(name, arguments);
+    }
+
+    return expr;
+}
+
+// TODO Variable Accessors
 Pulsar::Expression* Pulsar::Parser::primary() {
     if (matchAdvance(TK_TRUE)) {
         return new Literal("true", PR_BOOLEAN, peekLine());
@@ -36,10 +150,9 @@ Pulsar::Expression* Pulsar::Parser::primary() {
     }
 
     if (matchAdvance(TK_LPAR)) {
-        // TODO Change Later to expression();
-        Expression* expression = primary();
+        Expression* expr = expression();
         look(TK_RPAR, "A Closing Parenthesis Was Expected");
-        return new Grouping(expression, peekLine());
+        return new Grouping(expr, peekLine());
     }
 
     newError("An Expression Was Expected But Nothing Was Given", peekLine());
