@@ -87,6 +87,15 @@ void Pulsar::ASTPrinter::visitIfStatement(If* statement) {
     std::cout << "\n";
 }
 
+void Pulsar::ASTPrinter::visitPrintStatement(Print* statement) {
+    std::cout << "Print("; statement->getExpression()->accept(*this); std::cout << ")\n";
+}
+
+void Pulsar::ASTPrinter::visitWhileStatement(While* statement) {
+    std::cout << "\n" << giveTabs() << "While("; statement->getCondition()->accept(*this); std::cout << ")(\n";
+    blockStatement(statement->getStatements()); std::cout << "\n" << giveTabs() << ")";
+}
+
 std::string Pulsar::ASTPrinter::giveTabs() const {
     return std::string("\t", this->indentCount);
 }

@@ -23,6 +23,10 @@ Pulsar::Statement* Pulsar::Parser::statement() {
     while (!match(TK_EOF)) {
         if (matchAdvance(TK_IF)) {
             return ifStatement();
+        } else if (matchAdvance(TK_WHILE)) {
+            return whileStatement();
+        } else if (matchAdvance(TK_PRINT)) {
+            return printStatement();
         } else {
             return expressionStatement();
         }
@@ -59,6 +63,20 @@ Pulsar::Statement* Pulsar::Parser::ifStatement() {
     }
 
     return new If(expr, thenBranch, elseBranch, line);
+}
+
+Pulsar::Statement* Pulsar::Parser::whileStatement() {
+    int line = peekLine();
+    Expression* expr = expression();
+    Block* statements = block();
+
+    return new While(expr, statements, line);
+}
+
+Pulsar::Statement* Pulsar::Parser::printStatement() {
+    Print* statement = new Print(expression(), peekLine());
+    look(TK_SEMICOLON, "A Semicolon Was Expected After The Print Statement");
+    return statement;
 }
 
 Pulsar::Statement* Pulsar::Parser::expressionStatement() {

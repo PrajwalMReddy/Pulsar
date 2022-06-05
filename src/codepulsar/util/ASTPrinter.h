@@ -26,6 +26,8 @@ namespace Pulsar {
             void visitBlockStatement(Block* statement) override;
             void visitExpressionStatement(ExpressionStmt* statement) override;
             void visitIfStatement(If* statement) override;
+            void visitPrintStatement(Print* statement) override;
+            void visitWhileStatement(While* statement) override;
 
         private:
             int indentCount;

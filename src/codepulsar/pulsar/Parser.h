@@ -18,6 +18,8 @@
 #include "../ast/statement/ExpressionStmt.h"
 #include "../ast/statement/Block.h"
 #include "../ast/statement/If.h"
+#include "../ast/statement/Print.h"
+#include "../ast/statement/While.h"
 
 
 namespace Pulsar {
@@ -45,6 +47,8 @@ namespace Pulsar {
             Statement* statement();
             Block* block();
             Statement* ifStatement();
+            Statement* whileStatement();
+            Statement* printStatement();
             Statement* expressionStatement();
 
             // Expression Nodes
