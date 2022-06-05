@@ -18,7 +18,7 @@ namespace Pulsar {
         private:
             // Input Data
             std::string sourceCode;
-            Expression* program;
+            Statement* program;
 
             // Output Data
             CompilerError* errors;

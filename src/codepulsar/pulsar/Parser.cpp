@@ -7,7 +7,7 @@ Pulsar::Parser::Parser(std::string sourceCode) {
     this->current = 0;
 }
 
-Pulsar::Expression* Pulsar::Parser::parse() {
+Pulsar::Statement* Pulsar::Parser::parse() {
     Pulsar::Lexer lexer = Lexer(this->sourceCode);
     this->tokens = lexer.tokenize();
     this->errors = lexer.getErrors();
@@ -15,8 +15,56 @@ Pulsar::Expression* Pulsar::Parser::parse() {
     if (this->errors->hasError()) return this->program;
     Pulsar::TokenDisassembler::display(this->tokens);
 
-    this->program = expression();
+    this->program = statement();
     return this->program;
+}
+
+Pulsar::Statement* Pulsar::Parser::statement() {
+    while (!match(TK_EOF)) {
+        if (matchAdvance(TK_IF)) {
+            return ifStatement();
+        } else {
+            return expressionStatement();
+        }
+    }
+
+    return nullptr;
+}
+
+// TODO startScope() and endScope()
+Pulsar::Block* Pulsar::Parser::block() {
+    auto* statements = new std::vector<Statement*>;
+    look(TK_LBRACE, "An Opening Brace Was Expected Before The Block");
+
+    while (!match(TK_RBRACE) && !match(TK_EOF)) {
+        statements->push_back(statement());
+    }
+
+    look(TK_RBRACE, "A Closing Brace Was Expected After The Block");
+    return new Block(statements, peekLine());
+}
+
+Pulsar::Statement* Pulsar::Parser::ifStatement() {
+    int line = peekLine();
+    Expression* expr = expression();
+    Block* thenBranch = block();
+    Statement* elseBranch = nullptr;
+
+    if (matchAdvance(TK_ELSE)) {
+        if (matchAdvance(TK_IF)) {
+            elseBranch = ifStatement();
+        } else {
+            elseBranch = block();
+        }
+    }
+
+    return new If(expr, thenBranch, elseBranch, line);
+}
+
+Pulsar::Statement* Pulsar::Parser::expressionStatement() {
+    ExpressionStmt* expr = new ExpressionStmt(expression(), peekLine());
+    look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression");
+    return expr;
 }
 
 Pulsar::Expression* Pulsar::Parser::expression() {

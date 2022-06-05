@@ -14,12 +14,17 @@
 #include "../ast/expression/Binary.h"
 #include "../ast/expression/Logical.h"
 
+#include "../ast/Statement.h"
+#include "../ast/statement/ExpressionStmt.h"
+#include "../ast/statement/Block.h"
+#include "../ast/statement/If.h"
+
 
 namespace Pulsar {
     class Parser {
         public:
             Parser(std::string sourceCode);
-            Expression* parse();
+            Statement* parse();
             CompilerError* getErrors();
 
         private:
@@ -31,10 +36,18 @@ namespace Pulsar {
             int current;
 
             // Output Data
-            Expression* program;
+            Statement* program;
             CompilerError* errors;
 
-            // AST Parsing Functions
+            // ---- AST Parsing Functions ---- //
+
+            // Statement Nodes
+            Statement* statement();
+            Block* block();
+            Statement* ifStatement();
+            Statement* expressionStatement();
+
+            // Expression Nodes
             Expression* expression();
             Expression* assignment();
             Expression* logicalOr();
@@ -46,6 +59,10 @@ namespace Pulsar {
             Expression* unary();
             Expression* call();
             Expression* primary();
+
+            // ---- End AST Parsing Functions ---- //
+
+            // Node Parsing Helpers
 
             // Helper Functions
             bool match(TokenType type);
