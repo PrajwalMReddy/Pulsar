@@ -5,6 +5,7 @@ Pulsar::Parser::Parser(std::string sourceCode) {
     this->sourceCode = sourceCode;
 
     this->current = 0;
+    this->scopeDepth = 0;
 }
 
 Pulsar::Statement* Pulsar::Parser::parse() {
@@ -15,18 +16,76 @@ Pulsar::Statement* Pulsar::Parser::parse() {
     if (this->errors->hasError()) return this->program;
     Pulsar::TokenDisassembler::display(this->tokens);
 
-    this->program = statement();
+    this->program = declarationStatement();
     return this->program;
+}
+
+Pulsar::Statement* Pulsar::Parser::declarationStatement() {
+    Statement* decl = declaration();
+    if (decl != nullptr) return decl;
+    newError("Only Declarations Are Allowed At The Top Level", peekLine());
+    return nullptr;
+}
+
+Pulsar::Statement* Pulsar::Parser::declaration() {
+    if (matchAdvance(TK_FUN)) {
+        return functionDeclaration();
+    } else if (matchAdvance(TK_VAR)) {
+        return variableDeclaration(TK_VAR);
+    } else if (matchAdvance(TK_CONST)) {
+        return variableDeclaration(TK_CONST);
+    }
+
+    return nullptr;
+}
+
+Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
+    int line = peekLine();
+    std::string functionName = advance().literal;
+
+    look(TK_LPAR, "An Opening Parenthesis Was Expected Before The Parameter List");
+    auto* parameters = new std::vector<Parameter*>;
+
+    if (peekType() != TK_RPAR) {
+        do {
+            std::string parameterName = advance().literal;
+            Token type = {TK_ERROR, "", line};
+
+            if (!matchAdvance(TK_COLON)) {
+                newError("A Colon Was Expected After The Variable Name", peekLine());
+            } else {
+                type = advance();
+            }
+
+            parameters->push_back(new Parameter(parameterName, type));
+        } while (matchAdvance(TK_COMMA));
+    }
+
+    look(TK_RPAR, "A Closing Parenthesis Was Expected After The Parameter List");
+    if (!matchAdvance(TK_ARROW)) newError("A Return Datatype For The Function Was Expected", peekLine());
+
+    Token type = advance();
+    Block* statements = block();
+    return new Function(functionName, type, parameters, statements, line);
 }
 
 Pulsar::Statement* Pulsar::Parser::statement() {
     while (!match(TK_EOF)) {
-        if (matchAdvance(TK_IF)) {
+        Statement* decl = declaration();
+        if (decl != nullptr) return decl;
+
+        else if (matchAdvance(TK_IF)) {
             return ifStatement();
         } else if (matchAdvance(TK_WHILE)) {
             return whileStatement();
+        } else if (matchAdvance(TK_VAR)) {
+            return variableDeclaration(TK_VAR);
+        } else if (matchAdvance(TK_CONST)) {
+            return variableDeclaration(TK_CONST);
         } else if (matchAdvance(TK_PRINT)) {
             return printStatement();
+        } else if (matchAdvance(TK_RETURN)) {
+            return returnStatement();
         } else {
             return expressionStatement();
         }
@@ -35,9 +94,28 @@ Pulsar::Statement* Pulsar::Parser::statement() {
     return nullptr;
 }
 
-// TODO startScope() and endScope()
+Pulsar::Statement* Pulsar::Parser::variableDeclaration(TokenType accessType) {
+    Token identifier = advance();
+
+    look(TK_COLON, "Unexpected Token '" + peekLiteral() + "' After Variable Name");
+    Token type = advance();
+
+    Expression* expr = nullptr;
+    if (matchAdvance(TK_EQUAL)) {
+        expr = expression();
+    }
+
+    look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
+    return new VariableDecl(identifier, expr, type, accessType, isInGlobalScope(), peekLine());
+}
+
+void Pulsar::Parser::startScope() {
+    this->scopeDepth++;
+}
+
 Pulsar::Block* Pulsar::Parser::block() {
     auto* statements = new std::vector<Statement*>;
+    startScope();
     look(TK_LBRACE, "An Opening Brace Was Expected Before The Block");
 
     while (!match(TK_RBRACE) && !match(TK_EOF)) {
@@ -45,7 +123,12 @@ Pulsar::Block* Pulsar::Parser::block() {
     }
 
     look(TK_RBRACE, "A Closing Brace Was Expected After The Block");
+    endScope();
     return new Block(statements, peekLine());
+}
+
+void Pulsar::Parser::endScope() {
+    this->scopeDepth--;
 }
 
 Pulsar::Statement* Pulsar::Parser::ifStatement() {
@@ -79,6 +162,18 @@ Pulsar::Statement* Pulsar::Parser::printStatement() {
     return statement;
 }
 
+Pulsar::Statement* Pulsar::Parser::returnStatement() {
+    Return* statement;
+    if (match(TK_SEMICOLON)) {
+        statement = new Return(nullptr, peekLine());
+    } else {
+        statement = new Return(expression(), peekLine());
+    }
+
+    look(TK_SEMICOLON, "A Semicolon Was Expected After The Return Statement");
+    return statement;
+}
+
 Pulsar::Statement* Pulsar::Parser::expressionStatement() {
     ExpressionStmt* expr = new ExpressionStmt(expression(), peekLine());
     look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression");
@@ -89,9 +184,27 @@ Pulsar::Expression* Pulsar::Parser::expression() {
     return assignment();
 }
 
-// TODO Finish assignment()
 Pulsar::Expression* Pulsar::Parser::assignment() {
-    logicalOr();
+    if (peekType() != TK_IDENTIFIER) return logicalOr();
+
+    Token variable = peek();
+    if (peekNext().tokenType == TK_EQUAL) {
+        advance(); advance();
+        return new Assignment(variable.literal, expression(), peekLine());
+    } else if (peekNext().tokenType == TK_PLUS_EQUAL || peekNext().tokenType == TK_MINUS_EQUAL || peekNext().tokenType == TK_MUL_EQUAL || peekNext().tokenType == TK_DIV_EQUAL || peekNext().tokenType == TK_MOD_EQUAL) {
+        std::string identifier = variable.literal;
+        int line = variable.line;
+        advance();
+
+        std::string operatorType = peek().literal;
+        advance();
+        Expression *expr = expression();
+
+        // Expanding The Syntactic Sugar Into A Normal Assignment
+        return new Assignment(identifier,new Binary(new VariableExpr(identifier, line), operatorType.substr(0, 1), expr, line), line);
+    } else {
+        return logicalOr();
+    }
 }
 
 Pulsar::Expression* Pulsar::Parser::logicalOr() {
@@ -215,6 +328,11 @@ Pulsar::Expression* Pulsar::Parser::primary() {
         return new Literal(previous().literal, PR_CHARACTER, peekLine());
     }
 
+    if (match(TK_IDENTIFIER)) {
+        Token name = advance();
+        return new VariableExpr(name.literal, peekLine());
+    }
+
     if (matchAdvance(TK_LPAR)) {
         Expression* expr = expression();
         look(TK_RPAR, "A Closing Parenthesis Was Expected");
@@ -247,7 +365,7 @@ Pulsar::Token Pulsar::Parser::advance() {
 bool Pulsar::Parser::look(TokenType token, std::string message) {
     if (peekType() != token) {
         newError(message, peekLine());
-        // TODO synchronize();
+        synchronize();
         return true;
     } else {
         advance();
@@ -255,8 +373,30 @@ bool Pulsar::Parser::look(TokenType token, std::string message) {
     }
 }
 
+void Pulsar::Parser::synchronize() {
+    while (peekType() != TK_EOF) {
+        if (peekType() == TK_SEMICOLON) return;
+
+        switch (peekType()) {
+            case TK_IF:
+            case TK_WHILE:
+            case TK_VAR:
+            case TK_CONST:
+            case TK_PRINT:
+            case TK_RETURN:
+                return;
+        }
+
+        advance();
+    }
+}
+
 Pulsar::Token Pulsar::Parser::previous() {
     return this->tokens[this->current - 1];
+}
+
+bool Pulsar::Parser::isInGlobalScope() {
+    return this->scopeDepth == 0;
 }
 
 Pulsar::Token Pulsar::Parser::peek() {

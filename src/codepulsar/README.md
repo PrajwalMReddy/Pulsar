@@ -9,10 +9,13 @@ This holds all the source code directly involved in the compiler pipeline.
 This holds code that isn't directly a part of the compilation pipeline but is nevertheless very important for the compiler.
 
 ## ast
-This holds all the Abstract Syntax Tree nodes that are used while parsing. Furthermore, there are two child directories: one for the expression nodes and one for the statement nodes.
+This holds all the Abstract Syntax Tree nodes that are used while parsing. There are three child directories: one for the expression nodes, and two for the statement nodes.
+
+## variable
+This subdirectory holds all files required for handling variables, including functions, classes, and enums.
 
 ## primitive
-This package holds the code that is required for the built-in primitive types to work.
+This folder holds the code that is required for the built-in primitive types to work.
 
 ## analysis
 This holds all the classes that are used for the static analysis of the source code; for now this only includes the type checker and validator.

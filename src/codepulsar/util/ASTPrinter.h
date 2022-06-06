@@ -15,18 +15,23 @@ namespace Pulsar {
             void print(Statement* ast);
 
             // Expression AST Visitors
+            void visitAssignmentExpression(Assignment* expression) override;
             void visitBinaryExpression(Binary* expression) override;
             void visitCallExpression(Call* expression) override;
             void visitGroupingExpression(Grouping* expression) override;
             void visitLiteralExpression(Literal* expression) override;
             void visitLogicalExpression(Logical* expression) override;
             void visitUnaryExpression(Unary* expression) override;
+            void visitVariableExpression(VariableExpr* expression) override;
 
             // Statement AST Visitors
             void visitBlockStatement(Block* statement) override;
             void visitExpressionStatement(ExpressionStmt* statement) override;
+            void visitFunctionStatement(Function* statement) override;
             void visitIfStatement(If* statement) override;
             void visitPrintStatement(Print* statement) override;
+            void visitReturnStatement(Return* statement) override;
+            void visitVariableStatement(VariableDecl* statement) override;
             void visitWhileStatement(While* statement) override;
 
         private:

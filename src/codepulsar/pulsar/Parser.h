@@ -5,6 +5,7 @@
 
 #include "Lexer.h"
 #include "../util/TokenDisassembler.h"
+#include "../variable/Parameter.h"
 
 #include "../ast/Expression.h"
 #include "../ast/expression/Literal.h"
@@ -13,6 +14,8 @@
 #include "../ast/expression/Call.h"
 #include "../ast/expression/Binary.h"
 #include "../ast/expression/Logical.h"
+#include "../ast/expression/VariableExpr.h"
+#include "../ast/expression/Assignment.h"
 
 #include "../ast/Statement.h"
 #include "../ast/statement/ExpressionStmt.h"
@@ -20,6 +23,9 @@
 #include "../ast/statement/If.h"
 #include "../ast/statement/Print.h"
 #include "../ast/statement/While.h"
+#include "../ast/declaration/VariableDecl.h"
+#include "../ast/statement/Return.h"
+#include "../ast/declaration/Function.h"
 
 
 namespace Pulsar {
@@ -36,6 +42,7 @@ namespace Pulsar {
 
             // Processing Data
             int current;
+            int scopeDepth;
 
             // Output Data
             Statement* program;
@@ -44,11 +51,16 @@ namespace Pulsar {
             // ---- AST Parsing Functions ---- //
 
             // Statement Nodes
+            Statement* declarationStatement();
+            Statement* declaration();
+            Statement* functionDeclaration();
             Statement* statement();
             Block* block();
+            Statement* variableDeclaration(TokenType accessType);
             Statement* ifStatement();
             Statement* whileStatement();
             Statement* printStatement();
+            Statement* returnStatement();
             Statement* expressionStatement();
 
             // Expression Nodes
@@ -75,8 +87,13 @@ namespace Pulsar {
             Token advance();
             Token previous();
 
+            void startScope();
+            bool isInGlobalScope();
+            void endScope();
+
             // Error Handling Functions
             bool look(TokenType token, std::string message);
+            void synchronize();
             void newError(std::string message, int line);
 
             // The Peek Family
