@@ -86,7 +86,7 @@ Once again, the parentheses around while loops are optional.
 ## Functions
 ```pulsar
 // Function test takes in two integer arguments and returns and int.
-fun test(a: int, b: int): int {
+fun test(a: int, b: int) -> int {
     if a > b {
         return a;
     } else {

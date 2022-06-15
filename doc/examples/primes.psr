@@ -5,21 +5,23 @@ var start: int = 2;
 var i: int = -1;
 var isPrime: boolean = false;
 
-while start < 100 {
-    i = 2;
-    isPrime = true;
+fun main() -> int {
+    while start < 100 {
+        i = 2;
+        isPrime = true;
 
-    while i < start {
-        if start % i == 0 {
-            isPrime = false;
+        while i < start {
+            if start % i == 0 {
+                isPrime = false;
+            }
+
+            i += 1;
         }
 
-        i += 1;
-    }
+        if isPrime {
+            print start;
+        }
 
-    if isPrime {
-        print start;
+        start += 1;
     }
-
-    start += 1;
 }

@@ -19,9 +19,9 @@ As of now, the following features are working:
 
 ## TODO
 The following things are currently being worked upon:
-- A Working Compiler
-- Bytecode/AST Optimizations
 - User Defined Functions
-- Native Functions
+- Bytecode/AST Optimizations
+- A Standard Library
+- A Working Compiler
 
 ### Current Version: 0.0.6
