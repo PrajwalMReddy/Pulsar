@@ -2,6 +2,7 @@
 #define CODEPULSAR_PARSER_H
 
 #include <string>
+#include <vector>
 
 #include "Lexer.h"
 #include "../util/TokenDisassembler.h"
@@ -81,8 +82,8 @@ namespace Pulsar {
             // Node Parsing Helpers
 
             // Helper Functions
-            bool match(TokenType type);
-            bool matchAdvance(TokenType type);
+            bool match(std::vector<TokenType> types);
+            bool matchAdvance(std::vector<TokenType> types);
 
             Token advance();
             Token previous();

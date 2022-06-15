@@ -55,6 +55,7 @@ std::string Pulsar::TokenDisassembler::tokenToString(Pulsar::TokenType type) {
         case TK_DOT: return "TK_DOT";
         case TK_COMMA: return "TK_COMMA";
         case TK_COLON: return "TK_COLON";
+        case TK_ARROW: return "TK_ARROW";
         case TK_SEMICOLON: return "TK_SEMICOLON";
         case TK_DOUBLE_COLON: return "TK_DOUBLE_COLON";
         case TK_QMARK: return "TK_QMARK";
@@ -71,7 +72,8 @@ std::string Pulsar::TokenDisassembler::tokenToString(Pulsar::TokenType type) {
         case TK_CONST: return "TK_CONST";
         case TK_IF: return "TK_IF";
         case TK_ELSE: return "TK_ELSE";
-        case TK_WHILE: return "TK_CONTINUE";
+        case TK_WHILE: return "TK_WHILE";
+        case TK_CONTINUE: return "TK_CONTINUE";
         case TK_BREAK: return "TK_BREAK";
         case TK_FUN: return "TK_FUN";
         case TK_NATIVE: return "TK_NATIVE";

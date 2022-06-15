@@ -28,11 +28,11 @@ Pulsar::Statement* Pulsar::Parser::declarationStatement() {
 }
 
 Pulsar::Statement* Pulsar::Parser::declaration() {
-    if (matchAdvance(TK_FUN)) {
+    if (matchAdvance({ TK_FUN })) {
         return functionDeclaration();
-    } else if (matchAdvance(TK_VAR)) {
+    } else if (matchAdvance({ TK_VAR })) {
         return variableDeclaration(TK_VAR);
-    } else if (matchAdvance(TK_CONST)) {
+    } else if (matchAdvance({ TK_CONST })) {
         return variableDeclaration(TK_CONST);
     }
 
@@ -51,18 +51,18 @@ Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
             std::string parameterName = advance().literal;
             Token type = {TK_ERROR, "", line};
 
-            if (!matchAdvance(TK_COLON)) {
+            if (!matchAdvance({ TK_COLON })) {
                 newError("A Colon Was Expected After The Variable Name", peekLine());
             } else {
                 type = advance();
             }
 
             parameters->push_back(new Parameter(parameterName, type));
-        } while (matchAdvance(TK_COMMA));
+        } while (matchAdvance({ TK_COMMA }));
     }
 
     look(TK_RPAR, "A Closing Parenthesis Was Expected After The Parameter List");
-    if (!matchAdvance(TK_ARROW)) newError("A Return Datatype For The Function Was Expected", peekLine());
+    if (!matchAdvance({ TK_ARROW })) newError("A Return Datatype For The Function Was Expected", peekLine());
 
     Token type = advance();
     Block* statements = block();
@@ -70,21 +70,21 @@ Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
 }
 
 Pulsar::Statement* Pulsar::Parser::statement() {
-    while (!match(TK_EOF)) {
+    while (!match({ TK_EOF })) {
         Statement* decl = declaration();
         if (decl != nullptr) return decl;
 
-        else if (matchAdvance(TK_IF)) {
+        else if (matchAdvance({ TK_IF })) {
             return ifStatement();
-        } else if (matchAdvance(TK_WHILE)) {
+        } else if (matchAdvance({ TK_WHILE })) {
             return whileStatement();
-        } else if (matchAdvance(TK_VAR)) {
+        } else if (matchAdvance({ TK_VAR })) {
             return variableDeclaration(TK_VAR);
-        } else if (matchAdvance(TK_CONST)) {
+        } else if (matchAdvance({ TK_CONST })) {
             return variableDeclaration(TK_CONST);
-        } else if (matchAdvance(TK_PRINT)) {
+        } else if (matchAdvance({ TK_PRINT })) {
             return printStatement();
-        } else if (matchAdvance(TK_RETURN)) {
+        } else if (matchAdvance({ TK_RETURN })) {
             return returnStatement();
         } else {
             return expressionStatement();
@@ -101,7 +101,7 @@ Pulsar::Statement* Pulsar::Parser::variableDeclaration(TokenType accessType) {
     Token type = advance();
 
     Expression* expr = nullptr;
-    if (matchAdvance(TK_EQUAL)) {
+    if (matchAdvance({ TK_EQUAL })) {
         expr = expression();
     }
 
@@ -118,7 +118,7 @@ Pulsar::Block* Pulsar::Parser::block() {
     startScope();
     look(TK_LBRACE, "An Opening Brace Was Expected Before The Block");
 
-    while (!match(TK_RBRACE) && !match(TK_EOF)) {
+    while (!match({ TK_RBRACE }) && !match({ TK_EOF })) {
         statements->push_back(statement());
     }
 
@@ -137,8 +137,8 @@ Pulsar::Statement* Pulsar::Parser::ifStatement() {
     Block* thenBranch = block();
     Statement* elseBranch = nullptr;
 
-    if (matchAdvance(TK_ELSE)) {
-        if (matchAdvance(TK_IF)) {
+    if (matchAdvance({ TK_ELSE })) {
+        if (matchAdvance({ TK_IF })) {
             elseBranch = ifStatement();
         } else {
             elseBranch = block();
@@ -164,7 +164,7 @@ Pulsar::Statement* Pulsar::Parser::printStatement() {
 
 Pulsar::Statement* Pulsar::Parser::returnStatement() {
     Return* statement;
-    if (match(TK_SEMICOLON)) {
+    if (match({ TK_SEMICOLON })) {
         statement = new Return(nullptr, peekLine());
     } else {
         statement = new Return(expression(), peekLine());
@@ -210,7 +210,7 @@ Pulsar::Expression* Pulsar::Parser::assignment() {
 Pulsar::Expression* Pulsar::Parser::logicalOr() {
     Expression* expression = logicalAnd();
 
-    while (matchAdvance(TK_LOGICAL_OR)) {
+    while (matchAdvance({ TK_LOGICAL_OR })) {
         Token operatorType = previous();
         Expression* right = logicalAnd();
         expression = new Logical(expression, operatorType.literal, right, operatorType.line);
@@ -222,7 +222,7 @@ Pulsar::Expression* Pulsar::Parser::logicalOr() {
 Pulsar::Expression* Pulsar::Parser::logicalAnd() {
     Expression* expression = equality();
 
-    while (matchAdvance(TK_LOGICAL_AND)) {
+    while (matchAdvance({ TK_LOGICAL_AND })) {
         Token operatorType = previous();
         Expression* right = equality();
         expression = new Logical(expression, operatorType.literal, right, operatorType.line);
@@ -234,7 +234,7 @@ Pulsar::Expression* Pulsar::Parser::logicalAnd() {
 Pulsar::Expression* Pulsar::Parser::equality() {
     Expression* expression = comparison();
 
-    while (matchAdvance(TK_EQUAL_EQUAL) || matchAdvance(TK_NOT_EQUAL)) {
+    while (matchAdvance({ TK_EQUAL_EQUAL, TK_NOT_EQUAL })) {
         Token operatorType = previous();
         Expression* right = comparison();
         expression = new Binary(expression, operatorType.literal, right, operatorType.line);
@@ -246,7 +246,7 @@ Pulsar::Expression* Pulsar::Parser::equality() {
 Pulsar::Expression* Pulsar::Parser::comparison() {
     Expression* expression = term();
 
-    while (matchAdvance(TK_GT) || matchAdvance(TK_GT_EQUAL) || matchAdvance(TK_LT) || matchAdvance(TK_LT_EQUAL)) {
+    while (matchAdvance({ TK_GT, TK_GT_EQUAL, TK_LT, TK_LT_EQUAL })) {
         Token operatorType = previous();
         Expression* right = term();
         expression = new Binary(expression, operatorType.literal, right, operatorType.line);
@@ -258,7 +258,7 @@ Pulsar::Expression* Pulsar::Parser::comparison() {
 Pulsar::Expression* Pulsar::Parser::term() {
     Expression* expression = factor();
 
-    while (matchAdvance(TK_PLUS) || matchAdvance(TK_MINUS)) {
+    while (matchAdvance({ TK_PLUS, TK_MINUS })) {
         Token operatorType = previous();
         Expression* right = factor();
         expression = new Binary(expression, operatorType.literal, right, operatorType.line);
@@ -270,7 +270,7 @@ Pulsar::Expression* Pulsar::Parser::term() {
 Pulsar::Expression* Pulsar::Parser::factor() {
     Expression* expression = unary();
 
-    while (matchAdvance(TK_MULTIPLICATION) || matchAdvance(TK_DIVISION) || matchAdvance(TK_MODULUS)) {
+    while (matchAdvance({ TK_MULTIPLICATION, TK_DIVISION, TK_MODULUS })) {
         Token operatorType = previous();
         Expression* right = unary();
         expression = new Binary(expression, operatorType.literal, right, operatorType.line);
@@ -280,11 +280,11 @@ Pulsar::Expression* Pulsar::Parser::factor() {
 }
 
 Pulsar::Expression* Pulsar::Parser::unary() {
-    if (matchAdvance(TK_NOT) || matchAdvance(TK_MINUS)) {
+    if (matchAdvance({ TK_NOT, TK_MINUS })) {
         Token operatorType = previous();
         Expression* right = unary();
         return new Unary(operatorType.literal, right, operatorType.line);
-    } else if (matchAdvance(TK_PLUS)) {
+    } else if (matchAdvance({ TK_PLUS })) {
         return unary();
     }
 
@@ -296,13 +296,13 @@ Pulsar::Expression* Pulsar::Parser::call() {
     Token name = peek();
     Expression* expr = primary();
 
-    if (matchAdvance(TK_LPAR)) {
+    if (matchAdvance({ TK_LPAR })) {
         auto* arguments = new std::vector<Expression*>;
 
-        if (!match(TK_RPAR)) {
+        if (!match({ TK_RPAR })) {
             do {
                 arguments->push_back(expression());
-            } while (matchAdvance(TK_COMMA));
+            } while (matchAdvance({ TK_COMMA }));
         }
 
         look(TK_RPAR, "A Closing Parenthesis Is Required After A Call Expression");
@@ -314,26 +314,26 @@ Pulsar::Expression* Pulsar::Parser::call() {
 
 // TODO Variable Accessors
 Pulsar::Expression* Pulsar::Parser::primary() {
-    if (matchAdvance(TK_TRUE)) {
+    if (matchAdvance({ TK_TRUE })) {
         return new Literal("true", PR_BOOLEAN, peekLine());
-    } else if (matchAdvance(TK_FALSE)) {
+    } else if (matchAdvance({ TK_FALSE })) {
         return new Literal("false", PR_BOOLEAN, peekLine());
     }
 
-    if (matchAdvance(TK_INTEGER)) {
+    if (matchAdvance({ TK_INTEGER })) {
         return new Literal(previous().literal, PR_INTEGER, peekLine());
-    } else if (matchAdvance(TK_DOUBLE)) {
+    } else if (matchAdvance({ TK_DOUBLE })) {
         return new Literal(previous().literal, PR_DOUBLE, peekLine());
-    } else if (matchAdvance(TK_CHARACTER)) {
+    } else if (matchAdvance({ TK_CHARACTER })) {
         return new Literal(previous().literal, PR_CHARACTER, peekLine());
     }
 
-    if (match(TK_IDENTIFIER)) {
+    if (match({ TK_IDENTIFIER })) {
         Token name = advance();
         return new VariableExpr(name.literal, peekLine());
     }
 
-    if (matchAdvance(TK_LPAR)) {
+    if (matchAdvance({ TK_LPAR })) {
         Expression* expr = expression();
         look(TK_RPAR, "A Closing Parenthesis Was Expected");
         return new Grouping(expr, peekLine());
@@ -343,15 +343,22 @@ Pulsar::Expression* Pulsar::Parser::primary() {
     return new Literal("", PR_ERROR, peekLine());
 }
 
-bool Pulsar::Parser::match(TokenType type) {
-    if (peekType() == type) return true;
+bool Pulsar::Parser::match(std::vector<TokenType> types) {
+    for (TokenType type: types) {
+        if (peekType() == type) {
+            return true;
+        }
+    }
+
     return false;
 }
 
-bool Pulsar::Parser::matchAdvance(TokenType type) {
-    if (peekType() == type) {
-        advance();
-        return true;
+bool Pulsar::Parser::matchAdvance(std::vector<TokenType> types) {
+    for (TokenType type: types) {
+        if (peekType() == type) {
+            advance();
+            return true;
+        }
     }
 
     return false;
