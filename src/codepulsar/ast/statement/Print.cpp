@@ -6,7 +6,8 @@ Pulsar::Print::Print(Expression* expression, int line) {
     this->line = line;
 }
 
-void Pulsar::Print::accept(StmtVisitor& visitor) {
+template<typename R>
+R Pulsar::Print::accept(StmtVisitor<R>& visitor) {
     visitor.visitPrintStatement(this);
 }
 

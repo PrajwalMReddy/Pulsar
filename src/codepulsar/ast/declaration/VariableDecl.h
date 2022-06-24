@@ -11,7 +11,8 @@ namespace Pulsar {
     class VariableDecl: public Statement {
         public:
             VariableDecl(Token name, Expression* initializer, Token type, TokenType accessType, bool isGlobal, int line);
-            void accept(StmtVisitor& visitor);
+            template<typename R>
+            R accept(StmtVisitor<R>& visitor);
 
             Token getName();
             Expression* getInitializer();

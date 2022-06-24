@@ -9,36 +9,36 @@
 
 
 namespace Pulsar {
-    class ASTPrinter: public ExprVisitor, public StmtVisitor {
+class ASTPrinter: public ExprVisitor<std::string>, public StmtVisitor<std::string> {
         public:
             ASTPrinter();
             void print(Statement* ast);
 
             // Expression AST Visitors
-            void visitAssignmentExpression(Assignment* expression) override;
-            void visitBinaryExpression(Binary* expression) override;
-            void visitCallExpression(Call* expression) override;
-            void visitGroupingExpression(Grouping* expression) override;
-            void visitLiteralExpression(Literal* expression) override;
-            void visitLogicalExpression(Logical* expression) override;
-            void visitUnaryExpression(Unary* expression) override;
-            void visitVariableExpression(VariableExpr* expression) override;
+            std::string visitAssignmentExpression(Assignment* expression) override;
+            std::string visitBinaryExpression(Binary* expression) override;
+            std::string visitCallExpression(Call* expression) override;
+            std::string visitGroupingExpression(Grouping* expression) override;
+            std::string visitLiteralExpression(Literal* expression) override;
+            std::string visitLogicalExpression(Logical* expression) override;
+            std::string visitUnaryExpression(Unary* expression) override;
+            std::string visitVariableExpression(VariableExpr* expression) override;
 
             // Statement AST Visitors
-            void visitBlockStatement(Block* statement) override;
-            void visitExpressionStatement(ExpressionStmt* statement) override;
-            void visitFunctionStatement(Function* statement) override;
-            void visitIfStatement(If* statement) override;
-            void visitPrintStatement(Print* statement) override;
-            void visitReturnStatement(Return* statement) override;
-            void visitVariableStatement(VariableDecl* statement) override;
-            void visitWhileStatement(While* statement) override;
+            std::string visitBlockStatement(Block* statement) override;
+            std::string visitExpressionStatement(ExpressionStmt* statement) override;
+            std::string visitFunctionStatement(Function* statement) override;
+            std::string visitIfStatement(If* statement) override;
+            std::string visitPrintStatement(Print* statement) override;
+            std::string visitReturnStatement(Return* statement) override;
+            std::string visitVariableStatement(VariableDecl* statement) override;
+            std::string visitWhileStatement(While* statement) override;
 
         private:
             int indentCount;
 
             void constructTree(Statement* ast);
-            void blockStatement(Block* statement);
+            std::string blockStatement(Block* statement);
 
             std::string giveTabs() const;
             void incrementIndentCount();

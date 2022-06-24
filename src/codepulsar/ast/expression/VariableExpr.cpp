@@ -6,7 +6,8 @@ Pulsar::VariableExpr::VariableExpr(std::string name, int line) {
     this->line = line;
 }
 
-void Pulsar::VariableExpr::accept(ExprVisitor& visitor) {
+template<typename R>
+R Pulsar::VariableExpr::accept(ExprVisitor<R>& visitor) {
     visitor.visitVariableExpression(this);
 }
 

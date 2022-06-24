@@ -3,16 +3,17 @@
 
 
 namespace Pulsar {
+    template<typename R>
     class ExprVisitor {
         public:
-            virtual void visitAssignmentExpression(class Assignment* expression) = 0;
-            virtual void visitBinaryExpression(class Binary* expression) = 0;
-            virtual void visitCallExpression(class Call* expression) = 0;
-            virtual void visitGroupingExpression(class Grouping* expression) = 0;
-            virtual void visitLiteralExpression(class Literal* expression) = 0;
-            virtual void visitLogicalExpression(class Logical* expression) = 0;
-            virtual void visitUnaryExpression(class Unary* expression) = 0;
-            virtual void visitVariableExpression(class VariableExpr* expression) = 0;
+            virtual R visitAssignmentExpression(class Assignment* expression) = 0;
+            virtual R visitBinaryExpression(class Binary* expression) = 0;
+            virtual R visitCallExpression(class Call* expression) = 0;
+            virtual R visitGroupingExpression(class Grouping* expression) = 0;
+            virtual R visitLiteralExpression(class Literal* expression) = 0;
+            virtual R visitLogicalExpression(class Logical* expression) = 0;
+            virtual R visitUnaryExpression(class Unary* expression) = 0;
+            virtual R visitVariableExpression(class VariableExpr* expression) = 0;
     };
 }
 

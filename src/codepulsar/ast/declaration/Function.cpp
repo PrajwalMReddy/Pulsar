@@ -8,7 +8,8 @@ Pulsar::Function::Function(std::string name, Pulsar::Token type, std::vector<Par
     this->line = line;
 }
 
-void Pulsar::Function::accept(Pulsar::StmtVisitor& visitor) {
+template<typename R>
+R Pulsar::Function::accept(Pulsar::StmtVisitor<R>& visitor) {
     visitor.visitFunctionStatement(this);
 }
 

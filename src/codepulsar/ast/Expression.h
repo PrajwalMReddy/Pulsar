@@ -7,7 +7,7 @@
 namespace Pulsar {
     class Expression {
         public:
-            virtual void accept(ExprVisitor& visitor) = 0;
+            template<typename R> R accept(ExprVisitor<R>& visitor);
     };
 }
 

@@ -9,7 +9,8 @@ namespace Pulsar {
     class Return: public Statement {
         public:
             Return(Expression* value, int line);
-            void accept(StmtVisitor& visitor);
+            template<typename R>
+            R accept(StmtVisitor<R>& visitor);
 
             Expression* getValue();
             int getLine();

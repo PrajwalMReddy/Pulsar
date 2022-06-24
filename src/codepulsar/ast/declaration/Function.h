@@ -13,7 +13,8 @@ namespace Pulsar {
     class Function: public Statement {
         public:
             Function(std::string name, Token type, std::vector<Parameter*>* parameters, Block* statements, int line);
-            void accept(StmtVisitor& visitor);
+            template<typename R>
+            R accept(StmtVisitor<R>& visitor);
 
             std::string getName();
             Token getType();

@@ -6,7 +6,8 @@ Pulsar::Block::Block(std::vector<Statement*>* statements, int line) {
     this->line = line;
 }
 
-void Pulsar::Block::accept(StmtVisitor& visitor) {
+template<typename R>
+R Pulsar::Block::accept(StmtVisitor<R>& visitor) {
     visitor.visitBlockStatement(this);
 }
 

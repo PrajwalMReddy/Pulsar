@@ -10,7 +10,7 @@ namespace Pulsar {
     class Binary: public Expression {
         public:
             Binary(Expression* left, std::string operatorType, Expression* right, int line);
-            void accept(ExprVisitor& visitor);
+            template<typename R> R accept(ExprVisitor<R>& visitor);
 
             Expression* getLeft();
             std::string getOperator();

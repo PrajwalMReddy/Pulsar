@@ -3,16 +3,17 @@
 
 
 namespace Pulsar {
+    template<typename R>
     class StmtVisitor {
         public:
-            virtual void visitBlockStatement(class Block* statement) = 0;
-            virtual void visitExpressionStatement(class ExpressionStmt* statement) = 0;
-            virtual void visitFunctionStatement(class Function* statement) = 0;
-            virtual void visitIfStatement(class If* statement) = 0;
-            virtual void visitPrintStatement(class Print* statement) = 0;
-            virtual void visitReturnStatement(class Return* statement) = 0;
-            virtual void visitVariableStatement(class VariableDecl* statement) = 0;
-            virtual void visitWhileStatement(class While* statement) = 0;
+            virtual R visitBlockStatement(class Block* statement) = 0;
+            virtual R visitExpressionStatement(class ExpressionStmt* statement) = 0;
+            virtual R visitFunctionStatement(class Function* statement) = 0;
+            virtual R visitIfStatement(class If* statement) = 0;
+            virtual R visitPrintStatement(class Print* statement) = 0;
+            virtual R visitReturnStatement(class Return* statement) = 0;
+            virtual R visitVariableStatement(class VariableDecl* statement) = 0;
+            virtual R visitWhileStatement(class While* statement) = 0;
     };
 }
 

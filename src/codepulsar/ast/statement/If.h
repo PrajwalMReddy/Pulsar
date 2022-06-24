@@ -9,7 +9,8 @@ namespace Pulsar {
     class If: public Statement {
         public:
             If(Expression* condition, Block* thenBranch, Statement* elseBranch, int line);
-            void accept(StmtVisitor& visitor);
+            template<typename R>
+            R accept(StmtVisitor<R>& visitor);
 
             bool hasElse();
             Expression* getCondition();

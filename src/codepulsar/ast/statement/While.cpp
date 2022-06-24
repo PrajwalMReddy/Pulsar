@@ -7,7 +7,8 @@ Pulsar::While::While(Expression* condition, Block* statements, int line) {
     this->line = line;
 }
 
-void Pulsar::While::accept(StmtVisitor& visitor) {
+template<typename R>
+R Pulsar::While::accept(StmtVisitor<R>& visitor) {
     visitor.visitWhileStatement(this);
 }
 

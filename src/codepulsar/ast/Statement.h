@@ -7,7 +7,7 @@
 namespace Pulsar {
     class Statement {
         public:
-            virtual void accept(StmtVisitor& visitor) = 0;
+            template<typename R> R accept(StmtVisitor<R>& visitor);
     };
 }
 

@@ -6,7 +6,8 @@ Pulsar::Call::Call(Token name, std::vector<Expression*>* arguments): name(name) 
     this->line = name.line;
 }
 
-void Pulsar::Call::accept(ExprVisitor& visitor) {
+template<typename R>
+R Pulsar::Call::accept(ExprVisitor<R>& visitor) {
     visitor.visitCallExpression(this);
 }
 

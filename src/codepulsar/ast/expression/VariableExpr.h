@@ -10,7 +10,7 @@ namespace Pulsar {
     class VariableExpr: public Expression {
         public:
             VariableExpr(std::string name, int line);
-            void accept(ExprVisitor& visitor);
+            template<typename R> R accept(ExprVisitor<R>& visitor);
 
             std::string getName();
             int getLine();
