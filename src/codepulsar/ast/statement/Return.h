@@ -9,7 +9,7 @@ namespace Pulsar {
     class Return: public Statement {
         public:
             Return(Expression* value, int line);
-            void accept(StmtVisitor& visitor);
+            std::any accept(StmtVisitor& visitor);
 
             Expression* getValue();
             int getLine();

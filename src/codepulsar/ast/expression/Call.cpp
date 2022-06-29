@@ -6,8 +6,8 @@ Pulsar::Call::Call(Token name, std::vector<Expression*>* arguments): name(name) 
     this->line = name.line;
 }
 
-void Pulsar::Call::accept(ExprVisitor& visitor) {
-    visitor.visitCallExpression(this);
+std::any Pulsar::Call::accept(ExprVisitor& visitor) {
+    return visitor.visitCallExpression(this);
 }
 
 int Pulsar::Call::getArity() {

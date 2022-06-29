@@ -11,7 +11,7 @@ namespace Pulsar {
     class Call : public Expression {
         public:
             Call(Token name, std::vector<Expression*>* arguments);
-            void accept(ExprVisitor& visitor);
+            std::any accept(ExprVisitor& visitor);
 
             int getArity();
 

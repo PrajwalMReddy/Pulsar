@@ -9,7 +9,7 @@ namespace Pulsar {
     class ExpressionStmt: public Statement {
         public:
             ExpressionStmt(Expression* expression, int line);
-            void accept(StmtVisitor& visitor);
+            std::any accept(StmtVisitor& visitor);
 
             Expression* getExpression();
             int getLine();

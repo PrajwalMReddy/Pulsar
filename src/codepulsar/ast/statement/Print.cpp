@@ -6,8 +6,8 @@ Pulsar::Print::Print(Expression* expression, int line) {
     this->line = line;
 }
 
-void Pulsar::Print::accept(StmtVisitor& visitor) {
-    visitor.visitPrintStatement(this);
+std::any Pulsar::Print::accept(StmtVisitor& visitor) {
+    return visitor.visitPrintStatement(this);
 }
 
 Pulsar::Expression* Pulsar::Print::getExpression() {

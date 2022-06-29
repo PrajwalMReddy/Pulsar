@@ -8,8 +8,8 @@ Pulsar::Function::Function(std::string name, Pulsar::Token type, std::vector<Par
     this->line = line;
 }
 
-void Pulsar::Function::accept(Pulsar::StmtVisitor& visitor) {
-    visitor.visitFunctionStatement(this);
+std::any Pulsar::Function::accept(Pulsar::StmtVisitor& visitor) {
+    return visitor.visitFunctionStatement(this);
 }
 
 int Pulsar::Function::getArity() {

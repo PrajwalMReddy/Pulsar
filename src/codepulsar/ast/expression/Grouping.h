@@ -8,7 +8,7 @@ namespace Pulsar {
     class Grouping: public Expression {
         public:
             Grouping(Expression* expression, int line);
-            void accept(ExprVisitor& visitor);
+            std::any accept(ExprVisitor& visitor);
 
             Expression* getExpression();
             int getLine();

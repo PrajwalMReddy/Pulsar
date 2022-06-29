@@ -6,8 +6,8 @@ Pulsar::VariableExpr::VariableExpr(std::string name, int line) {
     this->line = line;
 }
 
-void Pulsar::VariableExpr::accept(ExprVisitor& visitor) {
-    visitor.visitVariableExpression(this);
+std::any Pulsar::VariableExpr::accept(ExprVisitor& visitor) {
+    return visitor.visitVariableExpression(this);
 }
 
 std::string Pulsar::VariableExpr::getName() {

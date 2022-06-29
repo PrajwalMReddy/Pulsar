@@ -10,7 +10,7 @@ namespace Pulsar {
     class Block: public Statement {
         public:
             Block(std::vector<Statement*>* statements, int line);
-            void accept(StmtVisitor& visitor);
+            std::any accept(StmtVisitor& visitor);
 
             std::vector<Statement*>* getStatements();
             int getLine();

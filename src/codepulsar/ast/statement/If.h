@@ -9,7 +9,7 @@ namespace Pulsar {
     class If: public Statement {
         public:
             If(Expression* condition, Block* thenBranch, Statement* elseBranch, int line);
-            void accept(StmtVisitor& visitor);
+            std::any accept(StmtVisitor& visitor);
 
             bool hasElse();
             Expression* getCondition();
