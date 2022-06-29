@@ -7,9 +7,8 @@ Pulsar::Assignment::Assignment(std::string identifier, Expression* value, int li
     this->line = line;
 }
 
-template<typename R>
-R Pulsar::Assignment::accept(ExprVisitor<R>& visitor) {
-    visitor.visitAssignmentExpression(this);
+std::any Pulsar::Assignment::accept(ExprVisitor& visitor) {
+    return visitor.visitAssignmentExpression(this);
 }
 
 std::string Pulsar::Assignment::getIdentifier() {

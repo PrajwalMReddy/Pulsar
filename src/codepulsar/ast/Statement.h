@@ -1,13 +1,15 @@
 #ifndef CODEPULSAR_STATEMENT_H
 #define CODEPULSAR_STATEMENT_H
 
+#include <any>
+
 #include "StmtVisitor.h"
 
 
 namespace Pulsar {
     class Statement {
         public:
-            template<typename R> R accept(StmtVisitor<R>& visitor);
+            virtual std::any accept(StmtVisitor& visitor) = 0;
     };
 }
 

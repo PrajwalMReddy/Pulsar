@@ -6,9 +6,8 @@ Pulsar::ExpressionStmt::ExpressionStmt(Expression* expression, int line) {
     this->line = line;
 }
 
-template<typename R>
-R Pulsar::ExpressionStmt::accept(StmtVisitor<R>& visitor) {
-    visitor.visitExpressionStatement(this);
+std::any Pulsar::ExpressionStmt::accept(StmtVisitor& visitor) {
+    return visitor.visitExpressionStatement(this);
 }
 
 Pulsar::Expression* Pulsar::ExpressionStmt::getExpression() {

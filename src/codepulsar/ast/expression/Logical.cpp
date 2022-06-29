@@ -8,9 +8,8 @@ Pulsar::Logical::Logical(Expression* left, std::string operatorType, Expression*
     this->line = line;
 }
 
-template<typename R>
-R Pulsar::Logical::accept(ExprVisitor<R>& visitor) {
-    visitor.visitLogicalExpression(this);
+std::any Pulsar::Logical::accept(ExprVisitor& visitor) {
+    return visitor.visitLogicalExpression(this);
 }
 
 Pulsar::Expression* Pulsar::Logical::getLeft() {

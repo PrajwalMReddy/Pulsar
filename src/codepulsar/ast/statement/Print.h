@@ -9,8 +9,7 @@ namespace Pulsar {
     class Print: public Statement {
         public:
             Print(Expression* expression, int line);
-            template<typename R>
-            R accept(StmtVisitor<R>& visitor);
+            std::any accept(StmtVisitor& visitor);
 
             Expression* getExpression();
             int getLine();

@@ -8,9 +8,8 @@ Pulsar::If::If(Expression* condition, Block* thenBranch, Statement* elseBranch, 
     this->line = line;
 }
 
-template<typename R>
-R Pulsar::If::accept(StmtVisitor<R>& visitor) {
-    visitor.visitIfStatement(this);
+std::any Pulsar::If::accept(StmtVisitor& visitor) {
+    return visitor.visitIfStatement(this);
 }
 
 bool Pulsar::If::hasElse() {

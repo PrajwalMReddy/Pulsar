@@ -10,7 +10,7 @@ namespace Pulsar {
     class Assignment: public Expression {
         public:
             Assignment(std::string identifier, Expression* value, int line);
-            template<typename R> R accept(ExprVisitor<R>& visitor);
+            std::any accept(ExprVisitor& visitor);
 
             std::string getIdentifier();
             Expression* getValue();

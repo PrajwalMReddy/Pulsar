@@ -7,9 +7,8 @@ Pulsar::While::While(Expression* condition, Block* statements, int line) {
     this->line = line;
 }
 
-template<typename R>
-R Pulsar::While::accept(StmtVisitor<R>& visitor) {
-    visitor.visitWhileStatement(this);
+std::any Pulsar::While::accept(StmtVisitor& visitor) {
+    return visitor.visitWhileStatement(this);
 }
 
 Pulsar::Expression* Pulsar::While::getCondition() {

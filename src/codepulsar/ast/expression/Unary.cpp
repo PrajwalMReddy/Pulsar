@@ -7,9 +7,8 @@ Pulsar::Unary::Unary(std::string operatorType, Expression* right, int line) {
     this->line = line;
 }
 
-template<typename R>
-R Pulsar::Unary::accept(ExprVisitor<R>& visitor) {
-    visitor.visitUnaryExpression(this);
+std::any Pulsar::Unary::accept(ExprVisitor& visitor) {
+    return visitor.visitUnaryExpression(this);
 }
 
 std::string Pulsar::Unary::getOperator() {

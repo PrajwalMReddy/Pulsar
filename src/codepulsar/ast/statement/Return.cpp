@@ -6,9 +6,8 @@ Pulsar::Return::Return(Expression* value, int line) {
     this->line = line;
 }
 
-template<typename R>
-R Pulsar::Return::accept(StmtVisitor<R>& visitor) {
-    visitor.visitReturnStatement(this);
+std::any Pulsar::Return::accept(StmtVisitor& visitor) {
+    return visitor.visitReturnStatement(this);
 }
 
 bool Pulsar::Return::hasValue() {

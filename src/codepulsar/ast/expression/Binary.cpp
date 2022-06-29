@@ -8,9 +8,8 @@ Pulsar::Binary::Binary(Expression* left, std::string operatorType, Expression* r
     this->line = line;
 }
 
-template<typename R>
-R Pulsar::Binary::accept(ExprVisitor<R>& visitor) {
-    visitor.visitBinaryExpression(this);
+std::any Pulsar::Binary::accept(ExprVisitor& visitor) {
+    return visitor.visitBinaryExpression(this);
 }
 
 Pulsar::Expression* Pulsar::Binary::getLeft() {

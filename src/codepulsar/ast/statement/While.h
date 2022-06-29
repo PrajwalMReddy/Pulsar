@@ -9,8 +9,7 @@ namespace Pulsar {
     class While: public Statement {
         public:
             While(Expression* condition, Block* statements, int line);
-            template<typename R>
-            R accept(StmtVisitor<R>& visitor);
+            std::any accept(StmtVisitor& visitor);
 
             Expression* getCondition();
             Block* getStatements();

@@ -16,51 +16,51 @@ void Pulsar::ASTPrinter::constructTree(Pulsar::Statement* ast) {
     if (ast == nullptr) {
         std::cout << "No AST Has Been Generated" << std::endl;
     } else {
-        ast->accept(*this); std::cout << std::endl;
+        std::cout << std::any_cast<std::string>(ast->accept(*this)) << std::endl;
     }
 }
 
-std::string Pulsar::ASTPrinter::visitAssignmentExpression(Assignment* expression) {
-    return "Assignment(Variable(" + expression->getIdentifier() + ") = " + expression->getValue()->accept(*this) + ")";
+std::any Pulsar::ASTPrinter::visitAssignmentExpression(Assignment* expression) {
+    return "Assignment(Variable(" + expression->getIdentifier() + ") = " + std::any_cast<std::string>(expression->getValue()->accept(*this)) + ")";
 }
 
-std::string Pulsar::ASTPrinter::visitBinaryExpression(Binary* expression) {
-    return "Binary(" + expression->getLeft()->accept(*this) + " " + expression->getOperator() + " " + expression->getRight()->accept(*this) + ")";
+std::any Pulsar::ASTPrinter::visitBinaryExpression(Binary* expression) {
+    return "Binary(" + std::any_cast<std::string>(expression->getLeft()->accept(*this)) + " " + expression->getOperator() + " " + std::any_cast<std::string>(expression->getRight()->accept(*this)) + ")";
 }
 
-std::string Pulsar::ASTPrinter::visitCallExpression(Call* expression) {
+std::any Pulsar::ASTPrinter::visitCallExpression(Call* expression) {
     std::string str;
     str += "Call:" + expression->getName().literal + "(";
 
     for (Expression* expr: *expression->getArguments()) {
-        str += expr->accept(*this) + ",";
+        str += std::any_cast<std::string>(expr->accept(*this)) + ",";
     }
 
     str += ")";
     return str;
 }
 
-std::string Pulsar::ASTPrinter::visitGroupingExpression(Grouping* expression) {
-    return "(" + expression->getExpression()->accept(*this) + ")";
+std::any Pulsar::ASTPrinter::visitGroupingExpression(Grouping* expression) {
+    return "(" + std::any_cast<std::string>(expression->getExpression()->accept(*this)) + ")";
 }
 
-std::string Pulsar::ASTPrinter::visitLiteralExpression(Literal* expression) {
+std::any Pulsar::ASTPrinter::visitLiteralExpression(Literal* expression) {
     return "Literal(" + expression->getValue() + ")";
 }
 
-std::string Pulsar::ASTPrinter::visitLogicalExpression(Logical* expression) {
-    return "Logical(" + expression->getLeft()->accept(*this) + " " + expression->getOperator() + " " + expression->getRight()->accept(*this) + ")";
+std::any Pulsar::ASTPrinter::visitLogicalExpression(Logical* expression) {
+    return "Logical(" + std::any_cast<std::string>(expression->getLeft()->accept(*this)) + " " + expression->getOperator() + " " + std::any_cast<std::string>(expression->getRight()->accept(*this)) + ")";
 }
 
-std::string Pulsar::ASTPrinter::visitUnaryExpression(Unary* expression) {
-    return "Unary(" + expression->getOperator() + " " + expression->getExpression()->accept(*this) + ")";
+std::any Pulsar::ASTPrinter::visitUnaryExpression(Unary* expression) {
+    return "Unary(" + expression->getOperator() + " " + std::any_cast<std::string>(expression->getExpression()->accept(*this)) + ")";
 }
 
-std::string Pulsar::ASTPrinter::visitVariableExpression(VariableExpr* expression) {
+std::any Pulsar::ASTPrinter::visitVariableExpression(VariableExpr* expression) {
     return "Variable(" + expression->getName() + ")";
 }
 
-std::string Pulsar::ASTPrinter::visitBlockStatement(Block* statement) {
+std::any Pulsar::ASTPrinter::visitBlockStatement(Block* statement) {
     std::string str;
     str += giveTabs() + "Block(\n";
     str += blockStatement(statement);
@@ -73,18 +73,18 @@ std::string Pulsar::ASTPrinter::blockStatement(Block* statement) {
     incrementIndentCount();
 
     for (Statement* stmt: *statement->getStatements()) {
-        str += giveTabs() + stmt->accept(*this);
+        str += giveTabs() + std::any_cast<std::string>(stmt->accept(*this));
     }
 
     decrementIndentCount();
     return str;
 }
 
-std::string Pulsar::ASTPrinter::visitExpressionStatement(ExpressionStmt* statement) {
-    return "Expression(" + statement->getExpression()->accept(*this) + ")\n";
+std::any Pulsar::ASTPrinter::visitExpressionStatement(ExpressionStmt* statement) {
+    return "Expression(" + std::any_cast<std::string>(statement->getExpression()->accept(*this)) + ")\n";
 }
 
-std::string Pulsar::ASTPrinter::visitFunctionStatement(Function* statement) {
+std::any Pulsar::ASTPrinter::visitFunctionStatement(Function* statement) {
     std::string str;
     str += "\n" + giveTabs() + "Function:" + statement->getName() + "(";
 
@@ -100,16 +100,16 @@ std::string Pulsar::ASTPrinter::visitFunctionStatement(Function* statement) {
     return str;
 }
 
-std::string Pulsar::ASTPrinter::visitIfStatement(If* statement) {
+std::any Pulsar::ASTPrinter::visitIfStatement(If* statement) {
     std::string str;
-    str += "\n" + giveTabs() + "If(" + statement->getCondition()->accept(*this) + ")(\n";
+    str += "\n" + giveTabs() + "If(" + std::any_cast<std::string>(statement->getCondition()->accept(*this)) + ")(\n";
     str += blockStatement(statement->getThenBranch()) + "\n" + giveTabs() + ")";
 
     if (statement->hasElse()) {
         str += " Else(\n";
         incrementIndentCount();
 
-        str += statement->getElseBranch()->accept(*this) + "\n";
+        str += std::any_cast<std::string>(statement->getElseBranch()->accept(*this)) + "\n";
 
         decrementIndentCount();
         str += giveTabs() + ")";
@@ -119,30 +119,30 @@ std::string Pulsar::ASTPrinter::visitIfStatement(If* statement) {
     return str;
 }
 
-std::string Pulsar::ASTPrinter::visitPrintStatement(Print* statement) {
-    return "Print(" + statement->getExpression()->accept(*this) + ")\n";
+std::any Pulsar::ASTPrinter::visitPrintStatement(Print* statement) {
+    return "Print(" + std::any_cast<std::string>(statement->getExpression()->accept(*this)) + ")\n";
 }
 
-std::string Pulsar::ASTPrinter::visitReturnStatement(Return* statement) {
+std::any Pulsar::ASTPrinter::visitReturnStatement(Return* statement) {
     if (statement->hasValue()) {
-        return "Return(" + statement->getValue()->accept(*this) + ")\n";
+        return "Return(" + std::any_cast<std::string>(statement->getValue()->accept(*this)) + ")\n";
     } else {
         return "Return()\n";
     }
 }
 
-std::string Pulsar::ASTPrinter::visitVariableStatement(VariableDecl* statement) {
+std::any Pulsar::ASTPrinter::visitVariableStatement(VariableDecl* statement) {
     std::string str;
     str += "Variable(";
     str += ((statement->isGlobalVariable()) ? "Global:" : "Local:");
-    str += statement->getName().literal + " = " + statement->getInitializer()->accept(*this);
+    str += statement->getName().literal + " = " + std::any_cast<std::string>(statement->getInitializer()->accept(*this));
     str += ")\n";
     return str;
 }
 
-std::string Pulsar::ASTPrinter::visitWhileStatement(While* statement) {
+std::any Pulsar::ASTPrinter::visitWhileStatement(While* statement) {
     std::string str;
-    str += "\n" + giveTabs() + "While(" + statement->getCondition()->accept(*this) + ")(\n";
+    str += "\n" + giveTabs() + "While(" + std::any_cast<std::string>(statement->getCondition()->accept(*this)) + ")(\n";
     str += blockStatement(statement->getStatements()) + "\n" + giveTabs() + ")";
     return str;
 }

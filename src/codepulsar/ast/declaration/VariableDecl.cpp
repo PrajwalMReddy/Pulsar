@@ -11,9 +11,8 @@ Pulsar::VariableDecl::VariableDecl(Token name, Expression* initializer, Token ty
     this->line = line;
 }
 
-template<typename R>
-R Pulsar::VariableDecl::accept(StmtVisitor<R>& visitor) {
-    visitor.visitVariableStatement(this);
+std::any Pulsar::VariableDecl::accept(StmtVisitor& visitor) {
+    return visitor.visitVariableStatement(this);
 }
 
 bool Pulsar::VariableDecl::isInitialized() {

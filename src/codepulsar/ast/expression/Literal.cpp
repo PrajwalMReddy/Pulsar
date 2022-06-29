@@ -7,9 +7,8 @@ Pulsar::Literal::Literal(std::string value, PrimitiveType type, int line) {
     this->line = line;
 }
 
-template<typename R>
-R Pulsar::Literal::accept(ExprVisitor<R>& visitor) {
-    visitor.visitLiteralExpression(this);
+std::any Pulsar::Literal::accept(ExprVisitor& visitor) {
+    return visitor.visitLiteralExpression(this);
 }
 
 std::string Pulsar::Literal::getValue() {
