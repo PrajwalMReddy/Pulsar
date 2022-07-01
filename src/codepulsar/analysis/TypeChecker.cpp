@@ -106,7 +106,6 @@ std::any Pulsar::TypeChecker::visitIfStatement(If* statement) {
     if (statement->hasElse()) statement->getElseBranch()->accept(*this);
 
     if (type != PR_BOOLEAN) newError("If Statement Has Non Boolean Condition", statement->getLine());
-
     return nullptr;
 }
 

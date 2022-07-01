@@ -1,5 +1,5 @@
-#ifndef CODEPULSAR_TYPECHECKER_H
-#define CODEPULSAR_TYPECHECKER_H
+#ifndef CODEPULSAR_VALIDATOR_H
+#define CODEPULSAR_VALIDATOR_H
 
 #include "../ast/ExprVisitor.h"
 #include "../ast/StmtVisitor.h"
@@ -11,10 +11,10 @@
 
 
 namespace Pulsar {
-    class TypeChecker: public ExprVisitor, public StmtVisitor {
+    class Validator: public ExprVisitor, public StmtVisitor {
         public:
-            TypeChecker(Statement* program, CompilerError* errors);
-            void check();
+            Validator(Statement* program, CompilerError* errors);
+            void validate();
 
             // Expression Nodes
             std::any visitAssignmentExpression(Assignment* expression) override;
@@ -39,10 +39,6 @@ namespace Pulsar {
         private:
             Statement* program;
             CompilerError* errors;
-
-            PrimitiveType checkType(Token type);
-            bool isOfType(PrimitiveType toCompare, std::vector<PrimitiveType> types);
-            bool isOperation(std::string toCompare, std::vector<std::string> operations);
 
             void newError(std::string message, int line);
             CompilerError* getErrors();
