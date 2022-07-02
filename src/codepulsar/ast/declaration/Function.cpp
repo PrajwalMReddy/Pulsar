@@ -1,7 +1,7 @@
 #include "Function.h"
 
 
-Pulsar::Function::Function(std::string name, Pulsar::Token type, std::vector<Parameter*>* parameters, Block* statements, int line): type(type) {
+Pulsar::Function::Function(std::string name, Pulsar::PrimitiveType type, std::vector<Parameter*>* parameters, Block* statements, int line): type(type) {
     this->name = name;
     this->parameters = parameters;
     this->statements = statements;
@@ -20,7 +20,7 @@ std::string Pulsar::Function::getName() {
     return this->name;
 }
 
-Pulsar::Token Pulsar::Function::getType() {
+Pulsar::PrimitiveType Pulsar::Function::getType() {
     return this->type;
 }
 

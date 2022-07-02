@@ -15,7 +15,7 @@ std::string Pulsar::Literal::getValue() {
     return this->value;
 }
 
-PrimitiveType Pulsar::Literal::getType() {
+Pulsar::PrimitiveType Pulsar::Literal::getType() {
     return this->type;
 }
 

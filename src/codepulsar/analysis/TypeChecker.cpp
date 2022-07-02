@@ -121,7 +121,7 @@ std::any Pulsar::TypeChecker::visitReturnStatement(Return* statement) {
 }
 
 std::any Pulsar::TypeChecker::visitVariableStatement(VariableDecl* statement) {
-    PrimitiveType variableType = checkType(statement->getType());
+    PrimitiveType variableType = statement->getType();
     PrimitiveType initializerType = std::any_cast<PrimitiveType>(statement->getInitializer()->accept(*this));
 
     if ((variableType != initializerType)) {
@@ -138,17 +138,6 @@ std::any Pulsar::TypeChecker::visitWhileStatement(While* statement) {
     if (type != PR_BOOLEAN) newError("While Statement Has Non Boolean Condition", statement->getLine());
 
     return nullptr;
-}
-
-PrimitiveType Pulsar::TypeChecker::checkType(Token type) {
-    std::string typeLiteral = type.literal;
-
-    if (typeLiteral == "boolean") return PR_BOOLEAN;
-    else if (typeLiteral == "char") return PR_CHARACTER;
-    else if (typeLiteral == "double") return PR_DOUBLE;
-    else if (typeLiteral == "int") return PR_INTEGER;
-    else if (typeLiteral == "void") return PR_VOID;
-    else return PR_ERROR;
 }
 
 bool Pulsar::TypeChecker::isOfType(PrimitiveType toCompare, std::vector<PrimitiveType> types) {

@@ -1,7 +1,7 @@
 #include "VariableDecl.h"
 
 
-Pulsar::VariableDecl::VariableDecl(Token name, Expression* initializer, Token type,
+Pulsar::VariableDecl::VariableDecl(Token name, Expression* initializer, PrimitiveType type,
                                    TokenType accessType, bool isGlobal, int line): name(name), type(type) {
     this->initializer = initializer;
     this->type = type;
@@ -27,7 +27,7 @@ Pulsar::Expression* Pulsar::VariableDecl::getInitializer() {
     return this->initializer;
 }
 
-Pulsar::Token Pulsar::VariableDecl::getType() {
+Pulsar::PrimitiveType Pulsar::VariableDecl::getType() {
     return this->type;
 }
 

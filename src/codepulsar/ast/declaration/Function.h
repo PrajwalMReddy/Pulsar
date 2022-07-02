@@ -7,16 +7,17 @@
 #include "../Statement.h"
 #include "../../variable/Parameter.h"
 #include "../../lang/Token.h"
+#include "../../primitive/PrimitiveType.h"
 
 
 namespace Pulsar {
     class Function: public Statement {
         public:
-            Function(std::string name, Token type, std::vector<Parameter*>* parameters, Block* statements, int line);
+            Function(std::string name, PrimitiveType type, std::vector<Parameter*>* parameters, Block* statements, int line);
             std::any accept(StmtVisitor& visitor);
 
             std::string getName();
-            Token getType();
+            PrimitiveType getType();
             std::vector<Parameter*>* getParameters();
             Block* getStatements();
             int getLine();
@@ -25,7 +26,7 @@ namespace Pulsar {
 
         private:
             std::string name;
-            Token type;
+            PrimitiveType type;
             std::vector<Parameter*>* parameters;
             Block* statements;
             int line;

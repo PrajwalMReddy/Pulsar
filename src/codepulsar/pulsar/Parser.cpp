@@ -64,7 +64,7 @@ Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
     look(TK_RPAR, "A Closing Parenthesis Was Expected After The Parameter List");
     if (!matchAdvance({ TK_ARROW })) newError("A Return Datatype For The Function Was Expected", peekLine());
 
-    Token type = advance();
+    PrimitiveType type = checkType(advance());
     Block* statements = block();
     return new Function(functionName, type, parameters, statements, line);
 }
@@ -98,7 +98,7 @@ Pulsar::Statement* Pulsar::Parser::variableDeclaration(TokenType accessType) {
     Token identifier = advance();
 
     look(TK_COLON, "Unexpected Token '" + peekLiteral() + "' After Variable Name");
-    Token type = advance();
+    PrimitiveType type = checkType(advance());
 
     Expression* expr = nullptr;
     if (matchAdvance({ TK_EQUAL })) {
@@ -312,7 +312,6 @@ Pulsar::Expression* Pulsar::Parser::call() {
     return expr;
 }
 
-// TODO Variable Accessors
 Pulsar::Expression* Pulsar::Parser::primary() {
     if (matchAdvance({ TK_TRUE })) {
         return new Literal("true", PR_BOOLEAN, peekLine());
@@ -404,6 +403,17 @@ Pulsar::Token Pulsar::Parser::previous() {
 
 bool Pulsar::Parser::isInGlobalScope() {
     return this->scopeDepth == 0;
+}
+
+Pulsar::PrimitiveType Pulsar::Parser::checkType(Token type) {
+    std::string typeLiteral = type.literal;
+
+    if (typeLiteral == "boolean") return PR_BOOLEAN;
+    else if (typeLiteral == "char") return PR_CHARACTER;
+    else if (typeLiteral == "double") return PR_DOUBLE;
+    else if (typeLiteral == "int") return PR_INTEGER;
+    else if (typeLiteral == "void") return PR_VOID;
+    else return PR_ERROR;
 }
 
 Pulsar::Token Pulsar::Parser::peek() {

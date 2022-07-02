@@ -10,12 +10,12 @@
 namespace Pulsar {
     class VariableDecl: public Statement {
         public:
-            VariableDecl(Token name, Expression* initializer, Token type, TokenType accessType, bool isGlobal, int line);
+            VariableDecl(Token name, Expression* initializer, PrimitiveType type, TokenType accessType, bool isGlobal, int line);
             std::any accept(StmtVisitor& visitor);
 
             Token getName();
             Expression* getInitializer();
-            Token getType();
+            PrimitiveType getType();
 
             TokenType getAccessType();
             bool isGlobalVariable();
@@ -26,7 +26,7 @@ namespace Pulsar {
         private:
             Token name;
             Expression* initializer;
-            Token type;
+            PrimitiveType type;
 
             TokenType accessType;
             bool isGlobal;

@@ -40,7 +40,6 @@ namespace Pulsar {
             Statement* program;
             CompilerError* errors;
 
-            PrimitiveType checkType(Token type);
             bool isOfType(PrimitiveType toCompare, std::vector<PrimitiveType> types);
             bool isOperation(std::string toCompare, std::vector<std::string> operations);
 
