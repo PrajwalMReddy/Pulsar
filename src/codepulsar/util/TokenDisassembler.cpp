@@ -137,5 +137,11 @@ std::string Pulsar::TokenDisassembler::space(Token token) {
 }
 
 std::string Pulsar::TokenDisassembler::giveSpaces(int length) {
-    return std::string(" ", std::max(0, 20 - length + 1));
+    std::string str;
+
+    for (int i = 0; i < std::max(0, 20 - length + 1); i++) {
+        str += " ";
+    }
+
+    return str;
 }

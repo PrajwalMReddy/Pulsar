@@ -148,7 +148,13 @@ std::any Pulsar::ASTPrinter::visitWhileStatement(While* statement) {
 }
 
 std::string Pulsar::ASTPrinter::giveTabs() const {
-    return std::string("\t", this->indentCount);
+    std::string str;
+
+    for (int i = 0; i < this->indentCount; i++) {
+        str += "    ";
+    }
+
+    return str;
 }
 
 void Pulsar::ASTPrinter::incrementIndentCount() {
