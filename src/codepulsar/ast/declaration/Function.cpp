@@ -8,6 +8,10 @@ Pulsar::Function::Function(std::string name, Pulsar::PrimitiveType type, std::ve
     this->line = line;
 }
 
+Pulsar::Parameter::Parameter(std::string name, Pulsar::PrimitiveType type): type(type) {
+    this->name = name;
+}
+
 std::any Pulsar::Function::accept(Pulsar::StmtVisitor& visitor) {
     return visitor.visitFunctionStatement(this);
 }
@@ -16,8 +20,16 @@ int Pulsar::Function::getArity() {
     return this->parameters->size();
 }
 
+std::string Pulsar::Parameter::getName() {
+    return this->name;
+}
+
 std::string Pulsar::Function::getName() {
     return this->name;
+}
+
+Pulsar::PrimitiveType Pulsar::Parameter::getType() {
+    return this->type;
 }
 
 Pulsar::PrimitiveType Pulsar::Function::getType() {

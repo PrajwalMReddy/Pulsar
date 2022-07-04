@@ -5,12 +5,23 @@
 #include <string>
 
 #include "../Statement.h"
-#include "../../variable/Parameter.h"
 #include "../../lang/Token.h"
 #include "../../primitive/PrimitiveType.h"
 
 
 namespace Pulsar {
+    class Parameter {
+        public:
+            Parameter(std::string name, PrimitiveType type);
+
+            std::string getName();
+            PrimitiveType getType();
+
+        private:
+            std::string name;
+            PrimitiveType type;
+    };
+
     class Function: public Statement {
         public:
             Function(std::string name, PrimitiveType type, std::vector<Parameter*>* parameters, Block* statements, int line);

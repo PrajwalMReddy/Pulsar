@@ -57,7 +57,7 @@ Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
                 type = advance();
             }
 
-            parameters->push_back(new Parameter(parameterName, type));
+            parameters->push_back(new Parameter(parameterName, checkType(type)));
         } while (matchAdvance({ TK_COMMA }));
     }
 

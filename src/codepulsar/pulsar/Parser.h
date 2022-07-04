@@ -6,7 +6,6 @@
 
 #include "Lexer.h"
 #include "../util/TokenDisassembler.h"
-#include "../variable/Parameter.h"
 
 #include "../ast/Expression.h"
 #include "../ast/expression/Literal.h"
