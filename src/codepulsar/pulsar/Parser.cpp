@@ -16,7 +16,16 @@ Pulsar::Statement* Pulsar::Parser::parse() {
     if (this->errors->hasError()) return this->program;
     Pulsar::TokenDisassembler::display(this->tokens);
 
-    this->program = declarationStatement();
+    // TODO Temporary Code To Allow More Than One Top Level Declaration
+
+    int line = peekLine();
+    std::vector<Statement*>* statements = new std::vector<Statement*>;
+
+    while (!match({ TK_EOF })) {
+        statements->push_back(declarationStatement());
+    }
+
+    this->program = new Block(statements, line);
     return this->program;
 }
 

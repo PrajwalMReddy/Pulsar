@@ -92,7 +92,7 @@ namespace Pulsar {
             void endScope();
             PrimitiveType checkType(Token type);
 
-        // Error Handling Functions
+            // Error Handling Functions
             bool look(TokenType token, std::string message);
             void synchronize();
             void newError(std::string message, int line);
