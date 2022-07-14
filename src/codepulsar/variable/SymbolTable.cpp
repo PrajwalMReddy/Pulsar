@@ -37,3 +37,56 @@ void Pulsar::SymbolTable::reassignGlobalVariable(std::string name, std::any valu
 bool Pulsar::SymbolTable::containsGlobalVariable(std::string name) {
     return this->globalVariables.find(name) != this->globalVariables.end();
 }
+
+Pulsar::PrimitiveType Pulsar::SymbolTable::getLocalType(std::string name) {
+    return getLocalVariable(name).getType();
+}
+
+bool Pulsar::SymbolTable::isLocalConstant(std::string name) {
+    return getLocalVariable(name).isConstant();
+}
+
+int Pulsar::SymbolTable::getLocalDepth(std::string name) {
+    return getLocalVariable(name).getDepth();
+}
+
+bool Pulsar::SymbolTable::isLocalInitialized(std::string name) {
+    return getLocalVariable(name).isInitialized();
+}
+
+void Pulsar::SymbolTable::setLocalInitialized(std::string name) {
+    getLocalVariable(name).setInitialized();
+}
+
+void Pulsar::SymbolTable::newLocal(std::string name, Pulsar::PrimitiveType type, bool isInitialized, bool isConstant, int depth) {
+    this->localVariables.push_back(LocalVariable(name, type, isInitialized, isConstant, depth));
+    this->localCount++;
+}
+
+Pulsar::LocalVariable Pulsar::SymbolTable::getLocalVariable(std::string name) {
+    for (int i = 0; i < this->localCount; i++) {
+        LocalVariable local = this->localVariables[i];
+
+        if (local.getName() == name) {
+            return local;
+        }
+    }
+
+    return LocalVariable("", PR_ERROR, false, true, -1);
+}
+
+int Pulsar::SymbolTable::getLocalCount() {
+    return this->localCount;
+}
+
+void Pulsar::SymbolTable::decrementLocalCount() {
+    this->localCount--;
+}
+
+void Pulsar::SymbolTable::incrementDepth() {
+    this->scopeDepth++;
+}
+
+void Pulsar::SymbolTable::decrementDepth() {
+    this->scopeDepth--;
+}

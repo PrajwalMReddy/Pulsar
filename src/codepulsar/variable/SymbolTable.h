@@ -2,11 +2,14 @@
 #define CODEPULSAR_SYMBOLTABLE_H
 
 #include <string>
+#include <vector>
 #include <map>
 #include <any>
 
 #include "../primitive/PrimitiveType.h"
 #include "GlobalVariable.h"
+#include "LocalVariable.h"
+#include "../lang/Token.h"
 
 
 namespace Pulsar {
@@ -26,8 +29,27 @@ namespace Pulsar {
             void reassignGlobalVariable(std::string name, std::any value);
             bool containsGlobalVariable(std::string name);
 
+            // Local Variable Core Functions
+            PrimitiveType getLocalType(std::string name);
+            bool isLocalConstant(std::string name);
+            int getLocalDepth(std::string name);
+            bool isLocalInitialized(std::string name);
+            void setLocalInitialized(std::string name);
+            void newLocal(std::string name, PrimitiveType type, bool isInitialized, bool isConstant, int depth);
+
+            // Local Variable Helper Functions
+            LocalVariable getLocalVariable(std::string name);
+            int getLocalCount();
+            void decrementLocalCount();
+            void incrementDepth();
+            void decrementDepth();
+
         private:
+            int scopeDepth;
+            int localCount;
+
             std::map<std::string, GlobalVariable> globalVariables;
+            std::vector<LocalVariable> localVariables;
     };
 }
 
