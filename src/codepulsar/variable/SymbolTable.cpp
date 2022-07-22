@@ -2,7 +2,11 @@
 
 
 Pulsar::SymbolTable::SymbolTable() {
+    this->scopeDepth = 0;
+    this->localCount = 0;
+
     this->globalVariables = std::map<std::string, GlobalVariable>();
+    this->localVariables = std::vector<LocalVariable>();
 }
 
 std::any Pulsar::SymbolTable::getGlobalValue(std::string name) {
@@ -61,6 +65,17 @@ void Pulsar::SymbolTable::setLocalInitialized(std::string name) {
 void Pulsar::SymbolTable::newLocal(std::string name, Pulsar::PrimitiveType type, bool isInitialized, bool isConstant, int depth) {
     this->localVariables.push_back(LocalVariable(name, type, isInitialized, isConstant, depth));
     this->localCount++;
+}
+
+bool Pulsar::SymbolTable::containsLocalVariable(std::string name) {
+    for (int i = this->localCount - 1; i >= 0; i--) {
+        LocalVariable local = this->localVariables[i];
+
+        if (local.getDepth() < this->scopeDepth) break;
+        if (local.getName() == name) return true;
+    }
+
+    return false;
 }
 
 Pulsar::LocalVariable Pulsar::SymbolTable::getLocalVariable(std::string name) {

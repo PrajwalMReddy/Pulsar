@@ -3,6 +3,7 @@
 
 Pulsar::Parser::Parser(std::string sourceCode) {
     this->sourceCode = sourceCode;
+    this->symbolTable = new SymbolTable();
 
     this->current = 0;
     this->scopeDepth = 0;
@@ -110,11 +111,26 @@ Pulsar::Statement* Pulsar::Parser::variableDeclaration(TokenType accessType) {
     PrimitiveType type = checkType(advance());
 
     Expression* expr = nullptr;
+    bool isInitialized = false;
+
     if (matchAdvance({ TK_EQUAL })) {
         expr = expression();
+        isInitialized = true;
     }
 
     look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
+
+    if (isInGlobalScope()) {
+        if (this->symbolTable->containsGlobalVariable(identifier.literal)) {
+            newError("Global Variable '" + identifier.literal + "' Already Exists", identifier.line);
+        } this->symbolTable->addGlobalVariable(identifier.literal, nullptr, type, isInitialized, (accessType == TK_CONST));
+    } else {
+        std::cout << this->symbolTable->containsLocalVariable(identifier.literal) << std::endl;
+        if (this->symbolTable->containsLocalVariable(identifier.literal)) {
+            newError("Local Variable '" + identifier.literal + "' Already Exists", identifier.line);
+        } this->symbolTable->newLocal(identifier.literal, type, isInitialized, (accessType == TK_CONST), this->scopeDepth);
+    }
+
     return new VariableDecl(identifier, expr, type, accessType, isInGlobalScope(), peekLine());
 }
 
@@ -447,6 +463,10 @@ int Pulsar::Parser::peekLine() {
 
 void Pulsar::Parser::newError(std::string message, int line) {
     this->errors->addError("Parsing Error", message, line);
+}
+
+Pulsar::SymbolTable* Pulsar::Parser::getSymbolTable() {
+    return this->symbolTable;
 }
 
 Pulsar::CompilerError* Pulsar::Parser::getErrors() {

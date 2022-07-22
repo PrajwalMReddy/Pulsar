@@ -35,7 +35,10 @@ namespace Pulsar {
             int getLocalDepth(std::string name);
             bool isLocalInitialized(std::string name);
             void setLocalInitialized(std::string name);
+
+            // Local Variable Extended Functions
             void newLocal(std::string name, PrimitiveType type, bool isInitialized, bool isConstant, int depth);
+            bool containsLocalVariable(std::string name);
 
             // Local Variable Helper Functions
             LocalVariable getLocalVariable(std::string name);

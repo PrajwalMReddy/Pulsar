@@ -6,6 +6,7 @@
 
 #include "Lexer.h"
 #include "../util/TokenDisassembler.h"
+#include "../variable/SymbolTable.h"
 
 #include "../ast/Expression.h"
 #include "../ast/expression/Literal.h"
@@ -33,6 +34,8 @@ namespace Pulsar {
         public:
             Parser(std::string sourceCode);
             Statement* parse();
+
+            SymbolTable* getSymbolTable();
             CompilerError* getErrors();
 
         private:
@@ -46,6 +49,7 @@ namespace Pulsar {
 
             // Output Data
             Statement* program;
+            SymbolTable* symbolTable;
             CompilerError* errors;
 
             // ---- AST Parsing Functions ---- //
