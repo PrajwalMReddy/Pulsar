@@ -9,16 +9,18 @@
 namespace Pulsar {
     class Assignment: public Expression {
         public:
-            Assignment(std::string identifier, Expression* value, int line);
+            Assignment(std::string identifier, Expression* value, bool isGlobal, int line);
             std::any accept(ExprVisitor& visitor);
 
             std::string getIdentifier();
             Expression* getValue();
+            bool isGlobalAssignment();
             int getLine();
 
         private:
             std::string identifier;
             Expression* value;
+            bool isGlobal;
             int line;
     };
 }

@@ -6,6 +6,9 @@
 #include "Parser.h"
 #include "../util/ErrorReporter.h"
 #include "../util/ASTPrinter.h"
+#include "../analysis/TypeChecker.h"
+#include "../analysis/Validator.h"
+#include "../variable/SymbolTable.h"
 
 
 namespace Pulsar {
@@ -19,6 +22,7 @@ namespace Pulsar {
             // Input Data
             std::string sourceCode;
             Statement* program;
+            SymbolTable* symbolTable;
 
             // Output Data
             CompilerError* errors;

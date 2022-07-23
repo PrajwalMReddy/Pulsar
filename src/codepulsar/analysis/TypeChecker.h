@@ -8,12 +8,13 @@
 #include "../primitive/PrimitiveType.h"
 #include "../pulsar/Pulsar.h"
 #include "../primitive/PrimitiveType.h"
+#include "../variable/SymbolTable.h"
 
 
 namespace Pulsar {
     class TypeChecker: public ExprVisitor, public StmtVisitor {
         public:
-            TypeChecker(Statement* program, CompilerError* errors);
+            TypeChecker(Statement* program, SymbolTable* symbolTable, CompilerError* errors);
             void check();
 
             // Expression Nodes
@@ -38,6 +39,7 @@ namespace Pulsar {
 
         private:
             Statement* program;
+            SymbolTable* symbolTable;
             CompilerError* errors;
 
             bool isOfType(PrimitiveType toCompare, std::vector<PrimitiveType> types);

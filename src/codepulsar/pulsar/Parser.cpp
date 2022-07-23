@@ -20,7 +20,7 @@ Pulsar::Statement* Pulsar::Parser::parse() {
     // TODO Temporary Code To Allow More Than One Top Level Declaration
 
     int line = peekLine();
-    std::vector<Statement*>* statements = new std::vector<Statement*>;
+    auto* statements = new std::vector<Statement*>;
 
     while (!match({ TK_EOF })) {
         statements->push_back(declarationStatement());
@@ -105,6 +105,7 @@ Pulsar::Statement* Pulsar::Parser::statement() {
 }
 
 Pulsar::Statement* Pulsar::Parser::variableDeclaration(TokenType accessType) {
+    int line = peekLine();
     Token identifier = advance();
 
     look(TK_COLON, "Unexpected Token '" + peekLiteral() + "' After Variable Name");
@@ -125,13 +126,12 @@ Pulsar::Statement* Pulsar::Parser::variableDeclaration(TokenType accessType) {
             newError("Global Variable '" + identifier.literal + "' Already Exists", identifier.line);
         } this->symbolTable->addGlobalVariable(identifier.literal, nullptr, type, isInitialized, (accessType == TK_CONST));
     } else {
-        std::cout << this->symbolTable->containsLocalVariable(identifier.literal) << std::endl;
         if (this->symbolTable->containsLocalVariable(identifier.literal)) {
             newError("Local Variable '" + identifier.literal + "' Already Exists", identifier.line);
         } this->symbolTable->newLocal(identifier.literal, type, isInitialized, (accessType == TK_CONST), this->scopeDepth);
     }
 
-    return new VariableDecl(identifier, expr, type, accessType, isInGlobalScope(), peekLine());
+    return new VariableDecl(identifier, expr, type, accessType, isInGlobalScope(), line);
 }
 
 void Pulsar::Parser::startScope() {
@@ -215,7 +215,7 @@ Pulsar::Expression* Pulsar::Parser::assignment() {
     Token variable = peek();
     if (peekNext().tokenType == TK_EQUAL) {
         advance(); advance();
-        return new Assignment(variable.literal, expression(), peekLine());
+        return new Assignment(variable.literal, expression(), isInGlobalScope(), peekLine());
     } else if (peekNext().tokenType == TK_PLUS_EQUAL || peekNext().tokenType == TK_MINUS_EQUAL || peekNext().tokenType == TK_MUL_EQUAL || peekNext().tokenType == TK_DIV_EQUAL || peekNext().tokenType == TK_MOD_EQUAL) {
         std::string identifier = variable.literal;
         int line = variable.line;
@@ -226,7 +226,7 @@ Pulsar::Expression* Pulsar::Parser::assignment() {
         Expression *expr = expression();
 
         // Expanding The Syntactic Sugar Into A Normal Assignment
-        return new Assignment(identifier,new Binary(new VariableExpr(identifier, line), operatorType.substr(0, 1), expr, line), line);
+        return new Assignment(identifier, new Binary(new VariableExpr(identifier, isInGlobalScope(), line), operatorType.substr(0, 1), expr, line), isInGlobalScope(), line);
     } else {
         return logicalOr();
     }
@@ -354,7 +354,7 @@ Pulsar::Expression* Pulsar::Parser::primary() {
 
     if (match({ TK_IDENTIFIER })) {
         Token name = advance();
-        return new VariableExpr(name.literal, peekLine());
+        return new VariableExpr(name.literal, isInGlobalScope(), peekLine());
     }
 
     if (matchAdvance({ TK_LPAR })) {

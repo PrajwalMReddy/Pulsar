@@ -8,12 +8,13 @@
 #include "../primitive/PrimitiveType.h"
 #include "../pulsar/Pulsar.h"
 #include "../primitive/PrimitiveType.h"
+#include "../variable/SymbolTable.h"
 
 
 namespace Pulsar {
     class Validator: public ExprVisitor, public StmtVisitor {
         public:
-            Validator(Statement* program, CompilerError* errors);
+            Validator(Statement* program, SymbolTable* symbolTable, CompilerError* errors);
             void validate();
 
             // Expression Nodes
@@ -38,6 +39,7 @@ namespace Pulsar {
 
         private:
             Statement* program;
+            SymbolTable* symbolTable;
             CompilerError* errors;
 
             void newError(std::string message, int line);

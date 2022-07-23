@@ -1,8 +1,9 @@
 #include "Validator.h"
 
 
-Pulsar::Validator::Validator(Statement* program, CompilerError* errors) {
+Pulsar::Validator::Validator(Statement* program, SymbolTable* symbolTable, CompilerError* errors) {
     this->program = program;
+    this->symbolTable = symbolTable;
     this->errors = errors;
 }
 
@@ -11,8 +12,13 @@ void Pulsar::Validator::validate() {
     this->program->accept(*this);
 }
 
-// TODO
 std::any Pulsar::Validator::visitAssignmentExpression(Assignment* expression) {
+    if (!expression->isGlobalAssignment() && this->symbolTable->isLocalConstant(expression->getIdentifier())) {
+        newError("Local Variable '" + expression->getIdentifier() + "' Is A Constant And Cannot Be Reassigned", expression->getLine());
+    } else if (expression->isGlobalAssignment() && this->symbolTable->isGlobalConstant(expression->getIdentifier())) {
+        newError("Global Variable '" + expression->getIdentifier() + "' Is A Constant And Cannot Be Reassigned", expression->getLine());
+    }
+
     expression->getValue()->accept(*this);
     return nullptr;
 }
@@ -48,8 +54,24 @@ std::any Pulsar::Validator::visitUnaryExpression(Unary* expression) {
     return nullptr;
 }
 
-// TODO
 std::any Pulsar::Validator::visitVariableExpression(VariableExpr* expression) {
+    std::string name = expression->getName();
+    int line = expression->getLine();
+
+    if (!expression->isGlobalVariable()) {
+        if (!this->symbolTable->containsLocalVariable(name)) {
+            newError("Local Variable '" + name + "' Is Used But Never Defined", line);
+        } else if (!this->symbolTable->isLocalInitialized(name)) {
+            newError("Local Variable '" + name + "' Has Not Been Initialized", line);
+        }
+    } else {
+        if (!this->symbolTable->containsGlobalVariable(name)) {
+            newError("Global Variable '" + name + "' Does Not Exist", line);
+        } else if (!this->symbolTable->isGlobalInitialized(name)) {
+            newError("Global Variable '" + name + "' Has Not Been Initialized", line);
+        }
+    }
+
     return nullptr;
 }
 
@@ -66,9 +88,12 @@ std::any Pulsar::Validator::visitExpressionStatement(ExpressionStmt* statement) 
     return nullptr;
 }
 
-// TODO
 std::any Pulsar::Validator::visitFunctionStatement(Function* statement) {
     statement->getStatements()->accept(*this);
+
+    for (Parameter* parameter: *statement->getParameters()) {
+        if (parameter->getType() == PR_ERROR) newError("Invalid Function Parameter(s) For Function " + statement->getName(), statement->getLine());
+    }
 
     return nullptr;
 }
@@ -91,9 +116,16 @@ std::any Pulsar::Validator::visitReturnStatement(Return* statement) {
     return nullptr;
 }
 
-// TODO
 std::any Pulsar::Validator::visitVariableStatement(VariableDecl* statement) {
     statement->getInitializer()->accept(*this);
+    bool isInitialized = statement->isInitialized();
+
+    if (!statement->isGlobalVariable() && this->symbolTable->isLocalInitialized(statement->getName().literal) && !isInitialized) {
+        newError("Local Constants Must Be Initialized While Being Declared", statement->getLine());
+    } else if (statement->isGlobalVariable() && this->symbolTable->isGlobalConstant(statement->getName().literal) && !isInitialized) {
+        newError("Global Constants Must Be Initialized While Being Declared", statement->getLine());
+    }
+
     return nullptr;
 }
 

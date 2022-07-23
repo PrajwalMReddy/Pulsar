@@ -1,8 +1,9 @@
 #include "TypeChecker.h"
 
 
-Pulsar::TypeChecker::TypeChecker(Statement* program, CompilerError* errors) {
+Pulsar::TypeChecker::TypeChecker(Statement* program, SymbolTable* symbolTable, CompilerError* errors) {
     this->program = program;
+    this->symbolTable = symbolTable;
     this->errors = errors;
 }
 
@@ -11,10 +12,22 @@ void Pulsar::TypeChecker::check() {
     this->program->accept(*this);
 }
 
-// TODO
 std::any Pulsar::TypeChecker::visitAssignmentExpression(Assignment* expression) {
-    expression->getValue()->accept(*this);
-    return PR_ERROR;
+    if (!expression->isGlobalAssignment()) {
+        if (this->symbolTable->getLocalType(expression->getIdentifier()) != std::any_cast<PrimitiveType>(expression->getValue()->accept(*this))) {
+            newError("Local Variable Is Being Assigned To The Wrong Type", expression->getLine());
+        }
+
+        this->symbolTable->setLocalInitialized(expression->getIdentifier());
+        return this->symbolTable->getLocalType(expression->getIdentifier());
+    } else {
+        if (this->symbolTable->getGlobalType(expression->getIdentifier()) != std::any_cast<PrimitiveType>(expression->getValue()->accept(*this))) {
+            newError("Global Variable Is Being Assigned To The Wrong Type", expression->getLine());
+        }
+
+        this->symbolTable->setGlobalInitialized(expression->getIdentifier());
+        return this->symbolTable->getGlobalType(expression->getIdentifier());
+    }
 }
 
 std::any Pulsar::TypeChecker::visitBinaryExpression(Binary* expression) {
@@ -77,9 +90,12 @@ std::any Pulsar::TypeChecker::visitUnaryExpression(Unary* expression) {
     return a;
 }
 
-// TODO
 std::any Pulsar::TypeChecker::visitVariableExpression(VariableExpr* expression) {
-    return PR_ERROR;
+    if (!expression->isGlobalVariable()) {
+        return this->symbolTable->getLocalType(expression->getName());
+    } else {
+        return this->symbolTable->getGlobalType(expression->getName());
+    }
 }
 
 std::any Pulsar::TypeChecker::visitBlockStatement(Block* statement) {
@@ -97,6 +113,11 @@ std::any Pulsar::TypeChecker::visitExpressionStatement(ExpressionStmt* statement
 
 std::any Pulsar::TypeChecker::visitFunctionStatement(Function* statement) {
     statement->getStatements()->accept(*this);
+
+    for (Parameter* parameter: *statement->getParameters()) {
+        if (parameter->getType() == PR_VOID) newError("Invalid Function Parameter(s) For Function " + statement->getName(), statement->getLine());
+    }
+
     return nullptr;
 }
 
