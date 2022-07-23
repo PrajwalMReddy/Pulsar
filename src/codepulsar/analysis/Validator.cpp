@@ -117,7 +117,7 @@ std::any Pulsar::Validator::visitReturnStatement(Return* statement) {
 }
 
 std::any Pulsar::Validator::visitVariableStatement(VariableDecl* statement) {
-    statement->getInitializer()->accept(*this);
+    if (statement->isInitialized()) statement->getInitializer()->accept(*this);
     bool isInitialized = statement->isInitialized();
 
     if (!statement->isGlobalVariable() && this->symbolTable->isLocalInitialized(statement->getName().literal) && !isInitialized) {

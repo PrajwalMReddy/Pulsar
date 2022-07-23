@@ -135,7 +135,13 @@ std::any Pulsar::ASTPrinter::visitVariableStatement(VariableDecl* statement) {
     std::string str;
     str += "Variable(";
     str += ((statement->isGlobalVariable()) ? "Global:" : "Local:");
-    str += statement->getName().literal + " = " + std::any_cast<std::string>(statement->getInitializer()->accept(*this));
+
+    if (statement->isInitialized()) {
+        str += statement->getName().literal + " = " + std::any_cast<std::string>(statement->getInitializer()->accept(*this));
+    } else {
+        str += "Uninitialized";
+    }
+
     str += ")\n";
     return str;
 }

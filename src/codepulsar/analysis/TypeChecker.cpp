@@ -143,10 +143,13 @@ std::any Pulsar::TypeChecker::visitReturnStatement(Return* statement) {
 
 std::any Pulsar::TypeChecker::visitVariableStatement(VariableDecl* statement) {
     PrimitiveType variableType = statement->getType();
-    PrimitiveType initializerType = std::any_cast<PrimitiveType>(statement->getInitializer()->accept(*this));
 
-    if ((variableType != initializerType)) {
-        newError("Variable Has Been Initialized With The Wrong Type", statement->getLine());
+    if (statement->isInitialized()) {
+        auto initializerType = std::any_cast<PrimitiveType>(statement->getInitializer()->accept(*this));
+
+        if ((variableType != initializerType)) {
+            newError("Variable Has Been Initialized With The Wrong Type", statement->getLine());
+        }
     }
 
     return nullptr;
