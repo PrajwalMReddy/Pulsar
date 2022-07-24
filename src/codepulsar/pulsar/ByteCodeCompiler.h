@@ -9,6 +9,7 @@
 #include "../analysis/TypeChecker.h"
 #include "../analysis/Validator.h"
 #include "../variable/SymbolTable.h"
+#include "../lang/Instruction.h"
 
 
 namespace Pulsar {
@@ -24,7 +25,11 @@ namespace Pulsar {
             Statement* program;
             SymbolTable* symbolTable;
 
+            // Processing Data
+            std::vector<Primitive> values;
+
             // Output Data
+            std::vector<Instruction> bytecode;
             CompilerError* errors;
 
             // Core Functions
