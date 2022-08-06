@@ -37,51 +37,145 @@ void Pulsar::ByteCodeCompiler::compile() {
 }
 
 std::any Pulsar::ByteCodeCompiler::visitAssignmentExpression(Assignment* expression) {
+    expression->getValue()->accept(*this);
+
+    if (expression->isGlobalAssignment()) {
+        return makeOpCode(OP_STORE_GLOBAL, expression->getIdentifier(), expression->getLine());
+    } else {
+        return makeOpCode(OP_SET_LOCAL, -1, expression->getLine()); // TODO Change -1
+    }
 }
 
 std::any Pulsar::ByteCodeCompiler::visitBinaryExpression(Binary* expression) {
+    expression->getLeft()->accept(*this);
+    expression->getRight()->accept(*this);
+
+    for (ByteCode op: identifyBinaryOperator(expression->getOperator())) {
+        makeOpCode(op, expression->getLine());
+    }
+
+    return nullptr;
 }
 
+// TODO
 std::any Pulsar::ByteCodeCompiler::visitCallExpression(Call* expression) {
 }
 
 std::any Pulsar::ByteCodeCompiler::visitGroupingExpression(Grouping* expression) {
+    return expression->getExpression()->accept(*this);
 }
 
 std::any Pulsar::ByteCodeCompiler::visitLiteralExpression(Literal* expression) {
+    std::string value = expression->getValue();
+    return makeConstant(value, expression->getType(), expression->getLine());
 }
 
 std::any Pulsar::ByteCodeCompiler::visitLogicalExpression(Logical* expression) {
+    expression->getLeft()->accept(*this);
+    int line = expression->getLine();
+    ByteCode jumpType;
+
+    if (expression->getOperator() == "&&") { jumpType = OP_JUMP_IF_FALSE; }
+    else if (expression->getOperator() == "||") { jumpType = OP_JUMP_IF_TRUE; }
+
+    int offset = makeJump(jumpType, line);
+    makeOpCode(OP_POP, line);
+
+    expression->getRight()->accept(*this);
+    fixJump(jumpType, offset);
+
+    return nullptr;
 }
 
 std::any Pulsar::ByteCodeCompiler::visitUnaryExpression(Unary* expression) {
+    expression->getExpression()->accept(*this);
+    ByteCode op = identifyUnaryOperator(expression->getOperator());
+    return makeOpCode(op, expression->getLine());
 }
 
 std::any Pulsar::ByteCodeCompiler::visitVariableExpression(VariableExpr* expression) {
+    if (expression->isGlobalVariable()) {
+        return makeOpCode(OP_LOAD_GLOBAL, expression->getName(), expression->getLine());
+    } else {
+        return makeOpCode(OP_GET_LOCAL, -1, expression->getLine()); // TODO Change -1
+    }
 }
 
 std::any Pulsar::ByteCodeCompiler::visitBlockStatement(Block* statement) {
+    for (Statement* stmt: *statement->getStatements()) {
+        stmt->accept(*this);
+    }
+
+    return nullptr;
 }
 
 std::any Pulsar::ByteCodeCompiler::visitExpressionStatement(ExpressionStmt* statement) {
+    statement->getExpression()->accept(*this);
+    makeOpCode(OP_POP, statement->getLine());
+    return nullptr;
 }
 
+// TODO
 std::any Pulsar::ByteCodeCompiler::visitFunctionStatement(Function* statement) {
 }
 
 std::any Pulsar::ByteCodeCompiler::visitIfStatement(If* statement) {
+    statement->getCondition()->accept(*this);
+    int ifOffset = makeJump(OP_JUMP_IF_FALSE, statement->getLine());
+    makeOpCode(OP_POP, statement->getLine());
+    statement->getThenBranch()->accept(*this);
+
+    int elseOffset = makeJump(OP_JUMP, statement->getThenBranch()->getLine());
+    fixJump(OP_JUMP_IF_FALSE, ifOffset);
+    makeOpCode(OP_POP, statement->getThenBranch()->getLine());
+
+    if (statement->hasElse()) {
+        statement->getElseBranch()->accept(*this);
+    }
+
+    fixJump(OP_JUMP, elseOffset);
+    return nullptr;
 }
 
 std::any Pulsar::ByteCodeCompiler::visitPrintStatement(Print* statement) {
+    statement->getExpression()->accept(*this);
+    makeOpCode(OP_PRINT, statement->getLine());
+    return nullptr;
 }
 
 std::any Pulsar::ByteCodeCompiler::visitReturnStatement(Return* statement) {
+    if (statement->hasValue()) {
+        statement->getValue()->accept(*this);
+    }
+
+    makeOpCode(OP_RETURN, statement->getLine());
+    return nullptr;
 }
 
 std::any Pulsar::ByteCodeCompiler::visitVariableStatement(VariableDecl* statement) {
+    statement->getInitializer()->accept(*this);
+
+    if (statement->isGlobalVariable()) {
+        return makeOpCode(OP_NEW_GLOBAL, statement->getName(), statement->getLine());
+    } else {
+        return makeOpCode(OP_NEW_LOCAL, statement->getName(), statement->getLine());
+    }
 }
 
 std::any Pulsar::ByteCodeCompiler::visitWhileStatement(While* statement) {
+    int start = this->instructions.size();
+    statement->getCondition()->accept(*this);
+
+    int offset = makeJump(OP_JUMP_IF_FALSE, statement->getLine());
+    makeOpCode(OP_POP, statement->getLine());
+
+    statement->getStatements()->accept(*this);
+    makeOpCode(OP_JUMP, start, statement->getStatements()->getLine());
+
+    fixJump(OP_JUMP_IF_FALSE, offset);
+    makeOpCode(OP_POP, statement->getStatements()->getLine());
+
+    return nullptr;
 }
 
 Pulsar::Instruction Pulsar::ByteCodeCompiler::makeConstant(std::string value, PrimitiveType type, int line) {
