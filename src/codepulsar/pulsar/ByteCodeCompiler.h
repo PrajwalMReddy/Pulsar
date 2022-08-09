@@ -22,8 +22,8 @@ namespace Pulsar {
             ByteCodeCompiler(std::string sourceCode);
 
             std::vector<Instruction> compileByteCode();
-            // TODO std::vector<std::any> getValues();
             SymbolTable* getSymbolTable();
+            std::vector<std::any> getValues();
             CompilerError* getErrors();
 
             // Expression AST Visitors

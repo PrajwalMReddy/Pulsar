@@ -131,7 +131,7 @@ std::any Pulsar::TypeChecker::visitIfStatement(If* statement) {
 }
 
 std::any Pulsar::TypeChecker::visitPrintStatement(Print* statement) {
-    statement->accept(*this);
+    statement->getExpression()->accept(*this);
     return nullptr;
 }
 

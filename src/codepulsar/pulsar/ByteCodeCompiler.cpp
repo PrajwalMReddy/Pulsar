@@ -186,10 +186,10 @@ Pulsar::Instruction Pulsar::ByteCodeCompiler::makeConstant(std::string value, Pr
     } if (type == PR_CHARACTER) {
         this->values.emplace_back(PCharacter(value[1]));
     } if (type == PR_BOOLEAN) {
-        this->values.emplace_back(PBoolean(value == "true" ? true : false));
+        this->values.emplace_back(PBoolean(value == "true"));
     }
 
-    return makeOpCode(OP_CONSTANT, this->values.size() - 1, line);
+    return makeOpCode(OP_CONSTANT, (int) (this->values.size() - 1), line);
 }
 
 Pulsar::Instruction Pulsar::ByteCodeCompiler::makeOpCode(ByteCode opcode, int line) {
@@ -211,7 +211,7 @@ int Pulsar::ByteCodeCompiler::makeJump(ByteCode opcode, int line) {
 void Pulsar::ByteCodeCompiler::fixJump(ByteCode opcode, int offset) {
     Instruction oldJump = this->instructions[offset];
     int line = oldJump.getLine();
-    Instruction jumpOpCode = Instruction(opcode, this->instructions.size(), line);
+    Instruction jumpOpCode = Instruction(opcode, (int) this->instructions.size(), line);
     this->instructions.at(offset) = jumpOpCode;
 }
 
@@ -252,6 +252,10 @@ std::vector<Pulsar::ByteCode> Pulsar::ByteCodeCompiler::identifyBinaryOperator(s
 
 Pulsar::SymbolTable* Pulsar::ByteCodeCompiler::getSymbolTable() {
     return this->symbolTable;
+}
+
+std::vector<std::any> Pulsar::ByteCodeCompiler::getValues() {
+    return this->values;
 }
 
 Pulsar::CompilerError* Pulsar::ByteCodeCompiler::getErrors() {

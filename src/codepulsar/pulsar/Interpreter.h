@@ -5,6 +5,7 @@
 
 #include "ByteCodeCompiler.h"
 #include "../util/ErrorReporter.h"
+#include "../util/Disassembler.h"
 
 
 namespace Pulsar {
@@ -16,6 +17,11 @@ namespace Pulsar {
         private:
             // Input Data
             std::string sourceCode;
+            std::vector<Instruction> instructions;
+
+            // Processing Data
+            SymbolTable* symbolTable;
+            std::vector<std::any> values;
 
             // Output Data
             CompilerError* errors;
