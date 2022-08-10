@@ -30,6 +30,7 @@ namespace Pulsar {
             bool containsGlobalVariable(std::string name);
 
             // Local Variable Core Functions
+            LocalVariable localAt(int i);
             PrimitiveType getLocalType(std::string name);
             bool isLocalConstant(std::string name);
             int getLocalDepth(std::string name);

@@ -1,9 +1,10 @@
 #include "Assignment.h"
 
 
-Pulsar::Assignment::Assignment(std::string identifier, Expression* value, bool isGlobal, int line) {
+Pulsar::Assignment::Assignment(std::string identifier, Expression* value, int localID, bool isGlobal, int line) {
     this->identifier = identifier;
     this->value = value;
+    this->localID = localID;
     this->isGlobal = isGlobal;
     this->line = line;
 }
@@ -18,6 +19,10 @@ std::string Pulsar::Assignment::getIdentifier() {
 
 Pulsar::Expression* Pulsar::Assignment::getValue() {
     return this->value;
+}
+
+int Pulsar::Assignment::getLocalID() {
+    return this->localID;
 }
 
 bool Pulsar::Assignment::isGlobalAssignment() {

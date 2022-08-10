@@ -42,6 +42,10 @@ bool Pulsar::SymbolTable::containsGlobalVariable(std::string name) {
     return this->globalVariables.find(name) != this->globalVariables.end();
 }
 
+Pulsar::LocalVariable Pulsar::SymbolTable::localAt(int i) {
+    return this->localVariables[i];
+}
+
 Pulsar::PrimitiveType Pulsar::SymbolTable::getLocalType(std::string name) {
     return getLocalVariable(name).getType();
 }

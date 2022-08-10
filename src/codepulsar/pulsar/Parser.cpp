@@ -215,7 +215,7 @@ Pulsar::Expression* Pulsar::Parser::assignment() {
     Token variable = peek();
     if (peekNext().tokenType == TK_EQUAL) {
         advance(); advance();
-        return new Assignment(variable.literal, expression(), isInGlobalScope(), peekLine());
+        return new Assignment(variable.literal, expression(), resolveLocal(variable), isInGlobalScope(), peekLine());
     } else if (peekNext().tokenType == TK_PLUS_EQUAL || peekNext().tokenType == TK_MINUS_EQUAL || peekNext().tokenType == TK_MUL_EQUAL || peekNext().tokenType == TK_DIV_EQUAL || peekNext().tokenType == TK_MOD_EQUAL) {
         std::string identifier = variable.literal;
         int line = variable.line;
@@ -226,7 +226,7 @@ Pulsar::Expression* Pulsar::Parser::assignment() {
         Expression *expr = expression();
 
         // Expanding The Syntactic Sugar Into A Normal Assignment
-        return new Assignment(identifier, new Binary(new VariableExpr(identifier, isInGlobalScope(), line), operatorType.substr(0, 1), expr, line), isInGlobalScope(), line);
+        return new Assignment(identifier, new Binary(new VariableExpr(identifier, resolveLocal(variable), isInGlobalScope(), line), operatorType.substr(0, 1), expr, line), resolveLocal(variable), isInGlobalScope(), line);
     } else {
         return logicalOr();
     }
@@ -354,7 +354,7 @@ Pulsar::Expression* Pulsar::Parser::primary() {
 
     if (match({ TK_IDENTIFIER })) {
         Token name = advance();
-        return new VariableExpr(name.literal, isInGlobalScope(), peekLine());
+        return new VariableExpr(name.literal, resolveLocal(name), isInGlobalScope(), peekLine());
     }
 
     if (matchAdvance({ TK_LPAR })) {
@@ -428,6 +428,18 @@ Pulsar::Token Pulsar::Parser::previous() {
 
 bool Pulsar::Parser::isInGlobalScope() {
     return this->scopeDepth == 0;
+}
+
+int Pulsar::Parser::resolveLocal(Token name) {
+    for (int i = this->symbolTable->getLocalCount() - 1; i >= 0; i--) {
+        LocalVariable local = this->symbolTable->localAt(i);
+
+        if (local.getName() == name.literal) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 Pulsar::PrimitiveType Pulsar::Parser::checkType(Token type) {

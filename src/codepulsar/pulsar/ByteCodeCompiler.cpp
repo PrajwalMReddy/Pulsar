@@ -42,7 +42,7 @@ std::any Pulsar::ByteCodeCompiler::visitAssignmentExpression(Assignment* express
     if (expression->isGlobalAssignment()) {
         return makeOpCode(OP_STORE_GLOBAL, expression->getIdentifier(), expression->getLine());
     } else {
-        return makeOpCode(OP_SET_LOCAL, -1, expression->getLine()); // TODO Change -1
+        return makeOpCode(OP_SET_LOCAL, expression->getLocalID(), expression->getLine());
     }
 }
 
@@ -97,7 +97,7 @@ std::any Pulsar::ByteCodeCompiler::visitVariableExpression(VariableExpr* express
     if (expression->isGlobalVariable()) {
         return makeOpCode(OP_LOAD_GLOBAL, expression->getName(), expression->getLine());
     } else {
-        return makeOpCode(OP_GET_LOCAL, -1, expression->getLine()); // TODO Change -1
+        return makeOpCode(OP_GET_LOCAL, expression->getLocalID(), expression->getLine());
     }
 }
 

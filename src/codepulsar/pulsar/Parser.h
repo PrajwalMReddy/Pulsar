@@ -94,6 +94,8 @@ namespace Pulsar {
             void startScope();
             bool isInGlobalScope();
             void endScope();
+
+            int resolveLocal(Token name);
             PrimitiveType checkType(Token type);
 
             // Error Handling Functions

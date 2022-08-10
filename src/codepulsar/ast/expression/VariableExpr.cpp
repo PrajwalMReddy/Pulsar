@@ -1,8 +1,9 @@
 #include "VariableExpr.h"
 
 
-Pulsar::VariableExpr::VariableExpr(std::string name, bool isGlobal, int line) {
+Pulsar::VariableExpr::VariableExpr(std::string name, int localID, bool isGlobal, int line) {
     this->name = name;
+    this->localID = localID;
     this->isGlobal = isGlobal;
     this->line = line;
 }
@@ -13,6 +14,10 @@ std::any Pulsar::VariableExpr::accept(ExprVisitor& visitor) {
 
 std::string Pulsar::VariableExpr::getName() {
     return this->name;
+}
+
+int Pulsar::VariableExpr::getLocalID() {
+    return this->localID;
 }
 
 bool Pulsar::VariableExpr::isGlobalVariable() {
