@@ -9,7 +9,6 @@ void Pulsar::Interpreter::interpret() {
     Pulsar::ByteCodeCompiler bcc = ByteCodeCompiler(this->sourceCode);
     this->instructions = bcc.compileByteCode();
 
-
     this->symbolTable = bcc.getSymbolTable();
     this->values = bcc.getValues();
 

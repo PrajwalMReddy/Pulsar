@@ -14,6 +14,7 @@
 #include "../primitive/type/PDouble.h"
 #include "../primitive/type/PCharacter.h"
 #include "../primitive/type/PBoolean.h"
+#include "../primitive/Value.h"
 
 
 namespace Pulsar {
@@ -23,7 +24,7 @@ namespace Pulsar {
 
             std::vector<Instruction> compileByteCode();
             SymbolTable* getSymbolTable();
-            std::vector<std::any> getValues();
+            std::vector<Value> getValues();
             CompilerError* getErrors();
 
             // Expression AST Visitors
@@ -53,7 +54,7 @@ namespace Pulsar {
             SymbolTable* symbolTable;
 
             // Processing Data
-            std::vector<std::any> values;
+            std::vector<Value> values;
 
             // Output Data
             std::vector<Instruction> instructions;

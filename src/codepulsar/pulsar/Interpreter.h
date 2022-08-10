@@ -6,6 +6,7 @@
 #include "ByteCodeCompiler.h"
 #include "../util/ErrorReporter.h"
 #include "../util/Disassembler.h"
+#include "../primitive/Value.h"
 
 
 namespace Pulsar {
@@ -21,7 +22,7 @@ namespace Pulsar {
 
             // Processing Data
             SymbolTable* symbolTable;
-            std::vector<std::any> values;
+            std::vector<Value> values;
 
             // Output Data
             CompilerError* errors;
