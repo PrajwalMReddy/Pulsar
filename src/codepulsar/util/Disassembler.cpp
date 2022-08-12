@@ -12,7 +12,6 @@ void Pulsar::Disassembler::disassemble() {
 
     std::cout << "\n-- Disassembled Bytecode --" << std::endl;
     displayInstructions();
-    std::cout << "\n";
 }
 
 void Pulsar::Disassembler::displayInstructions() {

@@ -26,6 +26,21 @@ namespace Pulsar {
 
             // Output Data
             CompilerError* errors;
+
+            // Other Necessary Data
+            const int STACK_MAX = 1024;
+            std::vector<std::any> stack;
+
+            int sp;
+            int ip;
+
+            // Functions
+            void execute();
+
+            void push(std::any value);
+            Value pop();
+
+            void runtimeError(std::string message);
     };
 }
 

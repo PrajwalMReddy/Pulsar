@@ -19,6 +19,8 @@ namespace Pulsar {
             Disassembler(std::vector<Instruction> instructions, SymbolTable* symbolTable, std::vector<Value> values);
             void disassemble();
 
+            static std::string opcodeToString(ByteCode byteCode);
+
         private:
             // Input Data
             std::vector<Instruction> instructions;
@@ -28,8 +30,6 @@ namespace Pulsar {
             // Functions
             void displayInstructions();
             void decideInstructionType(Instruction instruction);
-
-            std::string opcodeToString(ByteCode byteCode);
 
             void opcodeType(Instruction instruction);
             void operandType(Instruction instruction);
