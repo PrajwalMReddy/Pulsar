@@ -10,6 +10,7 @@
 #include "GlobalVariable.h"
 #include "LocalVariable.h"
 #include "../lang/Token.h"
+#include "../primitive/Primitive.h"
 
 
 namespace Pulsar {
@@ -18,15 +19,15 @@ namespace Pulsar {
             SymbolTable();
 
             // Global Variable Core Functions
-            std::any getGlobalValue(std::string name);
+            Primitive* getGlobalValue(std::string name);
             PrimitiveType getGlobalType(std::string name);
             bool isGlobalConstant(std::string name);
             bool isGlobalInitialized(std::string name);
             void setGlobalInitialized(std::string name);
 
             // Global Variable Extended Functions
-            void addGlobalVariable(std::string name, std::any value, PrimitiveType type, bool isInitialized, bool isConstant);
-            void reassignGlobalVariable(std::string name, std::any value);
+            void addGlobalVariable(std::string name, Primitive* value, PrimitiveType type, bool isInitialized, bool isConstant);
+            void reassignGlobalVariable(std::string name, Primitive* value);
             bool containsGlobalVariable(std::string name);
 
             // Local Variable Core Functions

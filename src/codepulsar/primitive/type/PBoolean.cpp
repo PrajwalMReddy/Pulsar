@@ -17,40 +17,40 @@ std::any Pulsar::PBoolean::getPrimitiveValue() {
     return this->value;
 }
 
-std::any Pulsar::PBoolean::unaryNegate() {
-    return PNone();
+Pulsar::Primitive* Pulsar::PBoolean::unaryNegate() {
+    return new PNone();
 }
 
-std::any Pulsar::PBoolean::unaryNot() {
-    return PBoolean(!this->value);
+Pulsar::Primitive* Pulsar::PBoolean::unaryNot() {
+    return new PBoolean(!this->value);
 }
 
-std::any Pulsar::PBoolean::plus(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PBoolean::plus(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PBoolean::minus(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PBoolean::minus(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PBoolean::times(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PBoolean::times(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PBoolean::div(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PBoolean::div(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PBoolean::rem(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PBoolean::rem(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PBoolean::compareGreater(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PBoolean::compareGreater(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PBoolean::compareLesser(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PBoolean::compareLesser(Primitive* primitive) {
+    return new PNone();
 }
 
 std::string Pulsar::PBoolean::toString() {

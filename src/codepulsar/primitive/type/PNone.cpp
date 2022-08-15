@@ -13,43 +13,43 @@ bool Pulsar::PNone::isPrimitiveType(PrimitiveType primitiveType) {
 }
 
 std::any Pulsar::PNone::getPrimitiveValue() {
-    return PNone();
+    return new PNone();
 }
 
-std::any Pulsar::PNone::unaryNegate() {
-    return PNone();
+Pulsar::Primitive* Pulsar::PNone::unaryNegate() {
+    return new PNone();
 }
 
-std::any Pulsar::PNone::unaryNot() {
-    return PNone();
+Pulsar::Primitive* Pulsar::PNone::unaryNot() {
+    return new PNone();
 }
 
-std::any Pulsar::PNone::plus(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PNone::plus(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PNone::minus(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PNone::minus(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PNone::times(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PNone::times(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PNone::div(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PNone::div(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PNone::rem(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PNone::rem(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PNone::compareGreater(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PNone::compareGreater(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PNone::compareLesser(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PNone::compareLesser(Primitive* primitive) {
+    return new PNone();
 }
 
 std::string Pulsar::PNone::toString() {

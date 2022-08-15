@@ -7,9 +7,9 @@
 namespace Pulsar {
     class GlobalVariable {
         public:
-            GlobalVariable(std::any value, PrimitiveType type, bool isInitialized, bool isConstant);
+            GlobalVariable(Primitive* value, PrimitiveType type, bool isInitialized, bool isConstant);
 
-            std::any getValue();
+            Primitive* getValue();
             PrimitiveType getType();
 
             bool isConstant();
@@ -17,7 +17,7 @@ namespace Pulsar {
             void setInitialized();
 
         private:
-            std::any value;
+            Primitive* value;
             PrimitiveType type;
 
             bool initialized;

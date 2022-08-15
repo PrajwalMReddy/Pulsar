@@ -9,7 +9,7 @@ Pulsar::SymbolTable::SymbolTable() {
     this->localVariables = std::vector<LocalVariable>();
 }
 
-std::any Pulsar::SymbolTable::getGlobalValue(std::string name) {
+Pulsar::Primitive* Pulsar::SymbolTable::getGlobalValue(std::string name) {
     return this->globalVariables.find(name)->second.getValue();
 }
 
@@ -29,11 +29,11 @@ void Pulsar::SymbolTable::setGlobalInitialized(std::string name) {
     this->globalVariables.find(name)->second.setInitialized();
 }
 
-void Pulsar::SymbolTable::addGlobalVariable(std::string name, std::any value, Pulsar::PrimitiveType type, bool isInitialized, bool isConstant) {
+void Pulsar::SymbolTable::addGlobalVariable(std::string name, Primitive* value, Pulsar::PrimitiveType type, bool isInitialized, bool isConstant) {
     this->globalVariables.insert({ name, GlobalVariable(value, type, isInitialized, isConstant) });
 }
 
-void Pulsar::SymbolTable::reassignGlobalVariable(std::string name, std::any value) {
+void Pulsar::SymbolTable::reassignGlobalVariable(std::string name, Primitive* value) {
     GlobalVariable variable = this->globalVariables.find(name)->second;
     this->globalVariables.insert_or_assign(name, GlobalVariable(value, variable.getType(), true, variable.isConstant()));
 }

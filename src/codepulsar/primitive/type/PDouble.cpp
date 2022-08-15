@@ -17,40 +17,40 @@ std::any Pulsar::PDouble::getPrimitiveValue() {
     return this->value;
 }
 
-std::any Pulsar::PDouble::unaryNegate() {
-    return PDouble(-this->value);
+Pulsar::Primitive* Pulsar::PDouble::unaryNegate() {
+    return new PDouble(-this->value);
 }
 
-std::any Pulsar::PDouble::unaryNot() {
-    return PNone();
+Pulsar::Primitive* Pulsar::PDouble::unaryNot() {
+    return new PNone();
 }
 
-std::any Pulsar::PDouble::plus(std::any primitive) {
-    return PDouble(this->value + std::any_cast<PDouble>(primitive).value);
+Pulsar::Primitive* Pulsar::PDouble::plus(Primitive* primitive) {
+    return new PDouble(this->value + std::any_cast<double>(primitive->getPrimitiveValue()));
 }
 
-std::any Pulsar::PDouble::minus(std::any primitive) {
-    return PDouble(this->value - std::any_cast<PDouble>(primitive).value);
+Pulsar::Primitive* Pulsar::PDouble::minus(Primitive* primitive) {
+    return new PDouble(this->value - std::any_cast<double>(primitive->getPrimitiveValue()));
 }
 
-std::any Pulsar::PDouble::times(std::any primitive) {
-    return PDouble(this->value * std::any_cast<PDouble>(primitive).value);
+Pulsar::Primitive* Pulsar::PDouble::times(Primitive* primitive) {
+    return new PDouble(this->value * std::any_cast<double>(primitive->getPrimitiveValue()));
 }
 
-std::any Pulsar::PDouble::div(std::any primitive) {
-    return PDouble(this->value / std::any_cast<PDouble>(primitive).value);
+Pulsar::Primitive* Pulsar::PDouble::div(Primitive* primitive) {
+    return new PDouble(this->value / std::any_cast<double>(primitive->getPrimitiveValue()));
 }
 
-std::any Pulsar::PDouble::rem(std::any primitive) {
-    return PDouble(std::fmod(this->value, std::any_cast<PDouble>(primitive).value));
+Pulsar::Primitive* Pulsar::PDouble::rem(Primitive* primitive) {
+    return new PDouble(std::fmod(this->value, std::any_cast<double>(primitive->getPrimitiveValue())));
 }
 
-std::any Pulsar::PDouble::compareGreater(std::any primitive) {
-    return PDouble(this->value > std::any_cast<PDouble>(primitive).value);
+Pulsar::Primitive* Pulsar::PDouble::compareGreater(Primitive* primitive) {
+    return new PDouble(this->value > std::any_cast<double>(primitive->getPrimitiveValue()));
 }
 
-std::any Pulsar::PDouble::compareLesser(std::any primitive) {
-    return PDouble(this->value < std::any_cast<PDouble>(primitive).value);
+Pulsar::Primitive* Pulsar::PDouble::compareLesser(Primitive* primitive) {
+    return new PDouble(this->value < std::any_cast<double>(primitive->getPrimitiveValue()));
 }
 
 std::string Pulsar::PDouble::toString() {

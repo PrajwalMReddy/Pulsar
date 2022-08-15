@@ -1,14 +1,14 @@
 #include "GlobalVariable.h"
 
 
-Pulsar::GlobalVariable::GlobalVariable(std::any value, Pulsar::PrimitiveType type, bool initialized, bool constant) {
+Pulsar::GlobalVariable::GlobalVariable(Primitive* value, Pulsar::PrimitiveType type, bool initialized, bool constant) {
     this->value = value;
     this->type = type;
     this->initialized = initialized;
     this->constant = constant;
 }
 
-std::any Pulsar::GlobalVariable::getValue() {
+Pulsar::Primitive* Pulsar::GlobalVariable::getValue() {
     return this->value;
 }
 

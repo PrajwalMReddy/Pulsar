@@ -14,17 +14,17 @@ namespace Pulsar {
             virtual bool isPrimitiveType(PrimitiveType primitiveType) = 0;
             virtual std::any getPrimitiveValue() = 0;
 
-            virtual std::any unaryNegate() = 0;
-            virtual std::any unaryNot() = 0;
+            virtual Primitive* unaryNegate() = 0;
+            virtual Primitive* unaryNot() = 0;
 
-            virtual std::any plus(std::any primitive) = 0;
-            virtual std::any minus(std::any primitive) = 0;
-            virtual std::any times(std::any primitive) = 0;
-            virtual std::any div(std::any primitive) = 0;
-            virtual std::any rem(std::any primitive) = 0;
+            virtual Primitive* plus(Primitive* primitive) = 0;
+            virtual Primitive* minus(Primitive* primitive) = 0;
+            virtual Primitive* times(Primitive* primitive) = 0;
+            virtual Primitive* div(Primitive* primitive) = 0;
+            virtual Primitive* rem(Primitive* primitive) = 0;
 
-            virtual std::any compareGreater(std::any primitive) = 0;
-            virtual std::any compareLesser(std::any primitive) = 0;
+            virtual Primitive* compareGreater(Primitive* primitive) = 0;
+            virtual Primitive* compareLesser(Primitive* primitive) = 0;
 
             virtual std::string toString() = 0;
     };

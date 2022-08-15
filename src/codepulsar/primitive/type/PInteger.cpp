@@ -17,40 +17,40 @@ std::any Pulsar::PInteger::getPrimitiveValue() {
     return this->value;
 }
 
-std::any Pulsar::PInteger::unaryNegate() {
-    return PInteger(-this->value);
+Pulsar::Primitive* Pulsar::PInteger::unaryNegate() {
+    return new PInteger(-this->value);
 }
 
-std::any Pulsar::PInteger::unaryNot() {
-    return PNone();
+Pulsar::Primitive* Pulsar::PInteger::unaryNot() {
+    return new PNone();
 }
 
-std::any Pulsar::PInteger::plus(std::any primitive) {
-    return PInteger(this->value + std::any_cast<PInteger>(primitive).value);
+Pulsar::Primitive* Pulsar::PInteger::plus(Primitive* primitive) {
+    return new PInteger(this->value + std::any_cast<int>(primitive->getPrimitiveValue()));
 }
 
-std::any Pulsar::PInteger::minus(std::any primitive) {
-    return PInteger(this->value - std::any_cast<PInteger>(primitive).value);
+Pulsar::Primitive* Pulsar::PInteger::minus(Primitive* primitive) {
+    return new PInteger(this->value - std::any_cast<int>(primitive->getPrimitiveValue()));
 }
 
-std::any Pulsar::PInteger::times(std::any primitive) {
-    return PInteger(this->value * std::any_cast<PInteger>(primitive).value);
+Pulsar::Primitive* Pulsar::PInteger::times(Primitive* primitive) {
+    return new PInteger(this->value * std::any_cast<int>(primitive->getPrimitiveValue()));
 }
 
-std::any Pulsar::PInteger::div(std::any primitive) {
-    return PInteger(this->value / std::any_cast<PInteger>(primitive).value);
+Pulsar::Primitive* Pulsar::PInteger::div(Primitive* primitive) {
+    return new PInteger(this->value / std::any_cast<int>(primitive->getPrimitiveValue()));
 }
 
-std::any Pulsar::PInteger::rem(std::any primitive) {
-    return PInteger(this->value % std::any_cast<PInteger>(primitive).value);
+Pulsar::Primitive* Pulsar::PInteger::rem(Primitive* primitive) {
+    return new PInteger(this->value % std::any_cast<int>(primitive->getPrimitiveValue()));
 }
 
-std::any Pulsar::PInteger::compareGreater(std::any primitive) {
-    return PInteger(this->value > std::any_cast<PInteger>(primitive).value);
+Pulsar::Primitive* Pulsar::PInteger::compareGreater(Primitive* primitive) {
+    return new PInteger(this->value > std::any_cast<int>(primitive->getPrimitiveValue()));
 }
 
-std::any Pulsar::PInteger::compareLesser(std::any primitive) {
-    return PInteger(this->value < std::any_cast<PInteger>(primitive).value);
+Pulsar::Primitive* Pulsar::PInteger::compareLesser(Primitive* primitive) {
+    return new PInteger(this->value < std::any_cast<int>(primitive->getPrimitiveValue()));
 }
 
 std::string Pulsar::PInteger::toString() {

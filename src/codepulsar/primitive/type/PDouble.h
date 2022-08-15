@@ -16,17 +16,17 @@ namespace Pulsar {
             bool isPrimitiveType(PrimitiveType primitiveType) override;
             std::any getPrimitiveValue() override;
 
-            std::any unaryNegate() override;
-            std::any unaryNot() override;
+            Primitive* unaryNegate() override;
+            Primitive* unaryNot() override;
 
-            std::any plus(std::any primitive) override;
-            std::any minus(std::any primitive) override;
-            std::any times(std::any primitive) override;
-            std::any div(std::any primitive) override;
-            std::any rem(std::any primitive) override;
+            Primitive* plus(Primitive* primitive) override;
+            Primitive* minus(Primitive* primitive) override;
+            Primitive* times(Primitive* primitive) override;
+            Primitive* div(Primitive* primitive) override;
+            Primitive* rem(Primitive* primitive) override;
 
-            std::any compareGreater(std::any primitive) override;
-            std::any compareLesser(std::any primitive) override;
+            Primitive* compareGreater(Primitive* primitive) override;
+            Primitive* compareLesser(Primitive* primitive) override;
 
             std::string toString() override;
 

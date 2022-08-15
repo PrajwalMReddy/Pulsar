@@ -17,40 +17,40 @@ std::any Pulsar::PCharacter::getPrimitiveValue() {
     return this->value;
 }
 
-std::any Pulsar::PCharacter::unaryNegate() {
-    return PNone();
+Pulsar::Primitive* Pulsar::PCharacter::unaryNegate() {
+    return new PNone();
 }
 
-std::any Pulsar::PCharacter::unaryNot() {
-    return PCharacter(!this->value);
+Pulsar::Primitive* Pulsar::PCharacter::unaryNot() {
+    return new PNone();
 }
 
-std::any Pulsar::PCharacter::plus(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PCharacter::plus(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PCharacter::minus(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PCharacter::minus(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PCharacter::times(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PCharacter::times(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PCharacter::div(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PCharacter::div(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PCharacter::rem(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PCharacter::rem(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PCharacter::compareGreater(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PCharacter::compareGreater(Primitive* primitive) {
+    return new PNone();
 }
 
-std::any Pulsar::PCharacter::compareLesser(std::any primitive) {
-    return PNone();
+Pulsar::Primitive* Pulsar::PCharacter::compareLesser(Primitive* primitive) {
+    return new PNone();
 }
 
 std::string Pulsar::PCharacter::toString() {
