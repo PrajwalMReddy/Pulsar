@@ -1,7 +1,7 @@
 #include "Disassembler.h"
 
 
-Pulsar::Disassembler::Disassembler(std::vector<Instruction> instructions, Pulsar::SymbolTable* symbolTable, std::vector<Value> values) {
+Pulsar::Disassembler::Disassembler(std::vector<Instruction> instructions, Pulsar::SymbolTable* symbolTable, std::vector<Primitive*> values) {
     this->instructions = instructions;
     this->symbolTable = symbolTable;
     this->values = values;
@@ -109,17 +109,7 @@ void Pulsar::Disassembler::opcodeType(Pulsar::Instruction instruction) {
 void Pulsar::Disassembler::operandType(Pulsar::Instruction instruction) {
     if (instruction.getOpcode() == OP_CONSTANT) {
         int operandInt = std::any_cast<int>(instruction.getOperand());
-        std::cout << opcodeToString(OP_CONSTANT) << spaces(instruction) << operandInt;
-
-        if (this->values[operandInt].getType() == PR_INTEGER) {
-            std::cout << "  (" << std::any_cast<PInteger>(this->values[operandInt].getValue()).toString() << ")" << std::endl;
-        } else if (std::any_cast<Value>(instruction.getOperand()).getType() == PR_DOUBLE) {
-            std::cout << "  (" << std::any_cast<PDouble>(this->values[operandInt].getValue()).toString() << ")" << std::endl;
-        } else if (std::any_cast<Value>(instruction.getOperand()).getType() == PR_CHARACTER) {
-            std::cout << "  (" << std::any_cast<PCharacter>(this->values[operandInt].getValue()).toString() << ")" << std::endl;
-        } else if (std::any_cast<Value>(instruction.getOperand()).getType() == PR_BOOLEAN) {
-            std::cout << "  (" << std::any_cast<PBoolean>(this->values[operandInt].getValue()).toString() << ")" << std::endl;
-        }
+        std::cout << opcodeToString(OP_CONSTANT) << spaces(instruction) << operandInt << " (" << this->values[operandInt]->toString() << ")" << std::endl;
     } else if (instruction.getOpcode() == OP_JUMP || instruction.getOpcode() == OP_JUMP_IF_TRUE || instruction.getOpcode() == OP_JUMP_IF_FALSE) {
         std::cout << opcodeToString(instruction.getOpcode()) << spaces(instruction) << std::any_cast<int>(instruction.getOperand()) << std::endl;
     } else if (instruction.getOpcode() == OP_NEW_GLOBAL || instruction.getOpcode() == OP_STORE_GLOBAL || instruction.getOpcode() == OP_LOAD_GLOBAL) {

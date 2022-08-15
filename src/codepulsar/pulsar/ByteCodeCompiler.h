@@ -10,11 +10,11 @@
 #include "../analysis/Validator.h"
 #include "../variable/SymbolTable.h"
 #include "../lang/Instruction.h"
+#include "../primitive/Primitive.h"
 #include "../primitive/type/PInteger.h"
 #include "../primitive/type/PDouble.h"
 #include "../primitive/type/PCharacter.h"
 #include "../primitive/type/PBoolean.h"
-#include "../primitive/Value.h"
 
 
 namespace Pulsar {
@@ -24,7 +24,7 @@ namespace Pulsar {
 
             std::vector<Instruction> compileByteCode();
             SymbolTable* getSymbolTable();
-            std::vector<Value> getValues();
+            std::vector<Primitive*> getValues();
             CompilerError* getErrors();
 
             // Expression AST Visitors
@@ -54,7 +54,7 @@ namespace Pulsar {
             SymbolTable* symbolTable;
 
             // Processing Data
-            std::vector<Value> values;
+            std::vector<Primitive*> values;
 
             // Output Data
             std::vector<Instruction> instructions;

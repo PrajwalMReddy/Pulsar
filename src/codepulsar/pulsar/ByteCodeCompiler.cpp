@@ -4,7 +4,7 @@
 Pulsar::ByteCodeCompiler::ByteCodeCompiler(std::string sourceCode) {
     this->sourceCode = sourceCode;
 
-    this->values = std::vector<Value>();
+    this->values = std::vector<Primitive*>();
     this->instructions = std::vector<Instruction>();
 }
 
@@ -73,7 +73,7 @@ std::any Pulsar::ByteCodeCompiler::visitLiteralExpression(Literal* expression) {
 std::any Pulsar::ByteCodeCompiler::visitLogicalExpression(Logical* expression) {
     expression->getLeft()->accept(*this);
     int line = expression->getLine();
-    ByteCode jumpType;
+    ByteCode jumpType = OP_JUMP;
 
     if (expression->getOperator() == "&&") { jumpType = OP_JUMP_IF_FALSE; }
     else if (expression->getOperator() == "||") { jumpType = OP_JUMP_IF_TRUE; }
@@ -180,13 +180,13 @@ std::any Pulsar::ByteCodeCompiler::visitWhileStatement(While* statement) {
 
 Pulsar::Instruction Pulsar::ByteCodeCompiler::makeConstant(std::string value, PrimitiveType type, int line) {
     if (type == PR_INTEGER) {
-        this->values.emplace_back(Value(PInteger(std::stoi(value)), type));
+        this->values.emplace_back(new PInteger(std::stoi(value)));
     } else if (type == PR_DOUBLE) {
-        this->values.emplace_back(Value(PDouble(std::stod(value)), type));
+        this->values.emplace_back(new PDouble(std::stod(value)));
     } if (type == PR_CHARACTER) {
-        this->values.emplace_back(Value(PCharacter(value[1]), type));
+        this->values.emplace_back(new PCharacter(value[1]));
     } if (type == PR_BOOLEAN) {
-        this->values.emplace_back(Value(PBoolean(value == "true"), type));
+        this->values.emplace_back(new PBoolean(value == "true"));
     }
 
     return makeOpCode(OP_CONSTANT, (int) (this->values.size() - 1), line);
@@ -254,7 +254,7 @@ Pulsar::SymbolTable* Pulsar::ByteCodeCompiler::getSymbolTable() {
     return this->symbolTable;
 }
 
-std::vector<Pulsar::Value> Pulsar::ByteCodeCompiler::getValues() {
+std::vector<Pulsar::Primitive*> Pulsar::ByteCodeCompiler::getValues() {
     return this->values;
 }
 

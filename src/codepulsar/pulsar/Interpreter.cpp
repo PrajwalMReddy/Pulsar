@@ -3,7 +3,7 @@
 
 Pulsar::Interpreter::Interpreter(std::string sourceCode) {
     this->sourceCode = sourceCode;
-    this->stack = std::vector<std::any>(STACK_MAX);
+    this->stack = std::vector<Primitive*>(STACK_MAX);
 
     this->sp = 0;
     this->ip = 0;
@@ -72,16 +72,16 @@ void Pulsar::Interpreter::execute() {
     }
 }
 
-void Pulsar::Interpreter::push(std::any value) {
+void Pulsar::Interpreter::push(Primitive* value) {
     if (this->sp > STACK_MAX) runtimeError("A Stack Overflow Has Occurred");
 
     this->stack[this->sp] = value;
     this->sp++;
 }
 
-Pulsar::Value Pulsar::Interpreter::pop() {
+Pulsar::Primitive* Pulsar::Interpreter::pop() {
     this->sp--;
-    return std::any_cast<Value>(this->stack[this->sp]);
+    return this->stack[this->sp];
 }
 
 void Pulsar::Interpreter::runtimeError(std::string message) {

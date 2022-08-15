@@ -6,7 +6,6 @@
 #include "ByteCodeCompiler.h"
 #include "../util/ErrorReporter.h"
 #include "../util/Disassembler.h"
-#include "../primitive/Value.h"
 
 
 namespace Pulsar {
@@ -22,14 +21,14 @@ namespace Pulsar {
 
             // Processing Data
             SymbolTable* symbolTable;
-            std::vector<Value> values;
+            std::vector<Primitive*> values;
 
             // Output Data
             CompilerError* errors;
 
             // Other Necessary Data
             const int STACK_MAX = 1024;
-            std::vector<std::any> stack;
+            std::vector<Primitive*> stack;
 
             int sp;
             int ip;
@@ -37,8 +36,8 @@ namespace Pulsar {
             // Functions
             void execute();
 
-            void push(std::any value);
-            Value pop();
+            void push(Primitive* value);
+            Primitive* pop();
 
             void runtimeError(std::string message);
     };

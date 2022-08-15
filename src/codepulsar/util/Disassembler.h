@@ -6,7 +6,6 @@
 #include "../lang/Instruction.h"
 #include "../variable/SymbolTable.h"
 #include "../pulsar/Pulsar.h"
-#include "../primitive/Value.h"
 #include "../primitive/type/PInteger.h"
 #include "../primitive/type/PDouble.h"
 #include "../primitive/type/PCharacter.h"
@@ -16,7 +15,7 @@
 namespace Pulsar {
     class Disassembler {
         public:
-            Disassembler(std::vector<Instruction> instructions, SymbolTable* symbolTable, std::vector<Value> values);
+            Disassembler(std::vector<Instruction> instructions, SymbolTable* symbolTable, std::vector<Primitive*> values);
             void disassemble();
 
             static std::string opcodeToString(ByteCode byteCode);
@@ -25,7 +24,7 @@ namespace Pulsar {
             // Input Data
             std::vector<Instruction> instructions;
             SymbolTable* symbolTable;
-            std::vector<Value> values;
+            std::vector<Primitive*> values;
 
             // Functions
             void displayInstructions();
