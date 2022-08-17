@@ -117,6 +117,7 @@ std::any Pulsar::ByteCodeCompiler::visitExpressionStatement(ExpressionStmt* stat
 
 // TODO
 std::any Pulsar::ByteCodeCompiler::visitFunctionStatement(Function* statement) {
+    statement->getStatements()->accept(*this); // TODO Temporary Code
 }
 
 std::any Pulsar::ByteCodeCompiler::visitIfStatement(If* statement) {

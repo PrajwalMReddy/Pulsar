@@ -36,6 +36,12 @@ namespace Pulsar {
             // Functions
             void execute();
 
+            void unaryOperation(ByteCode code);
+            void binaryOperation(ByteCode code);
+            void compareOperation(ByteCode code);
+            void conditionalJump(ByteCode code, Instruction instruction);
+            void loadGlobal(Instruction instruction);
+
             void push(Primitive* value);
             Primitive* pop();
 
