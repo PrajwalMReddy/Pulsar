@@ -215,7 +215,7 @@ Pulsar::Expression* Pulsar::Parser::assignment() {
     Token variable = peek();
     if (peekNext().tokenType == TK_EQUAL) {
         advance(); advance();
-        return new Assignment(variable.literal, expression(), resolveLocal(variable), isInGlobalScope(), peekLine());
+        return new Assignment(variable.literal, expression(), resolveLocal(variable), resolveLocal(variable) == -1, peekLine());
     } else if (peekNext().tokenType == TK_PLUS_EQUAL || peekNext().tokenType == TK_MINUS_EQUAL || peekNext().tokenType == TK_MUL_EQUAL || peekNext().tokenType == TK_DIV_EQUAL || peekNext().tokenType == TK_MOD_EQUAL) {
         std::string identifier = variable.literal;
         int line = variable.line;
@@ -226,7 +226,7 @@ Pulsar::Expression* Pulsar::Parser::assignment() {
         Expression *expr = expression();
 
         // Expanding The Syntactic Sugar Into A Normal Assignment
-        return new Assignment(identifier, new Binary(new VariableExpr(identifier, resolveLocal(variable), isInGlobalScope(), line), operatorType.substr(0, 1), expr, line), resolveLocal(variable), isInGlobalScope(), line);
+        return new Assignment(identifier, new Binary(new VariableExpr(identifier, resolveLocal(variable), resolveLocal(variable) == -1, line), operatorType.substr(0, 1), expr, line), resolveLocal(variable), resolveLocal(variable) == -1, line);
     } else {
         return logicalOr();
     }
@@ -354,7 +354,7 @@ Pulsar::Expression* Pulsar::Parser::primary() {
 
     if (match({ TK_IDENTIFIER })) {
         Token name = advance();
-        return new VariableExpr(name.literal, resolveLocal(name), isInGlobalScope(), peekLine());
+        return new VariableExpr(name.literal, resolveLocal(name), resolveLocal(name) == -1, peekLine());
     }
 
     if (matchAdvance({ TK_LPAR })) {

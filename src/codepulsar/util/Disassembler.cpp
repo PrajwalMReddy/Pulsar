@@ -112,7 +112,9 @@ void Pulsar::Disassembler::operandType(Pulsar::Instruction instruction) {
         std::cout << opcodeToString(OP_CONSTANT) << spaces(instruction) << operandInt << " (" << this->values[operandInt]->toString() << ")" << std::endl;
     } else if (instruction.getOpcode() == OP_JUMP || instruction.getOpcode() == OP_JUMP_IF_TRUE || instruction.getOpcode() == OP_JUMP_IF_FALSE) {
         std::cout << opcodeToString(instruction.getOpcode()) << spaces(instruction) << std::any_cast<int>(instruction.getOperand()) << std::endl;
-    } else if (instruction.getOpcode() == OP_NEW_GLOBAL || instruction.getOpcode() == OP_STORE_GLOBAL || instruction.getOpcode() == OP_LOAD_GLOBAL) {
+    } else if (instruction.getOpcode() == OP_STORE_GLOBAL || instruction.getOpcode() == OP_LOAD_GLOBAL) {
+        std::cout << opcodeToString(instruction.getOpcode()) << spaces(instruction) << std::any_cast<std::string>(instruction.getOperand()) << std::endl;
+    } else if (instruction.getOpcode() == OP_NEW_GLOBAL) {
         std::cout << opcodeToString(instruction.getOpcode()) << spaces(instruction) << std::any_cast<Token>(instruction.getOperand()).literal << std::endl;
     } else if (instruction.getOpcode() == OP_SET_LOCAL || instruction.getOpcode() == OP_GET_LOCAL) {
         std::cout << opcodeToString(instruction.getOpcode()) << spaces(instruction) << std::any_cast<int>(instruction.getOperand()) << std::endl;

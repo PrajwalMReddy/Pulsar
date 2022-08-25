@@ -46,11 +46,11 @@ Pulsar::Primitive* Pulsar::PDouble::rem(Primitive* primitive) {
 }
 
 Pulsar::Primitive* Pulsar::PDouble::compareGreater(Primitive* primitive) {
-    return new PDouble(this->value > std::any_cast<double>(primitive->getPrimitiveValue()));
+    return new PBoolean(this->value > std::any_cast<double>(primitive->getPrimitiveValue()));
 }
 
 Pulsar::Primitive* Pulsar::PDouble::compareLesser(Primitive* primitive) {
-    return new PDouble(this->value < std::any_cast<double>(primitive->getPrimitiveValue()));
+    return new PBoolean(this->value < std::any_cast<double>(primitive->getPrimitiveValue()));
 }
 
 std::string Pulsar::PDouble::toString() {

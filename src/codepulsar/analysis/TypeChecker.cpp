@@ -65,8 +65,8 @@ std::any Pulsar::TypeChecker::visitLiteralExpression(Literal* expression) {
 }
 
 std::any Pulsar::TypeChecker::visitLogicalExpression(Logical* expression) {
-    PrimitiveType a = std::any_cast<PrimitiveType>(expression->getLeft()->accept(*this));
-    PrimitiveType b = std::any_cast<PrimitiveType>(expression->getRight()->accept(*this));
+    auto a = std::any_cast<PrimitiveType>(expression->getLeft()->accept(*this));
+    auto b = std::any_cast<PrimitiveType>(expression->getRight()->accept(*this));
 
     if (!isOfType(a, { PR_BOOLEAN }) || !isOfType(b, { PR_BOOLEAN })) {
         newError("Logical Operation Has Non Boolean Operand(s)", expression->getLine());
@@ -77,7 +77,7 @@ std::any Pulsar::TypeChecker::visitLogicalExpression(Logical* expression) {
 }
 
 std::any Pulsar::TypeChecker::visitUnaryExpression(Unary* expression) {
-    PrimitiveType a = std::any_cast<PrimitiveType>(expression->getExpression()->accept(*this));
+    auto a = std::any_cast<PrimitiveType>(expression->getExpression()->accept(*this));
 
     if (isOperation(expression->getOperator(), { "!" }) && !isOfType(a, { PR_BOOLEAN })) {
         newError("Unary Not Operation Has Non Boolean Operand", expression->getLine());
@@ -107,7 +107,7 @@ std::any Pulsar::TypeChecker::visitBlockStatement(Block* statement) {
 }
 
 std::any Pulsar::TypeChecker::visitExpressionStatement(ExpressionStmt* statement) {
-    statement->accept(*this);
+    statement->getExpression()->accept(*this);
     return nullptr;
 }
 

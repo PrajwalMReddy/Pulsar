@@ -46,11 +46,11 @@ Pulsar::Primitive* Pulsar::PInteger::rem(Primitive* primitive) {
 }
 
 Pulsar::Primitive* Pulsar::PInteger::compareGreater(Primitive* primitive) {
-    return new PInteger(this->value > std::any_cast<int>(primitive->getPrimitiveValue()));
+    return new PBoolean(this->value > std::any_cast<int>(primitive->getPrimitiveValue()));
 }
 
 Pulsar::Primitive* Pulsar::PInteger::compareLesser(Primitive* primitive) {
-    return new PInteger(this->value < std::any_cast<int>(primitive->getPrimitiveValue()));
+    return new PBoolean(this->value < std::any_cast<int>(primitive->getPrimitiveValue()));
 }
 
 std::string Pulsar::PInteger::toString() {

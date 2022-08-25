@@ -3,6 +3,7 @@
 
 #include "../Primitive.h"
 #include "PNone.h"
+#include "PBoolean.h"
 
 
 namespace Pulsar {
