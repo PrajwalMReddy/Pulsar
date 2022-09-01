@@ -53,5 +53,5 @@ Pulsar::Primitive* Pulsar::PNone::compareLesser(Primitive* primitive) {
 }
 
 std::string Pulsar::PNone::toString() {
-    return "null";
+    return "¯\\_(ツ)_/¯";
 }
