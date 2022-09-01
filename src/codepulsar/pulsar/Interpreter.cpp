@@ -33,7 +33,7 @@ void Pulsar::Interpreter::execute() {
             case OP_CONSTANT: push(this->values[std::any_cast<int>(instruction.getOperand())]); break;
 
             case OP_NEGATE: unaryOperation(OP_NEGATE); break;
-            case OP_NOT:unaryOperation(OP_NOT); break;
+            case OP_NOT: unaryOperation(OP_NOT); break;
 
             case OP_ADD: binaryOperation(OP_ADD); break;
             case OP_SUBTRACT: binaryOperation(OP_SUBTRACT); break;
@@ -46,16 +46,17 @@ void Pulsar::Interpreter::execute() {
             case OP_COMPARE_LESSER: compareOperation(OP_COMPARE_LESSER); break;
 
             case OP_NEW_GLOBAL: {
-                auto name = std::any_cast<Token>(instruction.getOperand()).literal;
-                Primitive* primitive = pop();
-                this->symbolTable->reassignGlobalVariable(name, primitive);
+                auto newName = std::any_cast<Token>(instruction.getOperand()).literal;
+                Primitive* newPrimitive = pop();
+                this->symbolTable->reassignGlobalVariable(newName, newPrimitive);
                 break;
             }
             case OP_LOAD_GLOBAL: loadGlobal(instruction); break;
             case OP_STORE_GLOBAL: {
-                auto name = std::any_cast<std::string>(instruction.getOperand());
-                Primitive* primitive = pop();
-                this->symbolTable->reassignGlobalVariable(name, primitive);
+                auto storeName = std::any_cast<std::string>(instruction.getOperand());
+                Primitive* storePrimitive = pop();
+                this->symbolTable->reassignGlobalVariable(storeName, storePrimitive);
+                push(storePrimitive);
                 break;
             }
 
@@ -148,6 +149,8 @@ void Pulsar::Interpreter::push(Primitive* value) {
 }
 
 Pulsar::Primitive* Pulsar::Interpreter::pop() {
+    if (this->sp <= 0) runtimeError("A Stack Underflow Has Occurred");
+
     this->sp--;
     return this->stack[this->sp];
 }

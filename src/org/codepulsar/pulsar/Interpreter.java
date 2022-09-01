@@ -169,6 +169,7 @@ public class Interpreter {
                 default -> runtimeError("Unhandled ByteCode Instruction: " + instruction.getOpcode());
             }
 
+            debugStack(10);
             this.ip++;
         }
     }

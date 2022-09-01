@@ -73,7 +73,7 @@ std::any Pulsar::ByteCodeCompiler::visitLiteralExpression(Literal* expression) {
 std::any Pulsar::ByteCodeCompiler::visitLogicalExpression(Logical* expression) {
     expression->getLeft()->accept(*this);
     int line = expression->getLine();
-    ByteCode jumpType = OP_JUMP;
+    ByteCode jumpType;
 
     if (expression->getOperator() == "&&") { jumpType = OP_JUMP_IF_FALSE; }
     else if (expression->getOperator() == "||") { jumpType = OP_JUMP_IF_TRUE; }
