@@ -11,12 +11,18 @@
 #include "LocalVariable.h"
 #include "../lang/Token.h"
 #include "../primitive/Primitive.h"
+#include "FunctionVariable.h"
 
 
 namespace Pulsar {
     class SymbolTable {
         public:
             SymbolTable();
+
+            // Function Variable Core Functions
+            void addFunction(std::string name, Function functionNode, int arity, PrimitiveType returnType);
+            void setChunk(std::string name, std::vector<Instruction> chunk);
+            std::map<std::string, FunctionVariable> getVariables();
 
             // Global Variable Core Functions
             Primitive* getGlobalValue(std::string name);
@@ -53,6 +59,7 @@ namespace Pulsar {
             int scopeDepth;
             int localCount;
 
+            std::map<std::string, FunctionVariable> functionVariable;
             std::map<std::string, GlobalVariable> globalVariables;
             std::vector<LocalVariable> localVariables;
     };

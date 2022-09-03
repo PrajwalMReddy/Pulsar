@@ -9,6 +9,18 @@ Pulsar::SymbolTable::SymbolTable() {
     this->localVariables = std::vector<LocalVariable>();
 }
 
+void Pulsar::SymbolTable::addFunction(std::string name, Function functionNode, int arity, PrimitiveType returnType) {
+    this->functionVariable.insert({name, FunctionVariable(functionNode, arity, returnType)});
+}
+
+void Pulsar::SymbolTable::setChunk(std::string name, std::vector<Instruction> chunk) {
+    this->functionVariable.find(name)->second.setChunk(chunk);
+}
+
+std::map<std::string, Pulsar::FunctionVariable> Pulsar::SymbolTable::getVariables() {
+    return this->functionVariable;
+}
+
 Pulsar::Primitive* Pulsar::SymbolTable::getGlobalValue(std::string name) {
     return this->globalVariables.find(name)->second.getValue();
 }
