@@ -3,7 +3,7 @@
 This is the directory that holds the core code required for the Pulsar compiler and virtual machine.
 
 ## pulsar
-This holds all the source code directly involved in the compiler pipeline.
+This holds all the source code directly involved in the compiler pipeline. This includes the main function (located in Pulsar.cpp).
 
 ## lang
 This holds code that isn't directly a part of the compilation pipeline but is nevertheless very important for the compiler.

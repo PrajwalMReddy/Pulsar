@@ -16,6 +16,7 @@ namespace Pulsar {
         private:
             static void reportErrors(CompilerError* errors, std::string sourceCode);
             static std::vector<std::string> splitString(std::string string);
+            static std::string trimString(std::string string);
     };
 }
 

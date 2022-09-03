@@ -108,6 +108,10 @@ Pulsar::Statement* Pulsar::Parser::variableDeclaration(TokenType accessType) {
     int line = peekLine();
     Token identifier = advance();
 
+    if (identifier.tokenType != TK_IDENTIFIER) {
+        newError("Variable Names Should Be Identifiers", peekLine());
+    }
+
     look(TK_COLON, "Unexpected Token '" + peekLiteral() + "' After Variable Name");
     PrimitiveType type = checkType(advance());
 

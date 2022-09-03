@@ -54,5 +54,5 @@ Pulsar::Primitive* Pulsar::PBoolean::compareLesser(Primitive* primitive) {
 }
 
 std::string Pulsar::PBoolean::toString() {
-    return std::to_string(this->value);
+    return this->value ? "true" : "false";
 }

@@ -16,7 +16,7 @@ void Pulsar::ErrorReporter::reportErrors(CompilerError *errors, std::string sour
 
         std::cout << error.getErrorType() << " | ";
         std::cout << error.getMessage() << std::endl;
-        std::cout << "Line " << error.getLine() << ": " << lines[error.getLine() - 1] << "\n" << std::endl;
+        std::cout << "Line " << error.getLine() << ": " << trimString(lines[error.getLine() - 1]) << "\n" << std::endl;
     }
 
     exit(1);
@@ -35,4 +35,17 @@ std::vector<std::string> Pulsar::ErrorReporter::splitString(std::string sourceCo
     }
 
     return lines;
+}
+
+std::string Pulsar::ErrorReporter::trimString(std::string string) {
+    int startIndex = 0;
+
+    for (int i = 0; i < string.size(); i++) {
+        if (string[i] != ' ' && string[i] != '\t') {
+            startIndex = i;
+            break;
+        }
+    }
+
+    return string.substr(startIndex, string.size());
 }
