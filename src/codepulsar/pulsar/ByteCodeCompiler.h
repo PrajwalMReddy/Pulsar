@@ -57,7 +57,7 @@ namespace Pulsar {
             std::vector<Primitive*> values;
 
             // Output Data
-            std::vector<Instruction> instructions;
+            std::vector<Instruction> currentChunk;
             CompilerError* errors;
 
             // Core Functions

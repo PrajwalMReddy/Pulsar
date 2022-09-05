@@ -5,7 +5,7 @@ Pulsar::ByteCodeCompiler::ByteCodeCompiler(std::string sourceCode) {
     this->sourceCode = sourceCode;
 
     this->values = std::vector<Primitive*>();
-    this->instructions = std::vector<Instruction>();
+    this->currentChunk = std::vector<Instruction>();
 }
 
 std::vector<Pulsar::Instruction> Pulsar::ByteCodeCompiler::compileByteCode() {
@@ -14,21 +14,21 @@ std::vector<Pulsar::Instruction> Pulsar::ByteCodeCompiler::compileByteCode() {
     this->symbolTable = parser.getSymbolTable();
 
     this->errors = parser.getErrors();
-    if (this->errors->hasError()) return this->instructions;
+    if (this->errors->hasError()) return this->currentChunk;
 
     ASTPrinter astPrinter = ASTPrinter();
     astPrinter.print(this->program);
 
     Validator validator = Validator(this->program, this->symbolTable, this->errors);
     validator.validate();
-    if (this->errors->hasError()) return this->instructions;
+    if (this->errors->hasError()) return this->currentChunk;
 
     TypeChecker checker = TypeChecker(this->program, this->symbolTable, this->errors);
     checker.check();
-    if (this->errors->hasError()) return this->instructions;
+    if (this->errors->hasError()) return this->currentChunk;
 
     compile();
-    return this->instructions;
+    return this->symbolTable->getFunctions().find("main")->second.getChunk();
 }
 
 void Pulsar::ByteCodeCompiler::compile() {
@@ -57,8 +57,14 @@ std::any Pulsar::ByteCodeCompiler::visitBinaryExpression(Binary* expression) {
     return nullptr;
 }
 
-// TODO
 std::any Pulsar::ByteCodeCompiler::visitCallExpression(Call* expression) {
+    makeOpCode(OP_LOAD_FUNCTION, expression->getName().literal, expression->getLine());
+    for (Expression* expr: *expression->getArguments()) {
+        expr->accept(*this);
+    }
+
+    makeOpCode(OP_CALL, expression->getArity(), expression->getLine());
+    return nullptr;
 }
 
 std::any Pulsar::ByteCodeCompiler::visitGroupingExpression(Grouping* expression) {
@@ -115,9 +121,10 @@ std::any Pulsar::ByteCodeCompiler::visitExpressionStatement(ExpressionStmt* stat
     return nullptr;
 }
 
-// TODO
 std::any Pulsar::ByteCodeCompiler::visitFunctionStatement(Function* statement) {
-    statement->getStatements()->accept(*this); // TODO Temporary Code
+    statement->getStatements()->accept(*this);
+    this->symbolTable->setChunk(statement->getName(), this->currentChunk);
+    this->currentChunk = std::vector<Instruction>();
 }
 
 std::any Pulsar::ByteCodeCompiler::visitIfStatement(If* statement) {
@@ -164,7 +171,7 @@ std::any Pulsar::ByteCodeCompiler::visitVariableStatement(VariableDecl* statemen
 }
 
 std::any Pulsar::ByteCodeCompiler::visitWhileStatement(While* statement) {
-    int start = this->instructions.size();
+    int start = this->currentChunk.size();
     statement->getCondition()->accept(*this);
 
     int offset = makeJump(OP_JUMP_IF_FALSE, statement->getLine());
@@ -199,21 +206,21 @@ Pulsar::Instruction Pulsar::ByteCodeCompiler::makeOpCode(ByteCode opcode, int li
 
 Pulsar::Instruction Pulsar::ByteCodeCompiler::makeOpCode(ByteCode opcode, std::any operand, int line) {
     Instruction instruction = Instruction(opcode, operand, line);
-    this->instructions.push_back(instruction);
+    this->currentChunk.push_back(instruction);
     return instruction;
 }
 
 int Pulsar::ByteCodeCompiler::makeJump(ByteCode opcode, int line) {
-    int size = this->instructions.size();
+    int size = this->currentChunk.size();
     makeOpCode(opcode, line);
     return size;
 }
 
 void Pulsar::ByteCodeCompiler::fixJump(ByteCode opcode, int offset) {
-    Instruction oldJump = this->instructions[offset];
+    Instruction oldJump = this->currentChunk[offset];
     int line = oldJump.getLine();
-    Instruction jumpOpCode = Instruction(opcode, (int) this->instructions.size(), line);
-    this->instructions.at(offset) = jumpOpCode;
+    Instruction jumpOpCode = Instruction(opcode, (int) this->currentChunk.size(), line);
+    this->currentChunk.at(offset) = jumpOpCode;
 }
 
 Pulsar::ByteCode Pulsar::ByteCodeCompiler::identifyUnaryOperator(std::string oper) {

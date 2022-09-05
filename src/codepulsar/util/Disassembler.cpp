@@ -12,6 +12,7 @@ void Pulsar::Disassembler::disassemble() {
 
     std::cout << "\n-- Disassembled Bytecode --" << std::endl;
     displayInstructions();
+    std::cout << std::endl;
 }
 
 void Pulsar::Disassembler::displayInstructions() {
@@ -120,6 +121,10 @@ void Pulsar::Disassembler::operandType(Pulsar::Instruction instruction) {
         std::cout << opcodeToString(instruction.getOpcode()) << spaces(instruction) << std::any_cast<int>(instruction.getOperand()) << std::endl;
     } else if (instruction.getOpcode() == OP_NEW_LOCAL) {
         std::cout << opcodeToString(instruction.getOpcode()) << spaces(instruction) << std::any_cast<Token>(instruction.getOperand()).literal << std::endl;
+    } else if (instruction.getOpcode() == OP_CALL) {
+        std::cout << opcodeToString(instruction.getOpcode()) << spaces(instruction) << std::any_cast<int>(instruction.getOperand()) << std::endl;
+    } else if (instruction.getOpcode() == OP_LOAD_FUNCTION) {
+        std::cout << opcodeToString(instruction.getOpcode()) << spaces(instruction) << std::any_cast<std::string>(instruction.getOperand()) << std::endl;
     }
 }
 

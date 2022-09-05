@@ -68,10 +68,9 @@ void Pulsar::Interpreter::execute() {
             case OP_JUMP_IF_TRUE: conditionalJump(OP_JUMP_IF_TRUE, instruction); break;
             case OP_JUMP_IF_FALSE: conditionalJump(OP_JUMP_IF_FALSE, instruction); break;
 
-            // TODO
-            // case OP_LOAD_FUNCTION: break;
-            // case OP_CALL: break;
-            // case OP_RETURN: break;
+            case OP_LOAD_FUNCTION: break;
+            case OP_CALL: break;
+            case OP_RETURN: break;
 
             case OP_PRINT: std::cout << pop()->toString() << std::endl; break;
             case OP_POP: pop(); break;
