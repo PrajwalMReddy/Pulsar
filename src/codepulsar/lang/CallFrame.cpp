@@ -1,7 +1,7 @@
 #include "CallFrame.h"
 
 
-Pulsar::CallFrame::CallFrame(std::string caller, int returnIP, Pulsar::FunctionVariable function, int stackOffset) : function(function) {
+Pulsar::CallFrame::CallFrame(std::string caller, int returnIP, Pulsar::FunctionVariable* function, int stackOffset) : function(function) {
     this->caller = caller;
     this->returnIP = returnIP;
     this->function = function;

@@ -6,6 +6,8 @@
 #include "ByteCodeCompiler.h"
 #include "../util/ErrorReporter.h"
 #include "../util/Disassembler.h"
+#include "../lang/CallFrame.h"
+#include "../primitive/type/PFunction.h"
 
 
 namespace Pulsar {
@@ -18,6 +20,7 @@ namespace Pulsar {
             // Input Data
             std::string sourceCode;
             std::vector<Instruction> instructions;
+            std::string currentFunction;
 
             // Processing Data
             SymbolTable* symbolTable;
@@ -27,13 +30,20 @@ namespace Pulsar {
             CompilerError* errors;
 
             // Other Necessary Data
-            const int STACK_MAX = 1024;
+            CallFrame* currentFrame;
+            int callFrameCount;
+
+            std::vector<CallFrame*> callFrames;
             std::vector<Primitive*> stack;
+
+            const int FRAMES_MAX = 64;
+            const int STACK_MAX = FRAMES_MAX * 1024;
 
             int sp;
             int ip;
 
             // Functions
+            void setUp();
             void execute();
 
             void unaryOperation(ByteCode code);
@@ -41,6 +51,9 @@ namespace Pulsar {
             void compareOperation(ByteCode code);
             void conditionalJump(ByteCode code, Instruction instruction);
             void loadGlobal(Instruction instruction);
+
+            void callFunction(Instruction instruction);
+            void returnFunction();
 
             void push(Primitive* value);
             Primitive* pop();

@@ -3,7 +3,11 @@
 
 Pulsar::Interpreter::Interpreter(std::string sourceCode) {
     this->sourceCode = sourceCode;
-    this->stack = std::vector<Primitive*>(STACK_MAX);
+    this->callFrameCount = 0;
+    this->currentFrame = nullptr;
+
+    this->callFrames = std::vector<CallFrame*>();
+    this->stack = std::vector<Primitive*>();
 
     this->sp = 0;
     this->ip = 0;
@@ -19,9 +23,21 @@ void Pulsar::Interpreter::interpret() {
     this->errors = bcc.getErrors();
     ErrorReporter::report(this->errors, this->sourceCode);
 
-    Disassembler disassembler = Disassembler(this->instructions, this->symbolTable, this->values);
+    Disassembler disassembler = Disassembler(this->symbolTable, this->values);
     disassembler.disassemble();
 
+    setUp();
+}
+
+void Pulsar::Interpreter::setUp() {
+    this->instructions = this->symbolTable->getFunctions().find("main")->second.getChunk();
+    this->currentFunction = "main";
+
+    this->currentFrame = new CallFrame("main", 0, nullptr, 1);
+    this->callFrames[this->callFrameCount] = this->currentFrame;
+    this->callFrameCount++;
+
+    push(new PFunction("main"));
     execute();
 }
 
@@ -68,9 +84,9 @@ void Pulsar::Interpreter::execute() {
             case OP_JUMP_IF_TRUE: conditionalJump(OP_JUMP_IF_TRUE, instruction); break;
             case OP_JUMP_IF_FALSE: conditionalJump(OP_JUMP_IF_FALSE, instruction); break;
 
-            case OP_LOAD_FUNCTION: break;
-            case OP_CALL: break;
-            case OP_RETURN: break;
+            case OP_LOAD_FUNCTION: push(new PFunction(std::any_cast<std::string>(instruction.getOperand()))); break;
+            case OP_CALL: callFunction(instruction); break;
+            case OP_RETURN: returnFunction(); break;
 
             case OP_PRINT: std::cout << pop()->toString() << std::endl; break;
             case OP_POP: pop(); break;
@@ -138,6 +154,44 @@ void Pulsar::Interpreter::conditionalJump(ByteCode code, Instruction instruction
 void Pulsar::Interpreter::loadGlobal(Instruction instruction) {
     auto variableName = std::any_cast<std::string>(instruction.getOperand());
     push(this->symbolTable->getGlobalValue(variableName));
+}
+
+void Pulsar::Interpreter::callFunction(Instruction instruction) {
+    int nameOffset = this->sp - std::any_cast<int>(instruction.getOperand()) - 1;
+    std::string functionName = this->stack[nameOffset]->toString();
+    FunctionVariable function = this->symbolTable->getFunctions().find(functionName)->second;
+
+    int stackOffset = this->sp - std::any_cast<int>(instruction.getOperand());
+    CallFrame* frame = new CallFrame(this->currentFunction, this->ip, &function, stackOffset);
+    this->currentFrame = frame;
+
+    if (this->callFrameCount == FRAMES_MAX) {
+        runtimeError("A Stack Overflow Has Occurred");
+    }
+
+    this->callFrames[this->callFrameCount] = frame;
+    this->callFrameCount++;
+
+    this->currentFunction = functionName;
+    this->instructions = function.getChunk();
+    this->ip = -1;
+}
+
+void Pulsar::Interpreter::returnFunction() {
+    Primitive* returnValue = pop();
+    CallFrame* current = this->currentFrame;
+    std::string caller = current->getCaller();
+    FunctionVariable function = this->symbolTable->getFunctions().find(caller)->second;
+
+    this->currentFunction = caller;
+    this->callFrameCount--;
+
+    this->currentFrame = this->callFrames[this->callFrameCount];
+    this->instructions = function.getChunk();
+
+    this->ip = current->getReturnIP();
+    this->sp -= (current->getStackOffset() - 1);
+    push(returnValue);
 }
 
 void Pulsar::Interpreter::push(Primitive* value) {

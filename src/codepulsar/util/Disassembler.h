@@ -15,7 +15,7 @@
 namespace Pulsar {
     class Disassembler {
         public:
-            Disassembler(std::vector<Instruction> instructions, SymbolTable* symbolTable, std::vector<Primitive*> values);
+            Disassembler(SymbolTable* symbolTable, std::vector<Primitive*> values);
             void disassemble();
 
             static std::string opcodeToString(ByteCode byteCode);

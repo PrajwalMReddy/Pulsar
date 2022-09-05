@@ -9,7 +9,7 @@
 namespace Pulsar {
     class CallFrame {
         public:
-            CallFrame(std::string caller, int returnIP, Pulsar::FunctionVariable function, int stackOffset);
+            CallFrame(std::string caller, int returnIP, Pulsar::FunctionVariable* function, int stackOffset);
 
             std::string getCaller();
             int getReturnIP();
@@ -19,7 +19,7 @@ namespace Pulsar {
             std::string caller;
             int returnIP;
 
-            FunctionVariable function;
+            FunctionVariable* function;
             int stackOffset;
     };
 }

@@ -1,8 +1,7 @@
 #include "Disassembler.h"
 
 
-Pulsar::Disassembler::Disassembler(std::vector<Instruction> instructions, Pulsar::SymbolTable* symbolTable, std::vector<Primitive*> values) {
-    this->instructions = instructions;
+Pulsar::Disassembler::Disassembler(Pulsar::SymbolTable* symbolTable, std::vector<Primitive*> values) {
     this->symbolTable = symbolTable;
     this->values = values;
 }
@@ -16,19 +15,23 @@ void Pulsar::Disassembler::disassemble() {
 }
 
 void Pulsar::Disassembler::displayInstructions() {
-    int line = 0;
-    int count = 0;
+    for (auto& [name, function]: this->symbolTable->getFunctions()) {
+        int line = 0;
+        int count = 0;
+        this->instructions = function.getChunk();
 
-    for (Instruction instruction: this->instructions) {
-        if (instruction.getLine() == line) {
-            std::cout << "            " << count << "  | ";
-        } else {
-            line = instruction.getLine();
-            std::cout << "\n" << line << spaces(line) << count << "  | ";
+        std::cout << std::endl << "Disassembly Of Function " + name << std::endl;
+        for (Instruction instruction: this->instructions) {
+            if (instruction.getLine() == line) {
+                std::cout << "            " << count << "  | ";
+            } else {
+                line = instruction.getLine();
+                std::cout << "\n" << line << spaces(line) << count << "  | ";
+            }
+
+            decideInstructionType(instruction);
+            count++;
         }
-
-        decideInstructionType(instruction);
-        count++;
     }
 }
 

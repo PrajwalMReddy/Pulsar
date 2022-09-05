@@ -15,6 +15,6 @@ void Pulsar::Compiler::init() {
     this->errors = bcc.getErrors();
     ErrorReporter::report(this->errors, this->sourceCode);
 
-    Disassembler disassembler = Disassembler(this->instructions, this->symbolTable, this->values);
+    Disassembler disassembler = Disassembler(this->symbolTable, this->values);
     disassembler.disassemble();
 }
