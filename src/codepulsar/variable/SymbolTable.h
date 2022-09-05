@@ -22,7 +22,7 @@ namespace Pulsar {
             // Function Variable Core Functions
             void addFunction(std::string name, Function functionNode, int arity, PrimitiveType returnType);
             void setChunk(std::string name, std::vector<Instruction> chunk);
-            std::map<std::string, FunctionVariable> getVariables();
+            std::map<std::string, FunctionVariable> getFunctions();
 
             // Global Variable Core Functions
             Primitive* getGlobalValue(std::string name);

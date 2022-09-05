@@ -17,7 +17,7 @@ void Pulsar::SymbolTable::setChunk(std::string name, std::vector<Instruction> ch
     this->functionVariable.find(name)->second.setChunk(chunk);
 }
 
-std::map<std::string, Pulsar::FunctionVariable> Pulsar::SymbolTable::getVariables() {
+std::map<std::string, Pulsar::FunctionVariable> Pulsar::SymbolTable::getFunctions() {
     return this->functionVariable;
 }
 

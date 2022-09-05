@@ -51,9 +51,20 @@ std::any Pulsar::TypeChecker::visitBinaryExpression(Binary* expression) {
     }
 }
 
-// TODO
 std::any Pulsar::TypeChecker::visitCallExpression(Call* expression) {
-    return PR_ERROR;
+    FunctionVariable function = this->symbolTable->getFunctions().find(expression->getName().literal)->second;
+    std::vector<Parameter*>* parameters = function.getFunctionNode().getParameters();
+
+    for (int i = 0; i < expression->getArity(); i++) {
+        PrimitiveType exprType = std::any_cast<PrimitiveType>(expression->getArguments()->at(i)->accept(*this));
+        PrimitiveType paramType = parameters->at(i)->getType();
+
+        if (exprType != paramType) {
+            newError("Invalid Argument Type Passed To Function " + expression->getName().literal, expression->getLine());
+        }
+    }
+
+    return function.getReturnType();
 }
 
 std::any Pulsar::TypeChecker::visitGroupingExpression(Grouping* expression) {
@@ -135,9 +146,19 @@ std::any Pulsar::TypeChecker::visitPrintStatement(Print* statement) {
     return nullptr;
 }
 
-// TODO
 std::any Pulsar::TypeChecker::visitReturnStatement(Return* statement) {
-    if (statement->hasValue()) statement->getValue()->accept(*this);
+    FunctionVariable function = this->symbolTable->getFunctions().find(statement->getFunction())->second;
+
+    if (statement->hasValue()) {
+        PrimitiveType returnType = std::any_cast<PrimitiveType>(statement->getValue()->accept(*this));
+
+        if (function.getReturnType() != returnType) {
+            newError("Invalid Return Type Found", statement->getLine());
+        } else if (function.getReturnType() != PR_VOID) {
+            newError("A Return Value Was Expected But None Given", statement->getLine());
+        }
+    }
+
     return nullptr;
 }
 

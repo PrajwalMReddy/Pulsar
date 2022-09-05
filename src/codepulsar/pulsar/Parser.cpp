@@ -7,6 +7,8 @@ Pulsar::Parser::Parser(std::string sourceCode) {
 
     this->current = 0;
     this->scopeDepth = 0;
+
+    this->currentFunction = "";
 }
 
 Pulsar::Statement* Pulsar::Parser::parse() {
@@ -52,22 +54,29 @@ Pulsar::Statement* Pulsar::Parser::declaration() {
 Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
     int line = peekLine();
     std::string functionName = advance().literal;
+    this->currentFunction = functionName;
 
     look(TK_LPAR, "An Opening Parenthesis Was Expected Before The Parameter List");
     auto* parameters = new std::vector<Parameter*>;
 
+    int arity = 0;
     if (peekType() != TK_RPAR) {
         do {
-            std::string parameterName = advance().literal;
-            Token type = {TK_ERROR, "", line};
+            Token parameter = advance();
+            PrimitiveType type = PR_ERROR;
 
             if (!matchAdvance({ TK_COLON })) {
                 newError("A Colon Was Expected After The Variable Name", peekLine());
             } else {
-                type = advance();
+                if (!match({ TK_INT_TYPE, TK_DOUBLE_TYPE, TK_CHAR_TYPE, TK_BOOLEAN_TYPE })) {
+                    newError("A Datatype Was Expected For The Function's Parameters", peekLine());
+                }
+                type = checkType(advance());
             }
 
-            parameters->push_back(new Parameter(parameterName, checkType(type)));
+            arity++;
+            this->symbolTable->newLocal(parameter.literal, type, true, false, this->scopeDepth + 1);
+            parameters->push_back(new Parameter(parameter.literal, type));
         } while (matchAdvance({ TK_COMMA }));
     }
 
@@ -76,7 +85,14 @@ Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
 
     PrimitiveType type = checkType(advance());
     Block* statements = block();
-    return new Function(functionName, type, parameters, statements, line);
+
+    if (this->symbolTable->getFunctions().contains(functionName)) {
+        newError("Function '" + functionName + "' Already Exists", line);
+    }
+
+    auto* functionNode = new Function(functionName, type, parameters, statements, line);
+    this->symbolTable->addFunction(functionName, *functionNode, arity, type);
+    return functionNode;
 }
 
 Pulsar::Statement* Pulsar::Parser::statement() {
@@ -194,9 +210,9 @@ Pulsar::Statement* Pulsar::Parser::printStatement() {
 Pulsar::Statement* Pulsar::Parser::returnStatement() {
     Return* statement;
     if (match({ TK_SEMICOLON })) {
-        statement = new Return(nullptr, peekLine());
+        statement = new Return(nullptr, this->currentFunction, peekLine());
     } else {
-        statement = new Return(expression(), peekLine());
+        statement = new Return(expression(), this->currentFunction, peekLine());
     }
 
     look(TK_SEMICOLON, "A Semicolon Was Expected After The Return Statement");

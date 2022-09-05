@@ -42,6 +42,8 @@ namespace Pulsar {
             SymbolTable* symbolTable;
             CompilerError* errors;
 
+            void generalValidation();
+
             void newError(std::string message, int line);
             CompilerError* getErrors();
     };

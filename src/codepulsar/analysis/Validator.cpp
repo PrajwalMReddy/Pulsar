@@ -9,7 +9,17 @@ Pulsar::Validator::Validator(Statement* program, SymbolTable* symbolTable, Compi
 
 void Pulsar::Validator::validate() {
     if (this->program == nullptr) return;
+
+    generalValidation();
     this->program->accept(*this);
+}
+
+void Pulsar::Validator::generalValidation() {
+    int line = 1;
+
+    if (this->symbolTable->getFunctions().find("main") == this->symbolTable->getFunctions().end()) {
+        newError("The Main Function Was Not Found", line);
+    }
 }
 
 std::any Pulsar::Validator::visitAssignmentExpression(Assignment* expression) {
@@ -29,8 +39,14 @@ std::any Pulsar::Validator::visitBinaryExpression(Binary* expression) {
     return nullptr;
 }
 
-// TODO
 std::any Pulsar::Validator::visitCallExpression(Call* expression) {
+    if (this->symbolTable->getFunctions().find(expression->getName().literal) == this->symbolTable->getFunctions().end()) {
+        newError("Function '" + expression->getName().literal + "' Was Not Found", expression->getLine());
+    } else if (this->symbolTable->getFunctions().find(expression->getName().literal)->second.getArity() != expression->getArity()) {
+        newError("Function '" + expression->getName().literal + "' Expects " + std::to_string(this->symbolTable->getFunctions().find(expression->getName().literal)->second.getArity()) + " Argument(s); "
+                + std::to_string(expression->getArity()) + " Provided", expression->getLine());
+    }
+
     return nullptr;
 }
 

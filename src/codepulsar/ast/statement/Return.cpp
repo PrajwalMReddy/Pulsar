@@ -1,8 +1,9 @@
 #include "Return.h"
 
 
-Pulsar::Return::Return(Expression* value, int line) {
+Pulsar::Return::Return(Expression* value, std::string function, int line) {
     this->value = value;
+    this->function = function;
     this->line = line;
 }
 
@@ -16,6 +17,10 @@ bool Pulsar::Return::hasValue() {
 
 Pulsar::Expression* Pulsar::Return::getValue() {
     return this->value;
+}
+
+std::string Pulsar::Return::getFunction() {
+    return this->function;
 }
 
 int Pulsar::Return::getLine() {
