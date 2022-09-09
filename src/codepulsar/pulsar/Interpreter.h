@@ -58,6 +58,7 @@ namespace Pulsar {
             void push(Primitive* value);
             Primitive* pop();
 
+            void debugStack(int till);
             void runtimeError(std::string message);
     };
 }

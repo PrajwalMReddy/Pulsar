@@ -151,12 +151,11 @@ std::any Pulsar::TypeChecker::visitReturnStatement(Return* statement) {
 
     if (statement->hasValue()) {
         PrimitiveType returnType = std::any_cast<PrimitiveType>(statement->getValue()->accept(*this));
-
         if (function.getReturnType() != returnType) {
             newError("Invalid Return Type Found", statement->getLine());
-        } else if (function.getReturnType() != PR_VOID) {
-            newError("A Return Value Was Expected But None Given", statement->getLine());
         }
+    } else if (function.getReturnType() != PR_VOID) {
+        newError("A Return Value Was Expected But None Given", statement->getLine());
     }
 
     return nullptr;

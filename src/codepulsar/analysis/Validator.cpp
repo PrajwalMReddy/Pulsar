@@ -19,6 +19,9 @@ void Pulsar::Validator::generalValidation() {
 
     if (this->symbolTable->getFunctions().find("main") == this->symbolTable->getFunctions().end()) {
         newError("The Main Function Was Not Found", line);
+    } else if (this->symbolTable->getFunctions().find("main")->second.getFunctionNode().getParameters()->size() != 0) {
+        // TODO Temporary Restriction
+        newError("The Main Function Cannot Take Parameters", this->symbolTable->getFunctions().find("main")->second.getFunctionNode().getLine());
     }
 }
 

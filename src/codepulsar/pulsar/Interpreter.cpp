@@ -30,11 +30,10 @@ void Pulsar::Interpreter::interpret() {
 }
 
 void Pulsar::Interpreter::setUp() {
-    this->instructions = this->symbolTable->getFunctions().find("main")->second.getChunk();
     this->currentFunction = "main";
 
     this->currentFrame = new CallFrame("main", 0, nullptr, 1);
-    this->callFrames[this->callFrameCount] = this->currentFrame;
+    this->callFrames.push_back(this->currentFrame);
     this->callFrameCount++;
 
     push(new PFunction("main"));
@@ -77,8 +76,16 @@ void Pulsar::Interpreter::execute() {
             }
 
             case OP_NEW_LOCAL: break;
-            case OP_GET_LOCAL: push(this->stack[std::any_cast<int>(instruction.getOperand())]); break;
-            case OP_SET_LOCAL: this->stack[std::any_cast<int>(instruction.getOperand())] = this->stack[this->sp - 1]; break;
+            case OP_GET_LOCAL: {
+                int slot = std::any_cast<int>(instruction.getOperand()) + this->currentFrame->getStackOffset();
+                push(this->stack[slot]);
+                break;
+            }
+            case OP_SET_LOCAL: {
+                int slot = std::any_cast<int>(instruction.getOperand()) + this->currentFrame->getStackOffset();
+                this->stack[slot] = this->stack[this->sp - 1];
+                break;
+            }
 
             case OP_JUMP: this->ip = std::any_cast<int>(instruction.getOperand()) - 1; break;
             case OP_JUMP_IF_TRUE: conditionalJump(OP_JUMP_IF_TRUE, instruction); break;
@@ -169,7 +176,7 @@ void Pulsar::Interpreter::callFunction(Instruction instruction) {
         runtimeError("A Stack Overflow Has Occurred");
     }
 
-    this->callFrames[this->callFrameCount] = frame;
+    this->callFrames.push_back(frame);
     this->callFrameCount++;
 
     this->currentFunction = functionName;
@@ -197,7 +204,7 @@ void Pulsar::Interpreter::returnFunction() {
 void Pulsar::Interpreter::push(Primitive* value) {
     if (this->sp > STACK_MAX) runtimeError("A Stack Overflow Has Occurred");
 
-    this->stack[this->sp] = value;
+    this->stack.insert(this->stack.begin() + this->sp, value);
     this->sp++;
 }
 
@@ -206,6 +213,14 @@ Pulsar::Primitive* Pulsar::Interpreter::pop() {
 
     this->sp--;
     return this->stack[this->sp];
+}
+
+void Pulsar::Interpreter::debugStack(int till) {
+    for (int i = 0; i < till; i++) {
+        std::cout << this->stack[i]->toString() << " | ";
+    }
+
+    std::cout << std::endl;
 }
 
 void Pulsar::Interpreter::runtimeError(std::string message) {

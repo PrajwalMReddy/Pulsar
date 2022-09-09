@@ -174,6 +174,7 @@ Pulsar::Block* Pulsar::Parser::block() {
 
 void Pulsar::Parser::endScope() {
     this->scopeDepth--;
+    this->symbolTable->decrementDepth();
 }
 
 Pulsar::Statement* Pulsar::Parser::ifStatement() {
