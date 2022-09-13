@@ -141,8 +141,20 @@ std::any Pulsar::TypeChecker::visitIfStatement(If* statement) {
     return nullptr;
 }
 
+std::any Pulsar::TypeChecker::visitNoneStatement(NoneStmt* statement) {
+    return nullptr;
+}
+
 std::any Pulsar::TypeChecker::visitPrintStatement(Print* statement) {
     statement->getExpression()->accept(*this);
+    return nullptr;
+}
+
+std::any Pulsar::TypeChecker::visitProgramStatement(Program* statement) {
+    for (Statement* stmt: *statement->getStatements()) {
+        stmt->accept(*this);
+    }
+
     return nullptr;
 }
 

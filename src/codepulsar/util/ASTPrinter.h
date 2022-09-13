@@ -29,7 +29,9 @@ namespace Pulsar {
             std::any visitExpressionStatement(ExpressionStmt* statement) override;
             std::any visitFunctionStatement(Function* statement) override;
             std::any visitIfStatement(If* statement) override;
+            std::any visitNoneStatement(NoneStmt* statement) override;
             std::any visitPrintStatement(Print* statement) override;
+            std::any visitProgramStatement(Program* statement) override;
             std::any visitReturnStatement(Return* statement) override;
             std::any visitVariableStatement(VariableDecl* statement) override;
             std::any visitWhileStatement(While* statement) override;

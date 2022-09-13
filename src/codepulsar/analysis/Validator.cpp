@@ -125,8 +125,20 @@ std::any Pulsar::Validator::visitIfStatement(If* statement) {
     return nullptr;
 }
 
+std::any Pulsar::Validator::visitNoneStatement(NoneStmt* statement) {
+    return nullptr;
+}
+
 std::any Pulsar::Validator::visitPrintStatement(Print* statement) {
     statement->getExpression()->accept(*this);
+    return nullptr;
+}
+
+std::any Pulsar::Validator::visitProgramStatement(Program* statement) {
+    for (Statement* stmt: *statement->getStatements()) {
+        stmt->accept(*this);
+    }
+
     return nullptr;
 }
 

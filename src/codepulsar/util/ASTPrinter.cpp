@@ -119,8 +119,20 @@ std::any Pulsar::ASTPrinter::visitIfStatement(If* statement) {
     return str;
 }
 
+std::any Pulsar::ASTPrinter::visitNoneStatement(NoneStmt* statement) {
+    return "";
+}
+
 std::any Pulsar::ASTPrinter::visitPrintStatement(Print* statement) {
     return "Print(" + std::any_cast<std::string>(statement->getExpression()->accept(*this)) + ")\n";
+}
+
+std::any Pulsar::ASTPrinter::visitProgramStatement(Program* statement) {
+    std::string str;
+    str += giveTabs() + "Program(\n";
+    str += blockStatement(new Block(statement->getStatements(), 0));
+    str += "\n" + giveTabs() + ")";
+    return str;
 }
 
 std::any Pulsar::ASTPrinter::visitReturnStatement(Return* statement) {

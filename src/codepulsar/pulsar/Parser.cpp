@@ -19,24 +19,25 @@ Pulsar::Statement* Pulsar::Parser::parse() {
     if (this->errors->hasError()) return this->program;
     Pulsar::TokenDisassembler::display(this->tokens);
 
-    // TODO Temporary Code To Allow More Than One Top Level Declaration
+    this->program = programNode();
+    return this->program;
+}
 
-    int line = peekLine();
+Pulsar::Statement* Pulsar::Parser::programNode() {
     auto* statements = new std::vector<Statement*>;
 
     while (!match({ TK_EOF })) {
         statements->push_back(declarationStatement());
     }
 
-    this->program = new Block(statements, line);
-    return this->program;
+    return new Program(statements);
 }
 
 Pulsar::Statement* Pulsar::Parser::declarationStatement() {
     Statement* decl = declaration();
     if (decl != nullptr) return decl;
     newError("Only Declarations Are Allowed At The Top Level", peekLine());
-    return nullptr;
+    return new NoneStmt();
 }
 
 Pulsar::Statement* Pulsar::Parser::declaration() {

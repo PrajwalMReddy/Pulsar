@@ -19,14 +19,16 @@
 #include "../ast/expression/Assignment.h"
 
 #include "../ast/Statement.h"
+#include "../ast/other/Program.h"
 #include "../ast/statement/ExpressionStmt.h"
-#include "../ast/statement/Block.h"
+#include "../ast/other/Block.h"
 #include "../ast/statement/If.h"
 #include "../ast/statement/Print.h"
 #include "../ast/statement/While.h"
 #include "../ast/declaration/VariableDecl.h"
 #include "../ast/statement/Return.h"
 #include "../ast/declaration/Function.h"
+#include "../ast/other/NoneStmt.h"
 
 
 namespace Pulsar {
@@ -56,6 +58,7 @@ namespace Pulsar {
             // ---- AST Parsing Functions ---- //
 
             // Statement Nodes
+            Statement* programNode();
             Statement* declarationStatement();
             Statement* declaration();
             Statement* functionDeclaration();

@@ -145,9 +145,21 @@ std::any Pulsar::ByteCodeCompiler::visitIfStatement(If* statement) {
     return nullptr;
 }
 
+std::any Pulsar::ByteCodeCompiler::visitNoneStatement(NoneStmt* statement) {
+    return nullptr;
+}
+
 std::any Pulsar::ByteCodeCompiler::visitPrintStatement(Print* statement) {
     statement->getExpression()->accept(*this);
     makeOpCode(OP_PRINT, statement->getLine());
+    return nullptr;
+}
+
+std::any Pulsar::ByteCodeCompiler::visitProgramStatement(Program* statement) {
+    for (Statement* stmt: *statement->getStatements()) {
+        stmt->accept(*this);
+    }
+
     return nullptr;
 }
 
