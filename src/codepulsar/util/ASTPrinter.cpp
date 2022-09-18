@@ -136,11 +136,13 @@ std::any Pulsar::ASTPrinter::visitProgramStatement(Program* statement) {
 }
 
 std::any Pulsar::ASTPrinter::visitReturnStatement(Return* statement) {
+    std::string str;
     if (statement->hasValue()) {
-        return "Return(" + std::any_cast<std::string>(statement->getValue()->accept(*this)) + ")\n";
+        str = "Return(" + std::any_cast<std::string>(statement->getValue()->accept(*this)) + ")\n";
     } else {
-        return "Return()\n";
+        str = "Return()\n";
     }
+    return str;
 }
 
 std::any Pulsar::ASTPrinter::visitVariableStatement(VariableDecl* statement) {

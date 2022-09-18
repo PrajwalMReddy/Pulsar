@@ -16,7 +16,7 @@ void Pulsar::ErrorReporter::reportErrors(CompilerError *errors, std::string sour
 
         std::cout << error.getErrorType() << " | ";
         std::cout << error.getMessage() << std::endl;
-        std::cout << "Line " << error.getLine() << ": " << trimString(lines[error.getLine() - 1]) << "\n" << std::endl;
+        std::cout << "Line " << error.getLine() << ": " << (((int) lines.size() > 0) ? trimString(lines[error.getLine() - 1]) : "") << "\n" << std::endl;
     }
 
     exit(1);

@@ -17,7 +17,7 @@ void Pulsar::Validator::validate() {
 void Pulsar::Validator::generalValidation() {
     int line = 1;
 
-    if (this->symbolTable->getFunctions().find("main") == this->symbolTable->getFunctions().end()) {
+    if (this->symbolTable->getFunctions().count("main") == 0) {
         newError("The Main Function Was Not Found", line);
     } else if (this->symbolTable->getFunctions().find("main")->second.getFunctionNode().getParameters()->size() != 0) {
         // TODO Temporary Restriction
@@ -43,7 +43,7 @@ std::any Pulsar::Validator::visitBinaryExpression(Binary* expression) {
 }
 
 std::any Pulsar::Validator::visitCallExpression(Call* expression) {
-    if (this->symbolTable->getFunctions().find(expression->getName().literal) == this->symbolTable->getFunctions().end()) {
+    if (this->symbolTable->getFunctions().count(expression->getName().literal) == 0) {
         newError("Function '" + expression->getName().literal + "' Was Not Found", expression->getLine());
     } else if (this->symbolTable->getFunctions().find(expression->getName().literal)->second.getArity() != expression->getArity()) {
         newError("Function '" + expression->getName().literal + "' Expects " + std::to_string(this->symbolTable->getFunctions().find(expression->getName().literal)->second.getArity()) + " Argument(s); "

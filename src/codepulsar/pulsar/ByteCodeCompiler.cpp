@@ -125,6 +125,7 @@ std::any Pulsar::ByteCodeCompiler::visitFunctionStatement(Function* statement) {
     statement->getStatements()->accept(*this);
     this->symbolTable->setChunk(statement->getName(), this->currentChunk);
     this->currentChunk = std::vector<Instruction>();
+    return nullptr;
 }
 
 std::any Pulsar::ByteCodeCompiler::visitIfStatement(If* statement) {

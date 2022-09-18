@@ -4,7 +4,6 @@
 Pulsar::Interpreter::Interpreter(std::string sourceCode) {
     this->sourceCode = sourceCode;
     this->callFrameCount = 0;
-    this->currentFrame = nullptr;
 
     this->callFrames = std::vector<CallFrame*>();
     this->stack = std::vector<Primitive*>();
