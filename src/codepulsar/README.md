@@ -9,7 +9,7 @@ This holds all the source code directly involved in the compiler pipeline. This 
 This holds code that isn't directly a part of the compilation pipeline but is nevertheless very important for the compiler.
 
 ## ast
-This holds all the Abstract Syntax Tree nodes that are used while parsing. There are three child directories: one for the expression nodes, and two for the statement nodes.
+This holds all the Abstract Syntax Tree nodes that are used while parsing. There are four child directories: one for the expression nodes, two for statement nodes, and one for other miscellaneous nodes.
 
 ## variable
 This subdirectory holds all files required for handling variables, including functions, classes, and enums.

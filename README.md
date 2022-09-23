@@ -16,12 +16,20 @@ As of now, the following features are working:
 - Global Variables
 - If/Else Statements
 - While Loops
+- User Defined Functions
 
 ## TODO
 The following things are currently being worked upon:
-- User Defined Functions
 - Bytecode/AST Optimizations
 - A Standard Library
 - A Working Compiler
+
+## Learning Pulsar
+
+Read the Syntax Guide in [doc/syntax.md](doc/syntax.md).
+
+## Contributing
+
+Read the Contributor's Guide in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Current Version: 0.0.6
