@@ -46,7 +46,7 @@ a <= b; // Less Than Equal To
 a && b; // Logical And
 a || b; // Logical Or
 ```
-As of now, bitwise operators have not been implemented. They may or may not be added in the future
+As of now, bitwise operators have not been implemented. They may be added in the future
 
 ## Print Statements
 ```pulsar
@@ -94,4 +94,10 @@ fun test(a: int, b: int) -> int {
     }
 }
 ```
-The return type of the function is always written after the function parameter list.
+The return type of the function is always written after the function parameter list, using an arrow. In addition to the datatypes available for variables, a function can have a return type of void.
+
+## Return Statements
+```pulsar
+return true; // A return statement with a return value.
+return; // A return statement with no return value, for void functions.
+```
