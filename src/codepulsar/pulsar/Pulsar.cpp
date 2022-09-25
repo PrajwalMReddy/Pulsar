@@ -1,6 +1,6 @@
 #include "Pulsar.h"
 
-Pulsar::SetUp conditions = {"", false, "0.1.0"};
+Pulsar::SetUp conditions = {"", false, "0.0.6"};
 
 
 int main(int argc, char* argv[]) {

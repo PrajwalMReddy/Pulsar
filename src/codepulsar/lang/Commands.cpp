@@ -2,7 +2,7 @@
 
 
 void Pulsar::help() {
-    std::cout << "Usage: pulsar [command] [file]" << std::endl;
+    std::cout << "Usage: pulsar [file] [command]" << std::endl;
     std::cout << "Commands:" << std::endl;
     std::cout << "    -h     : Shows This Help Menu" << std::endl;
     std::cout << "    -v     : Displays The Current Version Number" << std::endl;
@@ -24,10 +24,12 @@ void Pulsar::parseCommands(std::string command) {
     else error("Invalid One Argument Command: " + command);
 }
 
-void Pulsar::parseCommands(std::string command, std::string file) {
+void Pulsar::parseCommands(std::string file, std::string command) {
     setUp(file);
 
     if (command == "-h") help();
+    else if (command == "-v") version();
+
     else if (command == "-i") interpretFile(file);
     else if (command == "-c") compileFile(file);
 
