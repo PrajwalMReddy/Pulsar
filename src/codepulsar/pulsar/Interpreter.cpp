@@ -101,6 +101,7 @@ void Pulsar::Interpreter::execute() {
             default: runtimeError("Unhandled ByteCode Instruction: " + Disassembler::opcodeToString(instruction.getOpcode()));
         }
 
+        debugStack(this->sp);
         this->ip++;
     }
 }
@@ -163,12 +164,11 @@ void Pulsar::Interpreter::loadGlobal(Instruction instruction) {
 }
 
 void Pulsar::Interpreter::callFunction(Instruction instruction) {
-    int nameOffset = this->sp - std::any_cast<int>(instruction.getOperand()) - 1;
-    std::string functionName = this->stack[nameOffset]->toString();
+    auto functionName = std::any_cast<std::string>(instruction.getOperand());
     FunctionVariable function = this->symbolTable->getFunctions().find(functionName)->second;
 
-    int stackOffset = this->sp - std::any_cast<int>(instruction.getOperand());
-    CallFrame* frame = new CallFrame(this->currentFunction, this->ip, &function, stackOffset);
+    int stackOffset = this->sp - function.getArity();
+    auto* frame = new CallFrame(this->currentFunction, this->ip, &function, stackOffset);
     this->currentFrame = frame;
 
     if (this->callFrameCount == FRAMES_MAX) {

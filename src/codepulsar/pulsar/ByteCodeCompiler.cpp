@@ -63,7 +63,7 @@ std::any Pulsar::ByteCodeCompiler::visitCallExpression(Call* expression) {
         expr->accept(*this);
     }
 
-    makeOpCode(OP_CALL, expression->getArity(), expression->getLine());
+    makeOpCode(OP_CALL, expression->getName().literal, expression->getLine());
     return nullptr;
 }
 
