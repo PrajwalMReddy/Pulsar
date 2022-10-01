@@ -55,9 +55,11 @@ Pulsar::TokenType Pulsar::Lexer::identifyIdentifier() {
     if (currentLiteral() == "else") return TK_ELSE;
     if (currentLiteral() == "enum") return TK_ENUM;
     if (currentLiteral() == "except") return TK_EXCEPT;
+    if (currentLiteral() == "extends") return TK_EXTENDS;
     if (currentLiteral() == "fun") return TK_FUN;
     if (currentLiteral() == "false") return TK_FALSE;
     if (currentLiteral() == "if") return TK_IF;
+    if (currentLiteral() == "implements") return TK_IMPLEMENTS;
     if (currentLiteral() == "import") return TK_IMPORT;
     if (currentLiteral() == "init") return TK_INIT;
     if (currentLiteral() == "int") return TK_INT_TYPE;
@@ -66,8 +68,8 @@ Pulsar::TokenType Pulsar::Lexer::identifyIdentifier() {
     if (currentLiteral() == "match") return TK_MATCH;
     if (currentLiteral() == "method") return TK_METHOD;
     if (currentLiteral() == "mod") return TK_MOD;
+    if (currentLiteral() == "namespace") return TK_NAMESPACE;
     if (currentLiteral() == "native") return TK_NATIVE;
-    if (currentLiteral() == "operator") return TK_OPERATOR;
     if (currentLiteral() == "override") return TK_OVERRIDE;
     if (currentLiteral() == "package") return TK_PACKAGE;
     if (currentLiteral() == "print") return TK_PRINT;
@@ -75,6 +77,7 @@ Pulsar::TokenType Pulsar::Lexer::identifyIdentifier() {
     if (currentLiteral() == "public") return TK_PUBLIC;
     if (currentLiteral() == "return") return TK_RETURN;
     if (currentLiteral() == "static") return TK_STATIC;
+    if (currentLiteral() == "trait") return TK_TRAIT;
     if (currentLiteral() == "true") return TK_TRUE;
     if (currentLiteral() == "try") return TK_TRY;
     if (currentLiteral() == "unsafe") return TK_UNSAFE;

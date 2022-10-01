@@ -65,9 +65,13 @@ std::string Pulsar::TokenDisassembler::tokenToString(Pulsar::TokenType type) {
         case TK_RBRACE: return "TK_RBRACE";
 
         case TK_PACKAGE: return "TK_PACKAGE";
+        case TK_NAMESPACE: return "TK_NAMESPACE";
         case TK_IMPORT: return "TK_IMPORT";
         case TK_CLASS: return "TK_CLASS";
+        case TK_TRAIT: return "TK_TRAIT";
         case TK_ENUM: return "TK_ENUM";
+        case TK_EXTENDS: return "TK_EXTENDS";
+        case TK_IMPLEMENTS: return "TK_IMPLEMENTS";
         case TK_VAR: return "TK_VAR";
         case TK_CONST: return "TK_CONST";
         case TK_IF: return "TK_IF";
@@ -79,7 +83,6 @@ std::string Pulsar::TokenDisassembler::tokenToString(Pulsar::TokenType type) {
         case TK_NATIVE: return "TK_NATIVE";
         case TK_METHOD: return "TK_METHOD";
         case TK_INIT: return "TK_INIT";
-        case TK_OPERATOR: return "TK_OPERATOR";
         case TK_STATIC: return "TK_STATIC";
         case TK_OVERRIDE: return "TK_OVERRIDE";
         case TK_PUBLIC: return "TK_PUBLIC";

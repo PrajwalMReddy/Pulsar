@@ -17,13 +17,14 @@ namespace Pulsar {
         TK_COLON, TK_ARROW, TK_DOUBLE_COLON, TK_QMARK,
 
         // Keywords
-        TK_PACKAGE, TK_IMPORT,
-        TK_CLASS, TK_ENUM,
+        TK_PACKAGE, TK_NAMESPACE, TK_IMPORT,
+        TK_CLASS, TK_TRAIT, TK_ENUM,
+        TK_EXTENDS, TK_IMPLEMENTS,
         TK_VAR, TK_CONST,
         TK_IF, TK_ELSE, TK_WHILE,
         TK_CONTINUE, TK_BREAK,
         TK_FUN, TK_NATIVE, TK_METHOD, TK_INIT,
-        TK_OPERATOR, TK_STATIC, TK_OVERRIDE,
+        TK_STATIC, TK_OVERRIDE,
         TK_PUBLIC, TK_PRIVATE, TK_RETURN,
 
         // Reserved Keywords (For Possible Future Use)

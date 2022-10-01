@@ -11,25 +11,40 @@ file:
     | program EOF
 
 program:
+    | package_declaration? import_statement* namespace_declaration
     | package_declaration? import_statement* declaration*
 
 package_declaration:
-    | "package" IDENTIFIER ("." IDENTIFIER)* ";"
+    | "package" IDENTIFIER ("::" IDENTIFIER)* ";"
 
 import_statement:
-    | "import" IDENTIFIER ("." IDENTIFIER)* ";"
+    | "import" IDENTIFIER ("::" IDENTIFIER)* ";"
+
+namespace_declaration:
+    | "namespace" IDENTIFIER ("::" IDENTIFIER)* "{" declaration* "}"
+
+namespace_identifier:
+    | IDENTIFIER ("::" IDENTIFIER)* "::"
 
 declaration:
     | class_declaration
+    | trait_declaration
+    | trait_implementation
     | enum_declaration
     | function_declaration
     | variable_declaration
 
-class_declaration:
-    | access_modifier? "class" IDENTIFIER ("<" IDENTIFIER)? "{" declaration* "}"
-
 access_modifier:
     | ("public" | "private")
+
+class_declaration:
+    | access_modifier? "class" IDENTIFIER ("extends" namespace_identifier? DATATYPE)? "{" declaration* "}"
+
+trait_declaration:
+    | access_modifier? "trait" IDENTIFIER "{" (function_signature ";")* "}"
+
+trait_implementation:
+    | IDENTIFIER "implements" IDENTIFIER "{" function_declaration* "}"
 
 enum_declaration:
     | access_modifier? "enum" IDENTIFIER? "{" enum_block? "}"
@@ -38,16 +53,19 @@ enum_block:
     | IDENTIFIER ("," IDENTIFIER)* ","?
 
 function_declaration:
-    | access_modifier? function_type IDENTIFIER "(" parameter? ")" "->" DATATYPE block
+    | function_signature block
+
+function_signature:
+    | access_modifier? function_type IDENTIFIER "(" parameter? ")" "->" DATATYPE
 
 function_type:
-    | ("fun" | "method" | "init" | "static" | "override" | "operator" | "native")
+    | ("fun" | "method" | "init" | "static" | "override" | "native")
 
 parameter:
     | IDENTIFIER ":" DATATYPE ("," IDENTIFIER ":" DATATYPE)*
 
 variable_declaration:
-    | access_modifier? ("var" | "const") IDENTIFIER ":" DATATYPE ("=" expression)? ";"
+    | access_modifier? ("var" | "const") IDENTIFIER ":" namespace_identifier? DATATYPE ("=" expression)? ";"
 
 block:
     | "{" statement* "}"
@@ -107,6 +125,6 @@ argument:
     | expression ("," expression)*
 
 primary:
-    | IDENTIFIER
+    | namespace_identifier? IDENTIFIER
     | DATA
     | "(" expression ")"

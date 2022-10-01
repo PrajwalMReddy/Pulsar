@@ -101,7 +101,6 @@ void Pulsar::Interpreter::execute() {
             default: runtimeError("Unhandled ByteCode Instruction: " + Disassembler::opcodeToString(instruction.getOpcode()));
         }
 
-        debugStack(this->sp);
         this->ip++;
     }
 }
