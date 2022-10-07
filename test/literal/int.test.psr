@@ -1,0 +1,10 @@
+fun main() -> int {
+    print 100; // Expect: 100
+    print -100; // Expect: -100
+
+    print 2147483647; // Expect: 2147483647
+    print -2147483647; // Expect: -2147483647
+
+    print 2147483648; // Expect: Invalid Value For Integer
+    print -2147483648; // Expect: Invalid Value For Integer
+}

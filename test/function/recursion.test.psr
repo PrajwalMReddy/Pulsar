@@ -1,0 +1,12 @@
+fun main() -> int {
+    tester(5); // Expect: 5, 4, 3, 2, 1
+}
+
+fun tester(a: int) -> void {
+    if a == 0 {
+        return;
+    }
+
+    print a;
+    tester(a - 1);
+}

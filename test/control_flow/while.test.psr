@@ -1,0 +1,8 @@
+fun main() -> int {
+    var i: int = 0;
+
+    while i < 5 { print i += 1; } // Expect: 1, 2, 3, 4, 5
+    while i > 10 { print i += 1; } // Expect:
+
+    while i { print i += 1; } // Expect: While Statement Has Non Boolean Condition
+}

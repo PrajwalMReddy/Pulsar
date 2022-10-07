@@ -1,0 +1,11 @@
+var global: int = 0;
+
+fun main() -> int {
+    var local: int = 0;
+
+    global -= 10;
+    local -= 20;
+
+    print global; // Expect: -10
+    print local; // Expect: -20
+}

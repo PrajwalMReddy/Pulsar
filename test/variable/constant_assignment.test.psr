@@ -1,0 +1,8 @@
+const global: int = 1;
+
+fun main() -> int {
+    const local: int = 2;
+
+    global += 1; // Expect: Global Variable 'global' Is A Constant And Cannot Be Reassigned
+    local += 1; // Expect: Local Variable 'local' Is A Constant And Cannot Be Reassigned
+}

@@ -1,0 +1,7 @@
+var a: int = 1;
+
+fun main() -> int {
+    if true {
+        print a; // Expect: 1
+    }
+}

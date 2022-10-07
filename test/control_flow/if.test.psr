@@ -1,0 +1,6 @@
+fun main() -> int {
+    if true { print 1; } // Expect: 1
+    if false { print 2; } // Expect:
+
+    if 1 { print 3; } // Expect: If Statement Has Non Boolean Condition
+}

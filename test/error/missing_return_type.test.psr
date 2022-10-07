@@ -1,0 +1,7 @@
+fun main() -> int {
+    tester();
+}
+
+fun tester() { // Expect: A Return Datatype For The Function Was Expected
+    print 100;
+}

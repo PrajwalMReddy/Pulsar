@@ -1,0 +1,8 @@
+var global: int;
+
+fun main() -> int {
+    var local: int;
+
+    print global; // Expect: Global Variable 'global' Has Not Been Initialized
+    print local; // Expect: Local Variable 'local' Has Not Been Initialized
+}

@@ -1,0 +1,7 @@
+fun main() -> int {
+    tester(); // Expect: Function 'tester' Expects 1 Argument(s); 0 Provided
+}
+
+fun tester(a: int) -> void {
+    print a;
+}

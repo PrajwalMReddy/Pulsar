@@ -1,0 +1,7 @@
+var a: int = 1;
+var b: double = 1.0;
+
+fun main() -> int {
+    print a; // Expect: 1
+    print b; // Expect: 1.0
+}

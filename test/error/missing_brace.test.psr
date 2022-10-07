@@ -1,0 +1,5 @@
+fun main() -> int {
+    if true // Expect: An Opening Brace Was Expected Before The Block
+        print 100;
+    }
+}

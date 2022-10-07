@@ -1,0 +1,7 @@
+fun main() -> int {
+    print 'A'; // Expect: A
+    print 'a'; // Expect: a
+
+    print 'B; // Expect: The Char Literal Has Not Been Closed
+    print 'CD'; // Expect: A Char May Only Contain 1 Character
+}

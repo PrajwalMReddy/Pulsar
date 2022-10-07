@@ -1,0 +1,4 @@
+fun main() -> int {
+    print 101 + 202; // Expect: 303
+    print 9.9 + 10.1; // Expect: 20.0
+}

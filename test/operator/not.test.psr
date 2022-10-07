@@ -1,0 +1,4 @@
+fun main() -> int {
+    print !true; // Expect: false
+    print !false; // Expect: true
+}

@@ -1,0 +1,8 @@
+const global: int = 1;
+
+fun main() -> int {
+    const local: int = 2;
+
+    print global; // Expect: 1
+    print local; // Expect: 2
+}

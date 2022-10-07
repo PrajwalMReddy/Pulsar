@@ -16,3 +16,11 @@ Pull requests are always welcome in order to enhance the project. These include:
 - Fixing any issues with the code
 - Documentation improvements
 - Spelling and grammar fixes
+
+## Contributing To The Test Suite
+
+These can include:
+- Adding a test case that is not already covered.
+- Fixing a test case to make sure that it accurately tests the intended feature.
+- Edits to make sure that each test is as concise and descriptive yet useful as possible.
+- Deleting redundant, unnecessary, or incorrect test cases.

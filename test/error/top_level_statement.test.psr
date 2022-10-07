@@ -1,0 +1,1 @@
+print 100; // Expect: Only Declarations Are Allowed At The Top Level

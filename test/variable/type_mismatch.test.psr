@@ -1,0 +1,5 @@
+var global: int = 1.0; // Expect: Variable Has Been Initialized With The Wrong Type
+
+fun main() -> int {
+    var local: int = 2.0; // Expect: Variable Has Been Initialized With The Wrong Type
+}

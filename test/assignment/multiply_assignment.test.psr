@@ -1,0 +1,11 @@
+var global: int = 10;
+
+fun main() -> int {
+    var local: int = 10;
+
+    global *= 10;
+    local *= 20;
+
+    print global; // Expect: 100
+    print local; // Expect: 200
+}

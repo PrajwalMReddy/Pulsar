@@ -1,0 +1,7 @@
+fun main() -> int {
+    print 10 % 3; // Expect: 1
+    print 1020 % 2; // Expect: 0
+    print 637 % 22; // Expect: 21
+
+    print 10.0 % 3.3; // Expect: 0.1
+}

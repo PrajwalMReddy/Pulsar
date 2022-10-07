@@ -1,0 +1,7 @@
+fun main() -> int {
+    print tester();
+}
+
+fun tester() -> boolean {
+    return 150; // Expect: Invalid Return Type Found
+}

@@ -1,0 +1,9 @@
+fun main() -> int {
+    print 100; // Expect: 100
+    tester(); // Expect: 150
+    print 200; // Expect: 200
+}
+
+fun tester() -> void {
+    print 150;
+}
