@@ -19,7 +19,7 @@ void Pulsar::Validator::generalValidation() {
 
     if (this->symbolTable->getFunctions().count("main") == 0) {
         newError("The Main Function Was Not Found", line);
-    } else if (this->symbolTable->getFunctions().find("main")->second.getFunctionNode().getParameters()->size() != 0) {
+    } else if (!this->symbolTable->getFunctions().find("main")->second.getFunctionNode().getParameters()->empty()) {
         // TODO Temporary Restriction
         newError("The Main Function Cannot Take Parameters", this->symbolTable->getFunctions().find("main")->second.getFunctionNode().getLine());
     }
@@ -30,6 +30,12 @@ std::any Pulsar::Validator::visitAssignmentExpression(Assignment* expression) {
         newError("Local Variable '" + expression->getIdentifier() + "' Is A Constant And Cannot Be Reassigned", expression->getLine());
     } else if (expression->isGlobalAssignment() && this->symbolTable->isGlobalConstant(expression->getIdentifier())) {
         newError("Global Variable '" + expression->getIdentifier() + "' Is A Constant And Cannot Be Reassigned", expression->getLine());
+    }
+
+    if (expression->isGlobalAssignment()) {
+        this->symbolTable->setGlobalInitialized(expression->getIdentifier());
+    } else if (!expression->isGlobalAssignment()) {
+        this->symbolTable->setLocalInitialized(expression->getIdentifier()); // TODO Fix The Issue That This Doesn't Change Anything
     }
 
     expression->getValue()->accept(*this);

@@ -27,7 +27,9 @@ Pulsar::Statement* Pulsar::Parser::programNode() {
     auto* statements = new std::vector<Statement*>;
 
     while (!match({ TK_EOF })) {
-        statements->push_back(declarationStatement());
+        Statement* statement = declarationStatement();
+        if (this->errors->hasError()) return statement;
+        statements->push_back(statement);
     }
 
     return new Program(statements);
@@ -204,7 +206,7 @@ Pulsar::Statement* Pulsar::Parser::whileStatement() {
 }
 
 Pulsar::Statement* Pulsar::Parser::printStatement() {
-    Print* statement = new Print(expression(), peekLine());
+    auto* statement = new Print(expression(), peekLine());
     look(TK_SEMICOLON, "A Semicolon Was Expected After The Print Statement");
     return statement;
 }
@@ -222,7 +224,7 @@ Pulsar::Statement* Pulsar::Parser::returnStatement() {
 }
 
 Pulsar::Statement* Pulsar::Parser::expressionStatement() {
-    ExpressionStmt* expr = new ExpressionStmt(expression(), peekLine());
+    auto* expr = new ExpressionStmt(expression(), peekLine());
     look(TK_SEMICOLON, "A Semicolon Was Expected After The Expression");
     return expr;
 }

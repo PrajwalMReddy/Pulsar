@@ -79,7 +79,7 @@ void Pulsar::SymbolTable::setLocalInitialized(std::string name) {
 }
 
 void Pulsar::SymbolTable::newLocal(std::string name, Pulsar::PrimitiveType type, bool isInitialized, bool isConstant, int depth) {
-    this->localVariables.push_back(LocalVariable(name, type, isInitialized, isConstant, depth));
+    this->localVariables.emplace_back(name, type, isInitialized, isConstant, depth);
     this->localCount++;
 }
 
@@ -103,7 +103,7 @@ Pulsar::LocalVariable Pulsar::SymbolTable::getLocalVariable(std::string name) {
         }
     }
 
-    return LocalVariable("", PR_ERROR, false, true, -1);
+    return { "", PR_ERROR, false, true, -1 };
 }
 
 int Pulsar::SymbolTable::getLocalCount() {

@@ -31,14 +31,14 @@ std::any Pulsar::TypeChecker::visitAssignmentExpression(Assignment* expression) 
 }
 
 std::any Pulsar::TypeChecker::visitBinaryExpression(Binary* expression) {
-    PrimitiveType a = std::any_cast<PrimitiveType>(expression->getLeft()->accept(*this));
-    PrimitiveType b = std::any_cast<PrimitiveType>(expression->getRight()->accept(*this));
+    auto a = std::any_cast<PrimitiveType>(expression->getLeft()->accept(*this));
+    auto b = std::any_cast<PrimitiveType>(expression->getRight()->accept(*this));
 
-    if (isOfType(a, { PR_BOOLEAN }) || isOfType(b, { PR_BOOLEAN })) {
-        if (!isOperation(expression->getOperator(), { "==", "!=" })) {
-            newError("Boolean Operands May Not Be Used For Non Equality Checks", expression->getLine());
-            return PR_ERROR;
-        }
+    if (isOperation(expression->getOperator(), { "==", "!=" })) {
+        return PR_BOOLEAN;
+    } else if (isOfType(a, { PR_BOOLEAN }) || isOfType(b, { PR_BOOLEAN })) {
+        newError("Boolean Operands May Not Be Used For Non Equality Checks", expression->getLine());
+        return PR_ERROR;
     } else if (a != b) {
         newError("Binary Operations Are Of Different Types", expression->getLine());
         return PR_ERROR;
@@ -56,7 +56,7 @@ std::any Pulsar::TypeChecker::visitCallExpression(Call* expression) {
     std::vector<Parameter*>* parameters = function.getFunctionNode().getParameters();
 
     for (int i = 0; i < expression->getArity(); i++) {
-        PrimitiveType exprType = std::any_cast<PrimitiveType>(expression->getArguments()->at(i)->accept(*this));
+        auto exprType = std::any_cast<PrimitiveType>(expression->getArguments()->at(i)->accept(*this));
         PrimitiveType paramType = parameters->at(i)->getType();
 
         if (exprType != paramType) {
@@ -133,7 +133,7 @@ std::any Pulsar::TypeChecker::visitFunctionStatement(Function* statement) {
 }
 
 std::any Pulsar::TypeChecker::visitIfStatement(If* statement) {
-    PrimitiveType type = std::any_cast<PrimitiveType>(statement->getCondition()->accept(*this));
+    auto type = std::any_cast<PrimitiveType>(statement->getCondition()->accept(*this));
     statement->getThenBranch()->accept(*this);
     if (statement->hasElse()) statement->getElseBranch()->accept(*this);
 
@@ -162,7 +162,7 @@ std::any Pulsar::TypeChecker::visitReturnStatement(Return* statement) {
     FunctionVariable function = this->symbolTable->getFunctions().find(statement->getFunction())->second;
 
     if (statement->hasValue()) {
-        PrimitiveType returnType = std::any_cast<PrimitiveType>(statement->getValue()->accept(*this));
+        auto returnType = std::any_cast<PrimitiveType>(statement->getValue()->accept(*this));
         if (function.getReturnType() != returnType) {
             newError("Invalid Return Type Found", statement->getLine());
         }
@@ -188,7 +188,7 @@ std::any Pulsar::TypeChecker::visitVariableStatement(VariableDecl* statement) {
 }
 
 std::any Pulsar::TypeChecker::visitWhileStatement(While* statement) {
-    PrimitiveType type = std::any_cast<PrimitiveType>(statement->getCondition()->accept(*this));
+    auto type = std::any_cast<PrimitiveType>(statement->getCondition()->accept(*this));
     statement->getStatements()->accept(*this);
 
     if (type != PR_BOOLEAN) newError("While Statement Has Non Boolean Condition", statement->getLine());
