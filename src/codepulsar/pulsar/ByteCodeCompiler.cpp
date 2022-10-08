@@ -16,8 +16,8 @@ std::vector<Pulsar::Instruction> Pulsar::ByteCodeCompiler::compileByteCode() {
     this->errors = parser.getErrors();
     if (this->errors->hasError()) return this->currentChunk;
 
-    ASTPrinter astPrinter = ASTPrinter();
-    astPrinter.print(this->program);
+    ASTPrinter rawASTPrinter = ASTPrinter();
+    rawASTPrinter.print(this->program, "Raw");
 
     Validator validator = Validator(this->program, this->symbolTable, this->errors);
     validator.validate();
@@ -26,6 +26,12 @@ std::vector<Pulsar::Instruction> Pulsar::ByteCodeCompiler::compileByteCode() {
     TypeChecker checker = TypeChecker(this->program, this->symbolTable, this->errors);
     checker.check();
     if (this->errors->hasError()) return this->currentChunk;
+
+    Optimizer optimizer = Optimizer(this->program);
+    this->program = optimizer.optimize();
+
+    ASTPrinter optimizedASTPrinter = ASTPrinter();
+    optimizedASTPrinter.print(this->program, "Optimized");
 
     compile();
     return this->symbolTable->getFunctions().find("main")->second.getChunk();

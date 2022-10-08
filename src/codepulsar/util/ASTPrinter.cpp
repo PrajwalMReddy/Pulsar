@@ -5,10 +5,10 @@ Pulsar::ASTPrinter::ASTPrinter() {
     this->indentCount = 0;
 }
 
-void Pulsar::ASTPrinter::print(Pulsar::Statement* ast) {
+void Pulsar::ASTPrinter::print(Pulsar::Statement* ast, std::string astType) {
     if (!conditions.debug) return;
 
-    std::cout << "\n-- AST --\n" << std::endl;
+    std::cout << "\n-- " << astType << " AST --\n" << std::endl;
     constructTree(ast);
 }
 

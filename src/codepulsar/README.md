@@ -18,7 +18,7 @@ This subdirectory holds all files required for handling variables, including fun
 This folder holds the code that is required for the built-in primitive types to work.
 
 ## analysis
-This holds all the classes that are used for the static analysis of the source code; for now this only includes the type checker and validator.
+This holds all the classes that are used for the static analysis of the source code; this includes the optimizer, type checker, and validator.
 
 ## util
 This holds other classes that aren't strictly needed for compilation but are there to provide diagnostic/extra information about the code and any problems present for debugging purposes.

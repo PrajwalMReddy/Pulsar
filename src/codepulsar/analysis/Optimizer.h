@@ -1,20 +1,21 @@
-#ifndef CODEPULSAR_ASTPRINTER_H
-#define CODEPULSAR_ASTPRINTER_H
+#ifndef CODEPULSAR_OPTIMIZER_H
+#define CODEPULSAR_OPTIMIZER_H
 
-#include "../pulsar/Pulsar.h"
 #include "../ast/ExprVisitor.h"
-#include "../ast/Expression.h"
 #include "../ast/StmtVisitor.h"
 #include "../ast/Statement.h"
+#include "../lang/CompilerError.h"
+#include "../analysis/TypeChecker.h"
+#include "../analysis/Validator.h"
 
 
 namespace Pulsar {
-    class ASTPrinter: public ExprVisitor, public StmtVisitor {
+    class Optimizer: public ExprVisitor, public StmtVisitor {
         public:
-            ASTPrinter();
-            void print(Statement* ast, std::string astType);
+            Optimizer(Statement* rawProgram);
+            Statement* optimize();
 
-            // Expression AST Visitors
+            // Expression Nodes
             std::any visitAssignmentExpression(Assignment* expression) override;
             std::any visitBinaryExpression(Binary* expression) override;
             std::any visitCallExpression(Call* expression) override;
@@ -24,7 +25,7 @@ namespace Pulsar {
             std::any visitUnaryExpression(Unary* expression) override;
             std::any visitVariableExpression(VariableExpr* expression) override;
 
-            // Statement AST Visitors
+            // Statement Nodes
             std::any visitBlockStatement(Block* statement) override;
             std::any visitExpressionStatement(ExpressionStmt* statement) override;
             std::any visitFunctionStatement(Function* statement) override;
@@ -37,14 +38,11 @@ namespace Pulsar {
             std::any visitWhileStatement(While* statement) override;
 
         private:
-            int indentCount;
+            // Input Data
+            Statement* rawProgram;
 
-            void constructTree(Statement* ast);
-            std::string blockStatement(Block* statement);
-
-            std::string giveTabs() const;
-            void incrementIndentCount();
-            void decrementIndentCount();
+            // Output Data
+            Statement* optimizedProgram;
     };
 }
 

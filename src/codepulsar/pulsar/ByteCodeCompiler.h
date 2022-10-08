@@ -15,6 +15,7 @@
 #include "../primitive/type/PDouble.h"
 #include "../primitive/type/PCharacter.h"
 #include "../primitive/type/PBoolean.h"
+#include "../analysis/Optimizer.h"
 
 
 namespace Pulsar {
