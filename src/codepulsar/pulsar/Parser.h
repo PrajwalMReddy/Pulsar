@@ -51,9 +51,9 @@ namespace Pulsar {
             std::string currentFunction;
 
             // Output Data
-            Statement* program;
+            Statement* program{};
             SymbolTable* symbolTable;
-            CompilerError* errors;
+            CompilerError* errors{};
 
             // ---- AST Parsing Functions ---- //
 

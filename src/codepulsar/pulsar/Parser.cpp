@@ -56,8 +56,12 @@ Pulsar::Statement* Pulsar::Parser::declaration() {
 
 Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
     int line = peekLine();
-    std::string functionName = advance().literal;
-    this->currentFunction = functionName;
+    Token nameToken = advance();
+
+    this->currentFunction = nameToken.literal;
+    if (nameToken.tokenType != TK_IDENTIFIER) {
+        newError("Function Names Must Be Identifiers", peekLine());
+    }
 
     look(TK_LPAR, "An Opening Parenthesis Was Expected Before The Parameter List");
     auto* parameters = new std::vector<Parameter*>;
@@ -68,12 +72,10 @@ Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
             Token parameter = advance();
             PrimitiveType type = PR_ERROR;
 
-            if (!matchAdvance({ TK_COLON })) {
-                newError("A Colon Was Expected After The Variable Name", peekLine());
+            look(TK_COLON, "A Colon Was Expected After The Variable Name");
+            if (!match({ TK_INT_TYPE, TK_DOUBLE_TYPE, TK_CHAR_TYPE, TK_BOOLEAN_TYPE })) {
+                newError("A Datatype Was Expected For The Function's Parameters", peekLine());
             } else {
-                if (!match({ TK_INT_TYPE, TK_DOUBLE_TYPE, TK_CHAR_TYPE, TK_BOOLEAN_TYPE })) {
-                    newError("A Datatype Was Expected For The Function's Parameters", peekLine());
-                }
                 type = checkType(advance());
             }
 
@@ -84,17 +86,23 @@ Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
     }
 
     look(TK_RPAR, "A Closing Parenthesis Was Expected After The Parameter List");
-    if (!matchAdvance({ TK_ARROW })) newError("A Return Datatype For The Function Was Expected", peekLine());
+    look(TK_ARROW, "The Arrow Token Was Expected Before Return Type");
 
-    PrimitiveType type = checkType(advance());
-    Block* statements = block();
-
-    if (this->symbolTable->getFunctions().contains(functionName)) {
-        newError("Function '" + functionName + "' Already Exists", line);
+    PrimitiveType type = PR_ERROR;
+    if (!match({ TK_VOID, TK_INT_TYPE, TK_DOUBLE_TYPE, TK_CHAR_TYPE, TK_BOOLEAN_TYPE })) {
+        newError("A Return Type Was Expected For The Function", peekLine());
+    } else {
+        type = checkType(advance());
     }
 
-    auto* functionNode = new Function(functionName, type, parameters, statements, line);
-    this->symbolTable->addFunction(functionName, *functionNode, arity, type);
+    Block* statements = block();
+
+    if (this->symbolTable->getFunctions().contains(this->currentFunction)) {
+        newError("Function '" + this->currentFunction + "' Already Exists", line);
+    }
+
+    auto* functionNode = new Function(this->currentFunction, type, parameters, statements, line);
+    this->symbolTable->addFunction(this->currentFunction, *functionNode, arity, type);
     return functionNode;
 }
 
@@ -131,8 +139,14 @@ Pulsar::Statement* Pulsar::Parser::variableDeclaration(TokenType accessType) {
         newError("Variable Names Should Be Identifiers", peekLine());
     }
 
-    look(TK_COLON, "Unexpected Token '" + peekLiteral() + "' After Variable Name");
-    PrimitiveType type = checkType(advance());
+    look(TK_COLON, "A Colon Was Expected After The Variable Name");
+    PrimitiveType type = PR_ERROR;
+
+    if (!match({ TK_INT_TYPE, TK_DOUBLE_TYPE, TK_CHAR_TYPE, TK_BOOLEAN_TYPE })) {
+        newError("A Datatype Was Expected For The Variable", peekLine());
+    } else {
+        type = checkType(advance());
+    }
 
     Expression* expr = nullptr;
     bool isInitialized = false;
@@ -420,29 +434,10 @@ Pulsar::Token Pulsar::Parser::advance() {
 bool Pulsar::Parser::look(TokenType token, std::string message) {
     if (peekType() != token) {
         newError(message, peekLine());
-        synchronize();
         return true;
     } else {
         advance();
         return false;
-    }
-}
-
-void Pulsar::Parser::synchronize() {
-    while (peekType() != TK_EOF) {
-        if (peekType() == TK_SEMICOLON) return;
-
-        switch (peekType()) {
-            case TK_IF:
-            case TK_WHILE:
-            case TK_VAR:
-            case TK_CONST:
-            case TK_PRINT:
-            case TK_RETURN:
-                return;
-        }
-
-        advance();
     }
 }
 

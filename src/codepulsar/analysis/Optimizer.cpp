@@ -9,7 +9,7 @@ Pulsar::Optimizer::Optimizer(Statement* rawProgram) {
 Pulsar::Statement* Pulsar::Optimizer::optimize() {
     this->rawProgram->accept(*this);
 
-    return this->optimizedProgram;
+    return this->rawProgram;
 }
 
 std::any Pulsar::Optimizer::visitAssignmentExpression(Assignment* expression) {
