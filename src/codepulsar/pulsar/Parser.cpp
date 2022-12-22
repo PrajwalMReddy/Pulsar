@@ -24,6 +24,8 @@ Pulsar::Statement* Pulsar::Parser::parse() {
 }
 
 Pulsar::Statement* Pulsar::Parser::programNode() {
+    if (this->tokens.empty()) return nullptr;
+
     auto* statements = new std::vector<Statement*>;
 
     while (!match({ TK_EOF })) {
@@ -494,6 +496,9 @@ int Pulsar::Parser::peekLine() {
 
 void Pulsar::Parser::newError(std::string message, int line) {
     this->errors->addError("Parsing Error", message, line);
+
+    // Prevents Ghost Errors And Parsing Breakdowns
+    ErrorReporter::report(this->errors, this->sourceCode);
 }
 
 Pulsar::SymbolTable* Pulsar::Parser::getSymbolTable() {

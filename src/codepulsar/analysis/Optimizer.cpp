@@ -7,8 +7,9 @@ Pulsar::Optimizer::Optimizer(Statement* rawProgram) {
 }
 
 Pulsar::Statement* Pulsar::Optimizer::optimize() {
-    this->rawProgram->accept(*this);
+    if (this->rawProgram == nullptr) return this->rawProgram;
 
+    this->rawProgram->accept(*this);
     return this->rawProgram;
 }
 

@@ -12,6 +12,8 @@ Pulsar::Lexer::Lexer(std::string sourceCode) {
 }
 
 std::vector<Pulsar::Token> Pulsar::Lexer::tokenize() {
+    if (this->sourceCode.empty()) return this->tokens;
+
     while (true) {
         Token toAdd = scanToken();
         this->tokens.push_back(toAdd);

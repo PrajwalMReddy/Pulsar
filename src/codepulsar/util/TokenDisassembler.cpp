@@ -9,6 +9,11 @@ void Pulsar::TokenDisassembler::display(std::vector<Pulsar::Token> tokens) {
 }
 
 void Pulsar::TokenDisassembler::displayTokens(std::vector<Pulsar::Token> tokens) {
+    if (tokens.empty()) {
+        std::cout << "\nNo Tokens Have Been Generated" << std::endl;
+        return;
+    }
+
     int line = 0;
 
     for (Pulsar::Token token: tokens) {
