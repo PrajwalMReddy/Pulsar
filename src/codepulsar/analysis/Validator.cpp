@@ -84,15 +84,11 @@ std::any Pulsar::Validator::visitVariableExpression(VariableExpr* expression) {
     int line = expression->getLine();
 
     if (!expression->isGlobalVariable()) {
-        if (!this->symbolTable->containsLocalVariable(name)) {
-            newError("Local Variable '" + name + "' Is Used But Never Defined", line);
-        } else if (!this->symbolTable->isLocalInitialized(name)) {
+        if (!this->symbolTable->isLocalInitialized(name)) {
             newError("Local Variable '" + name + "' Has Not Been Initialized", line);
         }
     } else {
-        if (!this->symbolTable->containsGlobalVariable(name)) {
-            newError("Global Variable '" + name + "' Does Not Exist", line);
-        } else if (!this->symbolTable->isGlobalInitialized(name)) {
+        if (!this->symbolTable->isGlobalInitialized(name)) {
             newError("Global Variable '" + name + "' Has Not Been Initialized", line);
         }
     }

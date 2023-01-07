@@ -161,13 +161,9 @@ Pulsar::Statement* Pulsar::Parser::variableDeclaration(TokenType accessType) {
     look(TK_SEMICOLON, "A Semicolon Was Expected After The Variable Declaration");
 
     if (isInGlobalScope()) {
-        if (this->symbolTable->containsGlobalVariable(identifier.literal)) {
-            newError("Global Variable '" + identifier.literal + "' Already Exists", identifier.line);
-        } this->symbolTable->addGlobalVariable(identifier.literal, nullptr, type, isInitialized, (accessType == TK_CONST));
+        this->symbolTable->addGlobalVariable(identifier.literal, nullptr, type, isInitialized, (accessType == TK_CONST));
     } else {
-        if (this->symbolTable->containsLocalVariable(identifier.literal)) {
-            newError("Local Variable '" + identifier.literal + "' Already Exists", identifier.line);
-        } this->symbolTable->newLocal(identifier.literal, type, isInitialized, (accessType == TK_CONST), this->scopeDepth);
+        this->symbolTable->newLocal(identifier.literal, type, isInitialized, (accessType == TK_CONST), this->scopeDepth);
     }
 
     return new VariableDecl(identifier, expr, type, accessType, isInGlobalScope(), line);

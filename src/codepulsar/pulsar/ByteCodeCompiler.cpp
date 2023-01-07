@@ -19,16 +19,22 @@ std::vector<Pulsar::Instruction> Pulsar::ByteCodeCompiler::compileByteCode() {
     ASTPrinter rawASTPrinter = ASTPrinter();
     rawASTPrinter.print(this->program, "Raw");
 
-    Validator validator = Validator(this->program, this->symbolTable, this->errors);
-    validator.validate();
-    if (this->errors->hasError()) return this->currentChunk;
+    /* Analyses And Optimizations */ {
+        VariableValidator varValidator = VariableValidator(this->program, this->symbolTable, this->errors);
+        varValidator.validate();
+        if (this->errors->hasError()) return this->currentChunk;
 
-    TypeChecker checker = TypeChecker(this->program, this->symbolTable, this->errors);
-    checker.check();
-    if (this->errors->hasError()) return this->currentChunk;
+        Validator validator = Validator(this->program, this->symbolTable, this->errors);
+        validator.validate();
+        if (this->errors->hasError()) return this->currentChunk;
 
-    Optimizer optimizer = Optimizer(this->program);
-    this->program = optimizer.optimize();
+        TypeChecker checker = TypeChecker(this->program, this->symbolTable, this->errors);
+        checker.check();
+        if (this->errors->hasError()) return this->currentChunk;
+
+        Optimizer optimizer = Optimizer(this->program);
+        this->program = optimizer.optimize();
+    }
 
     ASTPrinter optimizedASTPrinter = ASTPrinter();
     optimizedASTPrinter.print(this->program, "Optimized");
