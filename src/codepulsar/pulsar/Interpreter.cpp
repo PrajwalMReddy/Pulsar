@@ -42,15 +42,7 @@ void Pulsar::Interpreter::setUp() {
 void Pulsar::Interpreter::execute() {
     while (this->ip < this->instructions.size()) {
         Instruction instruction = this->instructions[this->ip];
-
-        Disassembler disassembler = Disassembler(this->symbolTable, this->values);
-        std::cout << disassembler.opcodeToString(instruction.getOpcode()) << std::endl;
-
         interpretBC(instruction);
-
-        for (int i = 0; i < this->sp; i++) {
-            std::cout << this->stack[i]->toString() << " | ";
-        } std::cout << std::endl;
 
         this->ip++;
     }
@@ -58,11 +50,7 @@ void Pulsar::Interpreter::execute() {
 
 void Pulsar::Interpreter::interpretBC(Instruction instruction) {
     switch (instruction.getOpcode()) {
-        case OP_CONSTANT: {
-            push(this->values[std::any_cast<int>(instruction.getOperand())]);
-            std::cout << "OP: " << std::any_cast<int>(instruction.getOperand()) << " - Slot: " << std::any_cast<int>(instruction.getOperand()) << " - Value: " << this->values[std::any_cast<int>(instruction.getOperand())]->toString() << " ----------------------------------------)" << std::endl;
-            break;
-        }
+        case OP_CONSTANT: push(this->values[std::any_cast<int>(instruction.getOperand())]); break;
 
         case OP_NEGATE: unaryOperation(OP_NEGATE); break;
         case OP_NOT: unaryOperation(OP_NOT); break;
@@ -95,7 +83,6 @@ void Pulsar::Interpreter::interpretBC(Instruction instruction) {
         case OP_NEW_LOCAL: break;
         case OP_GET_LOCAL: {
             int slot = std::any_cast<int>(instruction.getOperand()) + this->currentFrame->getStackOffset();
-            std::cout << "OP: " << std::any_cast<int>(instruction.getOperand()) << " - Slot: " << slot << " - Value: " << this->stack[slot]->toString() << " ----------------------------------------|" << std::endl;
             push(this->stack[slot]);
             break;
         }
@@ -183,7 +170,6 @@ void Pulsar::Interpreter::callFunction(Instruction instruction) {
     FunctionVariable function = this->symbolTable->getFunctions().find(functionName)->second;
 
     int stackOffset = this->sp - function.getArity();
-    std::cout << functionName << " - Offset: " << stackOffset << " ----------------------------------------]" << std::endl;
     auto* frame = new CallFrame(this->currentFunction, this->ip, &function, stackOffset);
     this->currentFrame = frame;
 

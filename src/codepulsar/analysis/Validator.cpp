@@ -35,7 +35,7 @@ std::any Pulsar::Validator::visitAssignmentExpression(Assignment* expression) {
     if (expression->isGlobalAssignment()) {
         this->symbolTable->setGlobalInitialized(expression->getIdentifier());
     } else if (!expression->isGlobalAssignment()) {
-        this->symbolTable->setLocalInitialized(expression->getIdentifier()); // TODO Fix The Issue That This Doesn't Change Anything
+        this->symbolTable->setLocalInitialized(expression->getIdentifier());
     }
 
     expression->getValue()->accept(*this);
@@ -153,10 +153,19 @@ std::any Pulsar::Validator::visitVariableStatement(VariableDecl* statement) {
     if (statement->isInitialized()) statement->getInitializer()->accept(*this);
     bool isInitialized = statement->isInitialized();
 
-    if (!statement->isGlobalVariable() && this->symbolTable->isLocalInitialized(statement->getName().literal) && !isInitialized) {
+    // For Constant Variables
+    if (!statement->isGlobalVariable() && this->symbolTable->isLocalConstant(statement->getName().literal) && !isInitialized) {
         newError("Local Constants Must Be Initialized While Being Declared", statement->getLine());
     } else if (statement->isGlobalVariable() && this->symbolTable->isGlobalConstant(statement->getName().literal) && !isInitialized) {
         newError("Global Constants Must Be Initialized While Being Declared", statement->getLine());
+    }
+
+    // For Variable Variables
+    // TODO Hopefully Temporary Restriction
+    else if (!statement->isGlobalVariable() && !isInitialized) {
+        newError("Local Variables Must Be Initialized While Being Declared", statement->getLine());
+    } else if (statement->isGlobalVariable() && !isInitialized) {
+        newError("Global Variables Must Be Initialized While Being Declared", statement->getLine());
     }
 
     return nullptr;

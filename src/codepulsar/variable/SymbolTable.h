@@ -49,7 +49,7 @@ namespace Pulsar {
             bool containsLocalVariable(std::string name);
 
             // Local Variable Helper Functions
-            LocalVariable getLocalVariable(std::string name);
+            LocalVariable* getLocalVariable(std::string name);
             int getLocalCount();
             void decrementLocalCount();
             void incrementDepth();
