@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for taking time out to go through Pulsar and contribute!
+Thank you for taking time to go through Pulsar and contributing!
 
 ## Reporting A Bug
 
@@ -8,7 +8,7 @@ To report a bug, you can open an issue on GitHub. When doing this, include the f
 - A descriptive title which concisely explains what is wrong.
 - A brief description of the unexpected/incorrect behavior and what was expected.
 - Steps to reproduce the issue, such as a minimal reproducible example of the input code.
-- Any error messages produced.
+- Any error messages produced (including messages reported from the Pulsar compiler and the C++ compiler).
 
 ## Pull Requests
 
@@ -19,7 +19,7 @@ Pull requests are always welcome in order to enhance the project. These include:
 
 ## Contributing To The Test Suite
 
-These can include:
+Contributing to the test suite can include:
 - Adding a test case that is not already covered.
 - Fixing a test case to make sure that it accurately tests the intended feature.
 - Edits to make sure that each test is as concise and descriptive yet useful as possible.

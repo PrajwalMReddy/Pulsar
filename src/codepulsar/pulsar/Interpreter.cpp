@@ -43,65 +43,81 @@ void Pulsar::Interpreter::execute() {
     while (this->ip < this->instructions.size()) {
         Instruction instruction = this->instructions[this->ip];
 
-        switch (instruction.getOpcode()) {
-            case OP_CONSTANT: push(this->values[std::any_cast<int>(instruction.getOperand())]); break;
+        Disassembler disassembler = Disassembler(this->symbolTable, this->values);
+        std::cout << disassembler.opcodeToString(instruction.getOpcode()) << std::endl;
 
-            case OP_NEGATE: unaryOperation(OP_NEGATE); break;
-            case OP_NOT: unaryOperation(OP_NOT); break;
+        interpretBC(instruction);
 
-            case OP_ADD: binaryOperation(OP_ADD); break;
-            case OP_SUBTRACT: binaryOperation(OP_SUBTRACT); break;
-            case OP_MULTIPLY: binaryOperation(OP_MULTIPLY); break;
-            case OP_DIVIDE: binaryOperation(OP_DIVIDE); break;
-            case OP_MODULO: binaryOperation(OP_MODULO); break;
-
-            case OP_COMPARE_EQUAL: compareOperation(OP_COMPARE_EQUAL); break;
-            case OP_COMPARE_GREATER: compareOperation(OP_COMPARE_GREATER); break;
-            case OP_COMPARE_LESSER: compareOperation(OP_COMPARE_LESSER); break;
-
-            case OP_NEW_GLOBAL: {
-                auto newName = std::any_cast<Token>(instruction.getOperand()).literal;
-                Primitive* newPrimitive = pop();
-                this->symbolTable->reassignGlobalVariable(newName, newPrimitive);
-                break;
-            }
-            case OP_LOAD_GLOBAL: loadGlobal(instruction); break;
-            case OP_STORE_GLOBAL: {
-                auto storeName = std::any_cast<std::string>(instruction.getOperand());
-                Primitive* storePrimitive = pop();
-                this->symbolTable->reassignGlobalVariable(storeName, storePrimitive);
-                push(storePrimitive);
-                break;
-            }
-
-            case OP_NEW_LOCAL: break;
-            case OP_GET_LOCAL: {
-                int slot = std::any_cast<int>(instruction.getOperand()) + this->currentFrame->getStackOffset();
-                push(this->stack[slot]);
-                break;
-            }
-            case OP_SET_LOCAL: {
-                int slot = std::any_cast<int>(instruction.getOperand()) + this->currentFrame->getStackOffset();
-                this->stack[slot] = this->stack[this->sp - 1];
-                break;
-            }
-
-            case OP_JUMP: this->ip = std::any_cast<int>(instruction.getOperand()) - 1; break;
-            case OP_JUMP_IF_TRUE: conditionalJump(OP_JUMP_IF_TRUE, instruction); break;
-            case OP_JUMP_IF_FALSE: conditionalJump(OP_JUMP_IF_FALSE, instruction); break;
-
-            case OP_LOAD_FUNCTION: push(new PFunction(std::any_cast<std::string>(instruction.getOperand()))); break;
-            case OP_CALL: callFunction(instruction); break;
-            case OP_RETURN: returnFunction(); break;
-
-            case OP_PRINT: std::cout << pop()->toString() << std::endl; break;
-            case OP_POP: pop(); break;
-
-            // Supposed To Be Unreachable
-            default: runtimeError("Unhandled ByteCode Instruction: " + Disassembler::opcodeToString(instruction.getOpcode()));
-        }
+        for (int i = 0; i < this->sp; i++) {
+            std::cout << this->stack[i]->toString() << " | ";
+        } std::cout << std::endl;
 
         this->ip++;
+    }
+}
+
+void Pulsar::Interpreter::interpretBC(Instruction instruction) {
+    switch (instruction.getOpcode()) {
+        case OP_CONSTANT: {
+            push(this->values[std::any_cast<int>(instruction.getOperand())]);
+            std::cout << "OP: " << std::any_cast<int>(instruction.getOperand()) << " - Slot: " << std::any_cast<int>(instruction.getOperand()) << " - Value: " << this->values[std::any_cast<int>(instruction.getOperand())]->toString() << " ----------------------------------------)" << std::endl;
+            break;
+        }
+
+        case OP_NEGATE: unaryOperation(OP_NEGATE); break;
+        case OP_NOT: unaryOperation(OP_NOT); break;
+
+        case OP_ADD: binaryOperation(OP_ADD); break;
+        case OP_SUBTRACT: binaryOperation(OP_SUBTRACT); break;
+        case OP_MULTIPLY: binaryOperation(OP_MULTIPLY); break;
+        case OP_DIVIDE: binaryOperation(OP_DIVIDE); break;
+        case OP_MODULO: binaryOperation(OP_MODULO); break;
+
+        case OP_COMPARE_EQUAL: compareOperation(OP_COMPARE_EQUAL); break;
+        case OP_COMPARE_GREATER: compareOperation(OP_COMPARE_GREATER); break;
+        case OP_COMPARE_LESSER: compareOperation(OP_COMPARE_LESSER); break;
+
+        case OP_NEW_GLOBAL: {
+            auto newName = std::any_cast<Token>(instruction.getOperand()).literal;
+            Primitive* newPrimitive = pop();
+            this->symbolTable->reassignGlobalVariable(newName, newPrimitive);
+            break;
+        }
+        case OP_LOAD_GLOBAL: loadGlobal(instruction); break;
+        case OP_STORE_GLOBAL: {
+            auto storeName = std::any_cast<std::string>(instruction.getOperand());
+            Primitive* storePrimitive = pop();
+            this->symbolTable->reassignGlobalVariable(storeName, storePrimitive);
+            push(storePrimitive);
+            break;
+        }
+
+        case OP_NEW_LOCAL: break;
+        case OP_GET_LOCAL: {
+            int slot = std::any_cast<int>(instruction.getOperand()) + this->currentFrame->getStackOffset();
+            std::cout << "OP: " << std::any_cast<int>(instruction.getOperand()) << " - Slot: " << slot << " - Value: " << this->stack[slot]->toString() << " ----------------------------------------|" << std::endl;
+            push(this->stack[slot]);
+            break;
+        }
+        case OP_SET_LOCAL: {
+            int slot = std::any_cast<int>(instruction.getOperand()) + this->currentFrame->getStackOffset();
+            this->stack[slot] = this->stack[this->sp - 1];
+            break;
+        }
+
+        case OP_JUMP: this->ip = std::any_cast<int>(instruction.getOperand()) - 1; break;
+        case OP_JUMP_IF_TRUE: conditionalJump(OP_JUMP_IF_TRUE, instruction); break;
+        case OP_JUMP_IF_FALSE: conditionalJump(OP_JUMP_IF_FALSE, instruction); break;
+
+        case OP_LOAD_FUNCTION: push(new PFunction(std::any_cast<std::string>(instruction.getOperand()))); break;
+        case OP_CALL: callFunction(instruction); break;
+        case OP_RETURN: returnFunction(); break;
+
+        case OP_PRINT: std::cout << pop()->toString() << std::endl; break;
+        case OP_POP: pop(); break;
+
+            // Supposed To Be Unreachable
+        default: runtimeError("Unhandled ByteCode Instruction: " + Disassembler::opcodeToString(instruction.getOpcode()));
     }
 }
 
@@ -167,6 +183,7 @@ void Pulsar::Interpreter::callFunction(Instruction instruction) {
     FunctionVariable function = this->symbolTable->getFunctions().find(functionName)->second;
 
     int stackOffset = this->sp - function.getArity();
+    std::cout << functionName << " - Offset: " << stackOffset << " ----------------------------------------]" << std::endl;
     auto* frame = new CallFrame(this->currentFunction, this->ip, &function, stackOffset);
     this->currentFrame = frame;
 
@@ -195,7 +212,7 @@ void Pulsar::Interpreter::returnFunction() {
     this->instructions = function.getChunk();
 
     this->ip = current->getReturnIP();
-    this->sp -= (current->getStackOffset() - 1);
+    this->sp = current->getStackOffset() - 1;
     push(returnValue);
 }
 

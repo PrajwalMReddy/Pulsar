@@ -39,12 +39,13 @@ namespace Pulsar {
             const int FRAMES_MAX = 64;
             const int STACK_MAX = FRAMES_MAX * 1024;
 
-            int sp;
+            int sp; // Stores The Address Of Next Available Stack Slot
             int ip;
 
             // Functions
             void setUp();
             void execute();
+            void interpretBC(Instruction instruction);
 
             void unaryOperation(ByteCode code);
             void binaryOperation(ByteCode code);
