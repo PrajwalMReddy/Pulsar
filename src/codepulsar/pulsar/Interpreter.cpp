@@ -204,6 +204,7 @@ void Pulsar::Interpreter::returnFunction() {
 
 void Pulsar::Interpreter::push(Primitive* value) {
     if (this->sp > STACK_MAX) runtimeError("A Stack Overflow Has Occurred");
+    if (value->isPrimitiveType(PR_ERROR)) runtimeError("The Stack Has Become Corrupted");
 
     this->stack.insert(this->stack.begin() + this->sp, value);
     this->sp++;

@@ -20,10 +20,6 @@ std::vector<Pulsar::Instruction> Pulsar::ByteCodeCompiler::compileByteCode() {
     rawASTPrinter.print(this->program, "Raw");
 
     /* Analyses And Optimizations */ {
-        VariableValidator varValidator = VariableValidator(this->program, this->symbolTable, this->errors);
-        varValidator.validate();
-        if (this->errors->hasError()) return this->currentChunk;
-
         Validator validator = Validator(this->program, this->symbolTable, this->errors);
         validator.validate();
         if (this->errors->hasError()) return this->currentChunk;
