@@ -96,7 +96,15 @@ fun test(a: int, b: int) -> int {
 ```
 The return type of the function is always written after the function parameter list, using an arrow. In addition to the datatypes available for variables, a function can have a return type of void.
 
-## Return Statements
+### Function Calls
+```pulsar
+foo(); // A function with no arguments.
+fib(10); // A function with a single argument.
+addTwo(1, 2); // A function with more than one argument.
+```
+Arguments to a function call are separated by commas like the function parameter list.
+
+### Return Statements
 ```pulsar
 return true; // A return statement with a return value.
 return; // A return statement with no return value, for void functions.

@@ -103,7 +103,7 @@ void Pulsar::Interpreter::interpretBC(Instruction instruction) {
         case OP_PRINT: std::cout << pop()->toString() << std::endl; break;
         case OP_POP: pop(); break;
 
-            // Supposed To Be Unreachable
+        // Supposed To Be Unreachable
         default: runtimeError("Unhandled ByteCode Instruction: " + Disassembler::opcodeToString(instruction.getOpcode()));
     }
 }
@@ -174,7 +174,7 @@ void Pulsar::Interpreter::callFunction(Instruction instruction) {
     this->currentFrame = frame;
 
     if (this->callFrameCount == FRAMES_MAX) {
-        runtimeError("A Stack Overflow Has Occurred");
+        runtimeError("Maximum Recursion Depth Has Been Reached");
     }
 
     this->callFrames.push_back(frame);
@@ -187,18 +187,20 @@ void Pulsar::Interpreter::callFunction(Instruction instruction) {
 
 void Pulsar::Interpreter::returnFunction() {
     Primitive* returnValue = pop();
-    CallFrame* current = this->currentFrame;
-    std::string caller = current->getCaller();
+
+    CallFrame* called = this->currentFrame;
+    std::string caller = called->getCaller();
     FunctionVariable function = this->symbolTable->getFunctions().find(caller)->second;
 
     this->currentFunction = caller;
     this->callFrameCount--;
 
-    this->currentFrame = this->callFrames[this->callFrameCount];
+    this->currentFrame = this->callFrames[this->callFrameCount - 1];
     this->instructions = function.getChunk();
 
-    this->ip = current->getReturnIP();
-    this->sp = current->getStackOffset() - 1;
+    this->ip = called->getReturnIP();
+    this->sp = called->getStackOffset() - 1;
+
     push(returnValue);
 }
 
