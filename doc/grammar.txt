@@ -119,7 +119,7 @@ unary:
     | call
 
 call:
-    | primary "(" argument? ")"
+    | primary ("(" argument? ")")?
 
 argument:
     | expression ("," expression)*
