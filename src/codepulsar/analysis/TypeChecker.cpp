@@ -42,6 +42,9 @@ std::any Pulsar::TypeChecker::visitBinaryExpression(Binary* expression) {
     } else if (a != b) {
         newError("Binary Operations Are Of Different Types", expression->getLine());
         return PR_ERROR;
+    } else if (isOfType(a, { PR_VOID }) || isOfType(b, { PR_VOID })) {
+        newError("Void Types May Not Be Used For Binary Operations", expression->getLine());
+        return PR_ERROR;
     }
 
     if (isOperation(expression->getOperator(), { "==", "!=", "<", "<=", ">", ">=" })) {
@@ -68,7 +71,7 @@ std::any Pulsar::TypeChecker::visitCallExpression(Call* expression) {
 }
 
 std::any Pulsar::TypeChecker::visitGroupingExpression(Grouping* expression) {
-    return std::any_cast<PrimitiveType>(expression->accept(*this));
+    return std::any_cast<PrimitiveType>(expression->getExpression()->accept(*this));
 }
 
 std::any Pulsar::TypeChecker::visitLiteralExpression(Literal* expression) {
@@ -95,6 +98,9 @@ std::any Pulsar::TypeChecker::visitUnaryExpression(Unary* expression) {
         return PR_ERROR;
     } else if (isOperation(expression->getOperator(), { "-" }) && isOfType(a, { PR_BOOLEAN })) {
         newError("Unary Negation Has A Boolean Operand", expression->getLine());
+        return PR_ERROR;
+    } else if (isOfType(a, { PR_VOID })) {
+        newError("Void Types May Not Be Used For Unary Operations", expression->getLine());
         return PR_ERROR;
     }
 
