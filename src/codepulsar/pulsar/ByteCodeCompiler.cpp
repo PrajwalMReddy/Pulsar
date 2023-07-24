@@ -247,6 +247,7 @@ void Pulsar::ByteCodeCompiler::fixJump(ByteCode opcode, int offset) {
 Pulsar::ByteCode Pulsar::ByteCodeCompiler::identifyUnaryOperator(std::string oper) {
     if (oper == "-") { return OP_NEGATE; }
     else if (oper == "!") { return OP_NOT; }
+    else return OP_ERROR;
 }
 
 std::vector<Pulsar::ByteCode> Pulsar::ByteCodeCompiler::identifyBinaryOperator(std::string oper) {

@@ -1,0 +1,9 @@
+var global: int = 0;
+var global: int = 1; // Expect: Global Variable 'global' Already Exists
+var global: boolean = true; // Expect: Global Variable 'global' Already Exists
+
+fun main() -> int {
+    var local: int = 0;
+    var local: int = 1; // Expect: Local Variable 'local' Already Exists
+    var local: boolean = true; // Expect: Local Variable 'local' Already Exists
+}

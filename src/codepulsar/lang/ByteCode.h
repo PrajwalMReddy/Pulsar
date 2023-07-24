@@ -21,7 +21,7 @@ namespace Pulsar {
         OP_LOAD_FUNCTION, OP_CALL, OP_RETURN,
 
         // Special OpCodes
-        OP_PRINT, OP_POP, // TODO OP_PRINT Is A Temporary Opcode
+        OP_PRINT, OP_POP, OP_ERROR, // TODO OP_PRINT Is A Temporary Opcode
     };
 }
 
