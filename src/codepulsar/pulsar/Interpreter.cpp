@@ -42,6 +42,7 @@ void Pulsar::Interpreter::setUp() {
 void Pulsar::Interpreter::execute() {
     while (this->ip < this->instructions.size()) {
         Instruction instruction = this->instructions[this->ip];
+        debugStack(this->sp);
         interpretBC(instruction);
 
         this->ip++;
@@ -83,6 +84,7 @@ void Pulsar::Interpreter::interpretBC(Instruction instruction) {
         case OP_NEW_LOCAL: break;
         case OP_GET_LOCAL: {
             int slot = std::any_cast<int>(instruction.getOperand()) + this->currentFrame->getStackOffset();
+            std::cout << "Slot: " << slot << " | Offset: " << std::any_cast<int>(instruction.getOperand()) << std::endl;
             push(this->stack[slot]);
             break;
         }

@@ -82,7 +82,7 @@ Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
             }
 
             arity++;
-            this->symbolTable->newLocal(parameter.literal, type, true, false, this->scopeDepth + 1);
+            this->symbolTable->newLocal(parameter.literal, type, this->currentFunction, true, false, this->scopeDepth + 1);
             parameters->push_back(new Parameter(parameter.literal, type));
         } while (matchAdvance({ TK_COMMA }));
     }
@@ -162,14 +162,14 @@ Pulsar::Statement* Pulsar::Parser::variableDeclaration(TokenType accessType) {
 
     if (isInGlobalScope() && this->symbolTable->containsGlobalVariable(identifier.literal)) {
         newError("Global Variable " + identifier.literal + " Already Exists", line);
-    } else if (!isInGlobalScope() && this->symbolTable->containsLocalVariable(identifier.literal)) {
+    } else if (!isInGlobalScope() && this->symbolTable->containsLocalVariable(identifier.literal, this->currentFunction)) {
         newError("Local Variable " + identifier.literal + " Already Exists", line);
     }
 
     if (isInGlobalScope()) {
         this->symbolTable->addGlobalVariable(identifier.literal, nullptr, type, isInitialized, (accessType == TK_CONST));
     } else {
-        this->symbolTable->newLocal(identifier.literal, type, isInitialized, (accessType == TK_CONST), this->scopeDepth);
+        this->symbolTable->newLocal(identifier.literal, type, this->currentFunction, isInitialized, (accessType == TK_CONST), this->scopeDepth);
     }
 
     return new VariableDecl(identifier, expr, type, accessType, isInGlobalScope(), line);

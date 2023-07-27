@@ -9,10 +9,11 @@
 namespace Pulsar {
     class LocalVariable {
         public:
-            LocalVariable(std::string name, PrimitiveType type, bool isInitialized, bool isConstant, int depth);
+            LocalVariable(std::string name, PrimitiveType type, std::string function, bool isInitialized, bool isConstant, int depth);
 
             std::string getName();
             PrimitiveType getType();
+            std::string getFunction();
 
             bool isConstant();
             int getDepth();
@@ -22,6 +23,7 @@ namespace Pulsar {
         private:
             std::string name;
             PrimitiveType type;
+            std::string function;
 
             bool initialized;
             bool constant;
