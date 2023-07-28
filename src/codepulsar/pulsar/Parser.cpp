@@ -9,6 +9,7 @@ Pulsar::Parser::Parser(std::string sourceCode) {
     this->scopeDepth = 0;
 
     this->currentFunction = "";
+    this->currentFunctionLocals = std::vector<LocalVariable>();
 }
 
 Pulsar::Statement* Pulsar::Parser::parse() {
@@ -81,8 +82,10 @@ Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
                 type = checkType(advance());
             }
 
-            arity++;
             this->symbolTable->newLocal(parameter.literal, type, this->currentFunction, true, false, this->scopeDepth + 1);
+            this->currentFunctionLocals.emplace_back(parameter.literal, type, this->currentFunction, true, false, this->scopeDepth + 1);
+
+            arity++;
             parameters->push_back(new Parameter(parameter.literal, type));
         } while (matchAdvance({ TK_COMMA }));
     }
@@ -105,6 +108,8 @@ Pulsar::Statement* Pulsar::Parser::functionDeclaration() {
 
     auto* functionNode = new Function(this->currentFunction, type, parameters, statements, line);
     this->symbolTable->addFunction(this->currentFunction, *functionNode, arity, type);
+
+    this->currentFunctionLocals = std::vector<LocalVariable>();
     return functionNode;
 }
 
@@ -170,6 +175,7 @@ Pulsar::Statement* Pulsar::Parser::variableDeclaration(TokenType accessType) {
         this->symbolTable->addGlobalVariable(identifier.literal, nullptr, type, isInitialized, (accessType == TK_CONST));
     } else {
         this->symbolTable->newLocal(identifier.literal, type, this->currentFunction, isInitialized, (accessType == TK_CONST), this->scopeDepth);
+        this->currentFunctionLocals.emplace_back(identifier.literal, type, this->currentFunction, isInitialized, (accessType == TK_CONST), this->scopeDepth);
     }
 
     return new VariableDecl(identifier, expr, type, accessType, isInGlobalScope(), line);
@@ -454,8 +460,8 @@ bool Pulsar::Parser::isInGlobalScope() {
 }
 
 int Pulsar::Parser::resolveLocal(Token name) {
-    for (int i = this->symbolTable->getLocalCount() - 1; i >= 0; i--) {
-        LocalVariable local = this->symbolTable->localAt(i);
+    for (int i = this->currentFunctionLocals.size() - 1; i >= 0; i--) {
+        LocalVariable local = this->currentFunctionLocals.at(i);
 
         if (local.getName() == name.literal) {
             return i;

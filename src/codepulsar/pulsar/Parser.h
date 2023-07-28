@@ -48,7 +48,9 @@ namespace Pulsar {
             // Processing Data
             int current;
             int scopeDepth;
+
             std::string currentFunction;
+            std::vector<LocalVariable> currentFunctionLocals;
 
             // Output Data
             Statement* program{};
